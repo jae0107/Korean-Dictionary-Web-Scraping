@@ -117,7 +117,6 @@ const MyRequestTable = ({
           }
           label="취소"
           showInMenu={false}
-          sx={{ '&:hover': { background: 'none' } }}
         />
       ]
     });

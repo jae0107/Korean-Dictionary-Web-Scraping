@@ -14,7 +14,7 @@ const schema = z.object({
   role: z.string().nonempty(),
 });
 
-const ProfileContainer = ({
+const UserContainer = ({
   defaultValues,
   editMode,
 } : {
@@ -58,7 +58,7 @@ const ProfileContainer = ({
               value={field.value}
               label="역할"
               onChange={field.onChange}
-              disabled={!editMode || userRole === 'STUDENT'}
+              disabled={!editMode || userRole === 'STUDENT' || userRole === 'TEACHER'}
             >
               <MenuItem value={''}><em>-</em></MenuItem>
               <MenuItem value={'STUDENT'}>학생</MenuItem>
@@ -116,21 +116,24 @@ const ProfileContainer = ({
           )}
         />
       </FormControl>
-      <FormControl component='fieldset'>
-        <TextField
-          {...register('number')}
-          type='number'
-          label='번호'
-          disabled={!editMode}
-          slotProps={{
-            htmlInput: {
-              min: 0
-            }
-          }}
-        />
-      </FormControl>
+      {
+        userRole === 'STUDENT' || userRole === 'TEACHER' && 
+        <FormControl component='fieldset'>
+          <TextField
+            {...register('number')}
+            type='number'
+            label='번호'
+            disabled={!editMode}
+            slotProps={{
+              htmlInput: {
+                min: 0
+              }
+            }}
+          />
+        </FormControl>
+      }
     </Stack>
   )
 }
 
-export default ProfileContainer;
+export default UserContainer;

@@ -120,7 +120,13 @@ const NavigationBar = ({
               요청 관리
             </Button>
             <Button
-              sx={{ my: 2, color: 'white', display: 'block' }}
+              sx={{ 
+                my: 2, 
+                color: 'white', 
+                display: 'block',
+                borderRadius: '0px',
+                borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+              }}
               onClick={(e) => setAnchorElUserManagement(e.currentTarget)}
             >
               사용자 관리
@@ -141,7 +147,7 @@ const NavigationBar = ({
               open={Boolean(anchorElUserManagement)}
               onClose={() => setAnchorElUserManagement(null)}
             >
-              <MenuItem>
+              <MenuItem sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                 <Typography sx={{ 
                     textAlign: 'center', 
                     color: 'inherit', 
@@ -152,7 +158,7 @@ const NavigationBar = ({
                   학생
                 </Typography>
               </MenuItem>
-              <MenuItem>
+              <MenuItem sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                 <Typography sx={{ 
                     textAlign: 'center', 
                     color: 'inherit', 
@@ -163,7 +169,7 @@ const NavigationBar = ({
                   선생님
                 </Typography>
               </MenuItem>
-              <MenuItem>
+              <MenuItem sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                 <Typography sx={{ 
                     textAlign: 'center', 
                     color: 'inherit', 

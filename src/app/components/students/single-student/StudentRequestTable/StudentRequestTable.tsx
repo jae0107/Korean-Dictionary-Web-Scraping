@@ -1,40 +1,67 @@
-import { Box, Chip, Tooltip } from "@mui/material";
+import { StudentRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
+import usePaginationModel from "@/app/hooks/usePaginationModel";
+import { useSnackbar } from "@/app/hooks/useSnackbar";
+import { useQuery } from "@apollo/client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { SyntheticEvent, useState } from "react";
+import { getStudentRequestsQuery } from "./query";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
-import MuiPagination from '@mui/material/Pagination';
-import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
+import { Box, Stack, Tab, Tooltip } from "@mui/material";
 import { CheckCircleOutline, DeleteForever, HighlightOff } from "@mui/icons-material";
-import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
-import { Dispatch, SetStateAction, useState } from "react";
-import korDicLogo from "../../../../assets/images/korDicLogo.png";
-import naverLogo from "../../../../assets/images/naverLogo.png";
-import UserInfoPopUp from "./UserInfoPopUp/UserInfoPopUp";
+import korDicLogo from "../../../../../assets/images/korDicLogo.png";
+import naverLogo from "../../../../../assets/images/naverLogo.png";
+import { TabContext, TabList } from "@mui/lab";
+import CustomNoRowsOverlay from "@/app/components/shared/CustomNoRowsOverlay";
+import MuiPagination from '@mui/material/Pagination';
 
-const RequestManagementTable = ({
-  loading,
-  words,
-  pageCount,
-  page,
-  paginationModel,
-  setPaginationModel,
-  wordRequestStatus,
-} : {
-  loading: boolean;
-  words: WordRequestItemsFragment[];
-  pageCount: number;
-  page: number;
-  paginationModel: {
-    page: number;
-    pageSize: number;
+const a11yProps = (index: string) => {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
   };
-  setPaginationModel: Dispatch<SetStateAction<{
-    page: number;
-    pageSize: number;
-  }>>;
-  wordRequestStatus: WordStatus;
-}) => {
-  const [getRequestor, setRequestor] = useState<RequestorItemsFragment | null>(null);
-  const [openUserInfoPopUp, setOpenUserInfoPopUp] = useState<boolean>(false);
+};
 
+const StudentRequestTable = ({
+  id,
+} : {
+  id: string;
+}) => {
+  const router = useRouter();
+  const { paginationModel, setPaginationModel } = usePaginationModel();
+  const { dispatchCurrentSnackBar } = useSnackbar();
+  const searchParams = useSearchParams();
+
+  const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
+  
+  const { data, loading } =
+      useQuery(getStudentRequestsQuery, {
+        fetchPolicy: 'network-only',
+        variables: {
+          paginationOptions: {
+            limit: paginationModel.pageSize,
+            pageNum: paginationModel.page,
+          },
+          filterOptions: {
+            status: wordRequestStatus,
+            requestorId: id,
+          },
+        },
+        onError: (error) => {
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+      });
+
+  const handleTabChange = (event: SyntheticEvent, newValue: WordStatus) => {
+    setWordRequestStatus(newValue);
+    router.push(`?status=${newValue}`);
+  };
+      
   const columns: GridColDef[] = [
     { field: 'page', headerName: '페이지', width: 60, filterable: false, sortable: false },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
@@ -52,7 +79,7 @@ const RequestManagementTable = ({
           </>
         );
       },
-      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+      renderCell: (params: GridRenderCellParams<StudentRequestItemsFragment>) => {
         return (
           params.row.korDicResults && params.row.korDicResults.map((result, i) => {
             return `${i+1}. ${result}\n`;
@@ -74,7 +101,7 @@ const RequestManagementTable = ({
           </>
         );
       },
-      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+      renderCell: (params: GridRenderCellParams<StudentRequestItemsFragment>) => {
         return (
           params.row.naverDicResults && params.row.naverDicResults.map((result, i) => {
             return `${i+1}. ${result}\n`;
@@ -83,46 +110,6 @@ const RequestManagementTable = ({
       }
     },
     { field: 'example', headerName: '예문', flex: 1, filterable: false, sortable: false },
-    // { 
-    //   field: 'status', 
-    //   headerName: '상태', 
-    //   width: 105, 
-    //   filterable: false, 
-    //   sortable: false,
-    //   renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
-    //     const status = params.row.status === 'APPROVED' ? '승인' : params.row.status === 'PENDING' ? '승인 대기중' : '거절';
-    //     return (
-    //       <Button 
-    //         variant="outlined" 
-    //         color={params.row.status === 'APPROVED' ? 'success' : params.row.status === 'PENDING' ? 'primary' : 'error'} 
-    //         size="small"
-    //         sx={{ cursor: 'default' }}
-    //       >
-    //         {status}
-    //       </Button>
-    //     );
-    //   },
-    // },
-    { 
-      field: 'requestor', 
-      headerName: '요청자', 
-      width: 100, 
-      filterable: false, 
-      sortable: false,
-      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
-        return (
-          <Chip 
-            label={params.row.requestor.name} 
-            color="primary" 
-            variant="outlined" 
-            onClick={() => {
-              setRequestor(params.row.requestor);
-              setOpenUserInfoPopUp(true);
-            }} 
-          />
-      );
-      },
-    },
     {
       field: 'actions',
       type: 'actions',
@@ -202,9 +189,30 @@ const RequestManagementTable = ({
   } else {
     columns.filter((column) => column.field !== "deniedReason");
   }
-  
+
   return (
-    <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+    <Stack width={'90%'} spacing={2} mb={2}>
+      <TabContext value={wordRequestStatus}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={handleTabChange}>
+            <Tab
+              label="승인"
+              value={WordStatus.Approved}
+              {...a11yProps(WordStatus.Approved)}
+            />
+            <Tab
+              label="승인 대기중"
+              value={WordStatus.Pending}
+              {...a11yProps(WordStatus.Pending)}
+            />
+            <Tab
+              label="거절"
+              value={WordStatus.Denied}
+              {...a11yProps(WordStatus.Denied)}
+            />
+          </TabList>
+        </Box>
+      </TabContext>
       <DataGrid
         pagination
         disableColumnMenu
@@ -212,7 +220,7 @@ const RequestManagementTable = ({
         keepNonExistentRowsSelected
         loading={loading}
         columns={columns}
-        rows={words}
+        rows={data?.getWords.records || []}
         pageSizeOptions={[10, 20, 50, 100]}
         initialState={{
           pagination: {
@@ -240,8 +248,8 @@ const RequestManagementTable = ({
                   boundaryCount={2}
                   showFirstButton
                   showLastButton
-                  count={pageCount}
-                  page={page+1}
+                  count={data?.getWords.pageInfo.pageCount || 0}
+                  page={paginationModel.page+1}
                   onChange={(event, page) => 
                     setPaginationModel((value) => {
                       return {
@@ -256,14 +264,8 @@ const RequestManagementTable = ({
           ),
         }}
       />
-      <UserInfoPopUp
-        getRequestor={getRequestor}
-        setRequestor={setRequestor}
-        setOpenUserInfoPopUp={setOpenUserInfoPopUp}
-        openUserInfoPopUp={openUserInfoPopUp}
-      />
-    </Box>
+    </Stack>
   );
 }
 
-export default RequestManagementTable;
+export default StudentRequestTable;
