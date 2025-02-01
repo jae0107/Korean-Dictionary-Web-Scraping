@@ -18,7 +18,7 @@ export class UserSearch {
 
   async process(): Promise<OffsetPaginationResponse<User>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { status, role, userName } = this.filterOptions;
+    const { status, roles, userName } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('users');
 
@@ -29,8 +29,8 @@ export class UserSearch {
       query = query.andWhere('users.status', '=', status);
     }
 
-    if (isPresent(role)) {
-      query = query.andWhere('users.role', '=', role);
+    if (isPresent(roles)) {
+      query = query.andWhere('users.role', 'in', roles);
     }
 
     if (isPresent(userName)) {

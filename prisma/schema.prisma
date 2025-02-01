@@ -38,8 +38,8 @@ model Word {
   title     String
   korDicResults String[]
   naverDicResults String[]
-  requestor    User    @relation(fields: [requestorId], references: [id])
-  requestorId  String @db.Uuid
+  requestor    User?    @relation(fields: [requestorId], references: [id])
+  requestorId  String? @db.Uuid
   page        Int?
   example     String?
   status    String  @default("PENDING")

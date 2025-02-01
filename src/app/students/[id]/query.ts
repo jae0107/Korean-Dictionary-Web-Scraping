@@ -1,6 +1,6 @@
 import { gql } from "../../generated/gql";
 
-export const studentFragment = gql(`
+export const singleStudentFragment = gql(`
   fragment SingleStudentItems on User {
     email
     name

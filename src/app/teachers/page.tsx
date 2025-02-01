@@ -1,26 +1,26 @@
 'use client'
 
-import { useQuery } from "@apollo/client";
-import { getStudentsQuery } from "./query";
+import { useSearchParams } from "next/navigation";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
-import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { UserRole, UserStatus } from "../generated/gql/graphql";
+import { useQuery } from "@apollo/client";
+import { getTeachersQuery } from "./query";
 import { Box } from "@mui/material";
-import StudentFilter from "../components/students/StudentFilter/StudentFilter";
-import StudentTable from "../components/students/StudentTable/StudentTable";
+import TeacherFilter from "../components/teachers/TeacherFilter/TeacherFilter";
+import TeacherTable from "../components/teachers/TeacherTable/TeacherTable";
 
-const StudentManagement = () => {
+const TeacherManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
-  const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
+  const [teacherStatus, setTeacherStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   
   const { data, loading } =
-    useQuery(getStudentsQuery, {
+    useQuery(getTeachersQuery, {
       fetchPolicy: 'network-only',
       variables: {
         paginationOptions: {
@@ -28,8 +28,8 @@ const StudentManagement = () => {
           pageNum: paginationModel.page,
         },
         filterOptions: {
-          roles: [UserRole.Student],
-          status: studentStatus,
+          roles: [UserRole.Teacher],
+          status: teacherStatus,
           userName: userNameKeyword,
         },
       },
@@ -43,30 +43,30 @@ const StudentManagement = () => {
         });
       },
     });
-
+      
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
       <Box display={'flex'} justifyContent={'center'}>
-        <StudentFilter
+        <TeacherFilter
           userNameKeyword={userNameKeyword}
           setUserNameKeyword={setUserNameKeyword}
-          studentStatus={studentStatus}
-          setStudentStatus={setStudentStatus}
+          teacherStatus={teacherStatus}
+          setTeacherStatus={setTeacherStatus}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
-        <StudentTable
+        <TeacherTable
           loading={loading}
-          students={data?.getUsers.records || []}
+          teachers={data?.getUsers.records || []}
           pageCount={data?.getUsers.pageInfo.pageCount || 0}
           page={paginationModel.page}
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
-          studentStatus={studentStatus}
+          teacherStatus={teacherStatus}
         />
       </Box>
     </Box>
   );
 }
 
-export default StudentManagement;
+export default TeacherManagement;

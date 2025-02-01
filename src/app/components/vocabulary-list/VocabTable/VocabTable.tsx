@@ -131,6 +131,13 @@ const VocabTable = ({
             />
           ),
         }}
+        localeText={{
+          footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
+          footerTotalRows: '총 행 수:',
+          MuiTablePagination: {
+            labelRowsPerPage: '페이지 당 행 수:',
+          }
+        }}
       />
     </Box>
   );

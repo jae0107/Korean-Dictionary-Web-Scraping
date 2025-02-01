@@ -1,18 +1,20 @@
 import { StudentRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import usePaginationModel from "@/app/hooks/usePaginationModel";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SyntheticEvent, useState } from "react";
 import { getStudentRequestsQuery } from "./query";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
-import { Box, Stack, Tab, Tooltip } from "@mui/material";
+import { Box, CircularProgress, Stack, Tab, Tooltip } from "@mui/material";
 import { CheckCircleOutline, DeleteForever, HighlightOff } from "@mui/icons-material";
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { TabContext, TabList } from "@mui/lab";
 import CustomNoRowsOverlay from "@/app/components/shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
+import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation } from "@/app/components/request-management/RequestManagementTable/query";
+import ConfirmDialog from "@/app/components/shared/ConfirmDialog";
 
 const a11yProps = (index: string) => {
   return {
@@ -32,8 +34,17 @@ const StudentRequestTable = ({
   const searchParams = useSearchParams();
 
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
+  const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
+  const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
+  const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
+  const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
+  const [selectedWordId, setSelectedWordId] = useState<string>('');
   
-  const { data, loading } =
+  const [approveWordRequest] = useMutation(approveWordRequestMutation);
+  const [denyWordRequest] = useMutation(denyWordRequestMutation);
+  const [deleteWordRequest] = useMutation(deleteWordRequestMutation);
+  
+  const { data, loading, refetch } =
       useQuery(getStudentRequestsQuery, {
         fetchPolicy: 'network-only',
         variables: {
@@ -56,6 +67,66 @@ const StudentRequestTable = ({
           });
         },
       });
+
+  const onApproval = (id: string) => {
+    setApprovalLoader({[id]: true});
+    approveWordRequest({
+      variables: {
+        approveWordRequestId: id,
+      },
+      onError: (error) => {
+        setApprovalLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+      onCompleted: () => {
+        refetch();
+        setApprovalLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '성공적으로 승인되었습니다.',
+          },
+        });
+      },
+    });
+  }
+
+  const onDeny = (id: string) => {
+    setDenyLoader({[id]: true});
+    denyWordRequest({
+      variables: {
+        denyWordRequestId: id,
+      },
+      onError: (error) => {
+        setDenyLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+      onCompleted: () => {
+        refetch();
+        setDenyLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '성공적으로 거절되었습니다.',
+          },
+        });
+      },
+    });
+  }
 
   const handleTabChange = (event: SyntheticEvent, newValue: WordStatus) => {
     setWordRequestStatus(newValue);
@@ -120,12 +191,16 @@ const StudentRequestTable = ({
             <GridActionsCellItem
               key="deny"
               icon={
+                getDenyLoader[params.row.id] ?
+                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+                : 
                 <Tooltip title={'거절'}>
                   <HighlightOff color="error" />
                 </Tooltip>
               }
               label="거절"
               showInMenu={false}
+              onClick={() => {onDeny(params.row.id)}}
             />
           ];
         } else if (params.row.status === 'DENIED') {
@@ -133,22 +208,33 @@ const StudentRequestTable = ({
             <GridActionsCellItem
               key="approve"
               icon={
+                getApprovalLoader[params.row.id] ?
+                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+                : 
                 <Tooltip title={'승인'}>
                   <CheckCircleOutline color="success" />
                 </Tooltip>
               }
               label="승인"
               showInMenu={false}
+              onClick={() => {onApproval(params.row.id)}}
             />,
             <GridActionsCellItem
               key="delete"
               icon={
+                getDeleteLoader[params.row.id] ?
+                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+                : 
                 <Tooltip title={'삭제'}>
                   <DeleteForever color="error" />
                 </Tooltip>
               }
               label="삭제"
               showInMenu={false}
+              onClick={() => {
+                setSelectedWordId(params.row.id);
+                setOpenConfirmDialog(true);
+              }}
             />
           ];
         }
@@ -156,22 +242,30 @@ const StudentRequestTable = ({
           <GridActionsCellItem
             key="approve"
             icon={
+              getApprovalLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
               <Tooltip title={'승인'}>
                 <CheckCircleOutline color="success" />
               </Tooltip>
             }
             label="승인"
             showInMenu={false}
+            onClick={() => {onApproval(params.row.id)}}
           />,
           <GridActionsCellItem
             key="deny"
             icon={
+              getDenyLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
               <Tooltip title={'거절'}>
                 <HighlightOff color="error" />
               </Tooltip>
             }
             label="거절"
             showInMenu={false}
+            onClick={() => {onDeny(params.row.id)}}
           />
         ]
       }
@@ -188,6 +282,41 @@ const StudentRequestTable = ({
     });
   } else {
     columns.filter((column) => column.field !== "deniedReason");
+  }
+
+  const handleClose = (isConfirm: boolean) => {
+    setOpenConfirmDialog(false);
+    if (isConfirm) {
+      setDeleteLoader({[selectedWordId]: true});
+      deleteWordRequest({
+        variables: {
+          deleteWordRequestId: selectedWordId,
+        },
+        onError: (error) => {
+          setSelectedWordId('');
+          setDeleteLoader({[selectedWordId]: false});
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+        onCompleted: () => {
+          refetch();
+          setSelectedWordId('');
+          setDeleteLoader({[selectedWordId]: false});
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'success',
+              message: '성공적으로 삭제되었습니다.',
+            },
+          });
+        },
+      });
+    }
   }
 
   return (
@@ -263,6 +392,19 @@ const StudentRequestTable = ({
             />
           ),
         }}
+        localeText={{
+          footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
+          footerTotalRows: '총 행 수:',
+          MuiTablePagination: {
+            labelRowsPerPage: '페이지 당 행 수:',
+          }
+        }}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        handleClose={handleClose}
+        title={'주의'}
+        content={'정말 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.'}
       />
     </Stack>
   );

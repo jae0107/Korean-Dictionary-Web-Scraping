@@ -19,7 +19,7 @@ const MyRequests = () => {
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [wordKeyword, setWordKeyword] = useState<string>('');
 
-  const { data, loading } =
+  const { data, loading, refetch } =
       useQuery(getMyRequestsQuery, {
         fetchPolicy: 'network-only',
         variables: {
@@ -62,6 +62,7 @@ const MyRequests = () => {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           wordRequestStatus={wordRequestStatus}
+          refetch={refetch}
         />
       </Box>
     </Box>

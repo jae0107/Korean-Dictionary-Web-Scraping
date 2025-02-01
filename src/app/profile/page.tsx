@@ -40,8 +40,8 @@ const Profile = () => {
       <Stack spacing={4} width={'300px'} mt={2}>  
         <Box display={'flex'} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
           <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-            <AccountBox color='info' sx={{ mr: 1, width: '50px', height: '50px' }}/>
-            <Typography variant="h4">프로필</Typography>
+            <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/>
+            <Typography variant="h5">프로필</Typography>
           </Box>
           <Button 
             variant='outlined' 

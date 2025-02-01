@@ -28,7 +28,7 @@ export const userTypeDefs = gql`
 
   input UserFilterOptions {
     status: UserStatus!
-    role: UserRole!
+    roles: [UserRole!]!
     userName: String
   }
 

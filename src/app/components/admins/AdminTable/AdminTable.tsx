@@ -1,23 +1,23 @@
-import { StudentItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
+import { AdminItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Visibility } from "@mui/icons-material";
 import { Box, Tooltip } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridPagination } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction } from "react";
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
 import { useRouter } from "next/navigation";
 
-const StudentTable = ({
+const AdminTable = ({
   loading,
-  students,
+  admins,
   pageCount,
   page,
   paginationModel,
   setPaginationModel,
-  studentStatus,
+  adminStatus,
 }: {
   loading: boolean;
-  students: StudentItemsFragment[];
+  admins: AdminItemsFragment[];
   pageCount: number;
   page: number;
   paginationModel: {
@@ -28,20 +28,37 @@ const StudentTable = ({
     page: number;
     pageSize: number;
   }>>;
-  studentStatus: UserStatus;
+  adminStatus: UserStatus;
 }) => {
   const router = useRouter();
   
   const columns: GridColDef[] = [
     { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
     { field: 'email', headerName: '이메일', flex: 3, filterable: false, sortable: false },
-    { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
-    { field: 'class', headerName: '반', flex: 1, filterable: false, sortable: false },
-    { field: 'number', headerName: '번호', flex: 1, filterable: false, sortable: false },
+    { 
+      field: 'year', 
+      headerName: '학년', 
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<AdminItemsFragment>) => {
+        return params.row.year ? params.row.year : '-';
+      },
+    },
+    { 
+      field: 'class', 
+      headerName: '반', 
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<AdminItemsFragment>) => {
+        return params.row.class ? params.row.class : '-';
+      },
+    },
     {
       field: 'actions',
       type: 'actions',
-      width: studentStatus === UserStatus.Pending ? 120 : 80,
+      width: adminStatus === UserStatus.Pending ? 120 : 80,
       getActions: (params) => {
         if (params.row.status === 'APPROVED') {
           return [
@@ -54,7 +71,7 @@ const StudentTable = ({
               }
               label="프로필 보기"
               showInMenu={false}
-              onClick={() => router.push(`/students/${params.row.id}`)}
+              onClick={() => router.push(`/admins/${params.row.id}`)}
             />,
             <GridActionsCellItem
               key="deny"
@@ -101,7 +118,7 @@ const StudentTable = ({
             }
             label="프로필 보기"
             showInMenu={false}
-            onClick={() => router.push(`/students/${params.row.id}`)}
+            onClick={() => router.push(`/admins/${params.row.id}`)}
           />,
           <GridActionsCellItem
             key="approve"
@@ -137,7 +154,7 @@ const StudentTable = ({
         keepNonExistentRowsSelected
         loading={loading}
         columns={columns}
-        rows={students}
+        rows={admins}
         pageSizeOptions={[10, 20, 50, 100]}
         initialState={{
           pagination: {
@@ -180,16 +197,9 @@ const StudentTable = ({
             />
           ),
         }}
-        localeText={{
-          footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
-          footerTotalRows: '총 행 수:',
-          MuiTablePagination: {
-            labelRowsPerPage: '페이지 당 행 수:',
-          }
-        }}
       />
     </Box>
   );
 }
 
-export default StudentTable;
+export default AdminTable;

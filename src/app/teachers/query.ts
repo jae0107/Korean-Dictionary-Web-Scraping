@@ -1,22 +1,21 @@
 import { gql } from "../generated/gql";
 
-export const studentFragment = gql(`
-  fragment StudentItems on User {
+export const teacherFragment = gql(`
+  fragment TeacherItems on User {
     id
     name
     year
     class
-    number
     email
     status
   }
 `);
 
-export const getStudentsQuery = gql(`
-  query GetStudents($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {
+export const getTeachersQuery = gql(`
+  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {
     getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {
       records {
-        ...StudentItems
+        ...TeacherItems
       }
       pageInfo {
         totalRowCount

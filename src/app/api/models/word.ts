@@ -3,17 +3,18 @@ import { ID } from "../utils/shared-types";
 import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 import { User } from "./user";
+import { WordStatus } from "@/app/generated/gql/graphql";
 
 class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare id: CreationOptional<ID>;
   declare title: string;
-  declare korDicResults: string[];
-  declare naverDicResults: string[];
+  declare korDicResults?: string[];
+  declare naverDicResults?: string[];
   declare requestorId: ID;
   declare status: string;
-  declare page: number;
-  declare example: string;
-  declare deniedReason: string;
+  declare page?: number;
+  declare example?: string;
+  declare deniedReason?: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -58,9 +59,9 @@ Word.init(
     validate: {
       async validateRequiredFields() {
         if (!isPresent(this.title)) throw new Error('Title is required.');
-        if (!isPresent(this.email)) throw new Error('Email is required.');
         if (!isPresent(this.requestorId)) throw new Error('Requestor ID is required.');
         if (!isPresent(this.status)) throw new Error('Status is required.');
+        if (!isPresent(this.korDicResults) && !isPresent(this.naverDicResults)) throw new Error('At least one of korDicResults or naverDicResults is required.');
       },
     },
   },
@@ -68,7 +69,7 @@ Word.init(
 
 Word.addHook('beforeValidate', 'defaultValues', (word: Word) => {
   if (word.isNewRecord) {
-    word.status = word.status || 'PENDING';
+    word.status = word.status || WordStatus.Pending;
   }
 });
 

@@ -1,26 +1,26 @@
 'use client'
 
-import { useQuery } from "@apollo/client";
-import { getStudentsQuery } from "./query";
+import { useSearchParams } from "next/navigation";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
-import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { Box } from "@mui/material";
-import StudentFilter from "../components/students/StudentFilter/StudentFilter";
-import StudentTable from "../components/students/StudentTable/StudentTable";
+import { useQuery } from "@apollo/client";
+import { getAdminsQuery } from "./query";
+import AdminFilter from "../components/admins/AdminFilter/AdminFilter";
+import AdminTable from "../components/admins/AdminTable/AdminTable";
 
-const StudentManagement = () => {
+const AdminManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
-  const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
+  const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   
   const { data, loading } =
-    useQuery(getStudentsQuery, {
+    useQuery(getAdminsQuery, {
       fetchPolicy: 'network-only',
       variables: {
         paginationOptions: {
@@ -28,8 +28,8 @@ const StudentManagement = () => {
           pageNum: paginationModel.page,
         },
         filterOptions: {
-          roles: [UserRole.Student],
-          status: studentStatus,
+          roles: [UserRole.Admin, UserRole.Superadmin],
+          status: adminStatus,
           userName: userNameKeyword,
         },
       },
@@ -47,26 +47,26 @@ const StudentManagement = () => {
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
       <Box display={'flex'} justifyContent={'center'}>
-        <StudentFilter
+        <AdminFilter
           userNameKeyword={userNameKeyword}
           setUserNameKeyword={setUserNameKeyword}
-          studentStatus={studentStatus}
-          setStudentStatus={setStudentStatus}
+          adminStatus={adminStatus}
+          setAdminStatus={setAdminStatus}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
-        <StudentTable
+        <AdminTable
           loading={loading}
-          students={data?.getUsers.records || []}
+          admins={data?.getUsers.records || []}
           pageCount={data?.getUsers.pageInfo.pageCount || 0}
           page={paginationModel.page}
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
-          studentStatus={studentStatus}
+          adminStatus={adminStatus}
         />
       </Box>
     </Box>
   );
 }
 
-export default StudentManagement;
+export default AdminManagement;

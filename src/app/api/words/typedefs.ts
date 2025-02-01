@@ -28,6 +28,17 @@ export const wordTypeDefs = gql`
     createdAt: DateTime!
   }
 
+  input WordInput {
+    title: String
+    status: WordStatus
+    korDicResults: [String!]
+    naverDicResults: [String!]
+    page: Int
+    example: String
+    deniedReason: String
+    requestorId: ID
+  }
+
   type WordOffsetPaginationResponse {
     records: [Word!]!
     pageInfo: OffsetPaginationPageInfo!
@@ -42,5 +53,15 @@ export const wordTypeDefs = gql`
       paginationOptions: OffsetPaginationOptions!
       filterOptions: WordFilterOptions!
     ): WordOffsetPaginationResponse!
+  }
+
+  type Mutation {
+    createWordRequest(input: WordInput!): Word!
+    approveWordRequest(id: ID!): Boolean!
+    denyWordRequest(id: ID!): Boolean!
+    deleteWordRequest(id: ID!): Boolean!
+    bulkApproveWordRequests(ids: [ID!]!): Boolean!
+    bulkDenyWordRequests(ids: [ID!]!): Boolean!
+    bulkDeleteWordRequests(ids: [ID!]!): Boolean!
   }
 `;

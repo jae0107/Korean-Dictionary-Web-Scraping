@@ -22,7 +22,7 @@ const RequestManagement = () => {
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
   
-  const { data, loading } =
+  const { data, loading, refetch } =
     useQuery(getWordRequestsQuery, {
       fetchPolicy: 'network-only',
       variables: {
@@ -74,6 +74,7 @@ const RequestManagement = () => {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           wordRequestStatus={wordRequestStatus}
+          refetch={refetch}
         />
       </Box>
     </Box>

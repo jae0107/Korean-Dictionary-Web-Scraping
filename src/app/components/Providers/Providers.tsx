@@ -10,6 +10,7 @@ import { ApolloProvider } from "@apollo/client";
 import client from "@/app/lib/apolloClient";
 import type {} from '@mui/x-data-grid/themeAugmentation';
 import { CurrentUserProvider } from "./CurrentUserProvider";
+import { SnackbarProvider } from "@/app/hooks/useSnackbar";
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -109,12 +110,13 @@ const Providers = ({ children } : { children: ReactNode }) => {
           <ColorModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
               <CssBaseline enableColorScheme />
-              {/* <NavigationBar theme={theme} colorMode={colorMode}/> */}
               <Suspense fallback={null}>
-                <CurrentUserProvider>
-                  <NavigationBar theme={theme} colorMode={colorMode} />
-                  {children}
-                </CurrentUserProvider>
+                <SnackbarProvider>
+                  <CurrentUserProvider>
+                    <NavigationBar theme={theme} colorMode={colorMode} />
+                    {children}
+                  </CurrentUserProvider>
+                </SnackbarProvider>
               </Suspense>
             </ThemeProvider>
           </ColorModeContext.Provider>
