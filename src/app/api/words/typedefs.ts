@@ -19,6 +19,7 @@ export const wordTypeDefs = gql`
     id: ID!
     title: String!
     status: WordStatus!
+    previousStatus: WordStatus
     korDicResults: [String!]
     naverDicResults: [String!]
     page: Int
@@ -58,9 +59,11 @@ export const wordTypeDefs = gql`
   type Mutation {
     createWordRequest(input: WordInput!): Word!
     approveWordRequest(id: ID!): Boolean!
+    recoverWordRequest(id: ID!): Boolean!
     denyWordRequest(id: ID!): Boolean!
     deleteWordRequest(id: ID!): Boolean!
     bulkApproveWordRequests(ids: [ID!]!): Boolean!
+    bulkRecoverWordRequests(ids: [ID!]!): Boolean!
     bulkDenyWordRequests(ids: [ID!]!): Boolean!
     bulkDeleteWordRequests(ids: [ID!]!): Boolean!
   }

@@ -1,6 +1,7 @@
 import { RequestorItemsFragment } from "@/app/generated/gql/graphql";
 import { AccountBox } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableRow } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 
 const UserInfoPopUp = ({
@@ -14,6 +15,8 @@ const UserInfoPopUp = ({
   setOpenUserInfoPopUp: (value: boolean) => void;
   openUserInfoPopUp: boolean;
 }) => {
+  const router = useRouter();
+  
   const getRole = () => {
     if (getRequestor?.role === 'STUDENT') {
       return '학생';
@@ -25,7 +28,16 @@ const UserInfoPopUp = ({
     return '';
   }
 
-  const handleClose = () => {
+  const handleClose = (id?: string) => {
+    if (id) {
+      if (getRequestor?.role === 'STUDENT') {
+        router.push(`/students/${id}`);
+      } else if (getRequestor?.role === 'TEACHER') {
+        router.push(`/teachers/${id}`);
+      } else if (getRequestor?.role === 'ADMIN' || getRequestor?.role === 'SUPERADMIN') {
+        router.push(`/admins/${id}`);
+      }
+    }
     setOpenUserInfoPopUp(false);
     setRequestor(null);
   }
@@ -33,7 +45,7 @@ const UserInfoPopUp = ({
   return (
     <Dialog
       open={openUserInfoPopUp}
-      onClose={handleClose}
+      onClose={() => handleClose()}
       >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
         <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/> {`${getRole()} 프로필`}
@@ -65,7 +77,7 @@ const UserInfoPopUp = ({
         </Table>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" onClick={handleClose}>
+        <Button variant="contained" onClick={() => handleClose(getRequestor?.id)}>
           {`${getRole()} 페이지로 이동`}
         </Button>
       </DialogActions>

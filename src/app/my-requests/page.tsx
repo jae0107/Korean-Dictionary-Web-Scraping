@@ -18,6 +18,7 @@ const MyRequests = () => {
 
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [wordKeyword, setWordKeyword] = useState<string>('');
+  const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
 
   const { data, loading, refetch } =
       useQuery(getMyRequestsQuery, {
@@ -51,6 +52,7 @@ const MyRequests = () => {
           setWordRequestStatus={setWordRequestStatus}
           wordKeyword={wordKeyword}
           setWordKeyword={setWordKeyword}
+          setSelectedRequests={setSelectedRequests}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} height={'100%'}>
@@ -63,6 +65,8 @@ const MyRequests = () => {
           setPaginationModel={setPaginationModel}
           wordRequestStatus={wordRequestStatus}
           refetch={refetch}
+          selectedRequests={selectedRequests}
+          setSelectedRequests={setSelectedRequests}
         />
       </Box>
     </Box>

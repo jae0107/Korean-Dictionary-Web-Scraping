@@ -12,6 +12,7 @@ class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare naverDicResults?: string[];
   declare requestorId: ID;
   declare status: string;
+  declare previousStatus?: string;
   declare page?: number;
   declare example?: string;
   declare deniedReason?: string;
@@ -46,6 +47,7 @@ Word.init(
     naverDicResults: DataTypes.ARRAY(DataTypes.STRING),
     requestorId: DataTypes.UUID,
     status: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
+    previousStatus: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
     page: DataTypes.INTEGER,
     example: DataTypes.STRING,
     deniedReason: DataTypes.STRING,

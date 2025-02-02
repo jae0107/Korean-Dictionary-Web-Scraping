@@ -6,6 +6,7 @@ import { OffsetPaginationResponse } from "../utils/shared-types";
 import { Context } from "../graphql/route";
 import { WordSearch } from "./word-search";
 import { Op } from "sequelize";
+import { sequelize } from "../initialisers";
 
 export const wordResolvers = {
   Query: {
@@ -16,8 +17,10 @@ export const wordResolvers = {
     createWordRequest,
     approveWordRequest,
     denyWordRequest,
+    recoverWordRequest,
     deleteWordRequest,
     bulkApproveWordRequests,
+    bulkRecoverWordRequests,
     bulkDenyWordRequests,
     bulkDeleteWordRequests,
   },
@@ -107,7 +110,7 @@ async function approveWordRequest(
     const word = await Word.findByPk(id);
 
     if (word) {
-      await word.update({ status: WordStatus.Approved });
+      await word.update({ status: WordStatus.Approved, previousStatus: word.status });
     } else {
       throw new Error('No Word Found');
     }
@@ -125,15 +128,17 @@ async function bulkApproveWordRequests(
 ): Promise<boolean> {
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
-
-    await Word.update(
-      { status: WordStatus.Approved },
+    await sequelize.query(
+      `
+      UPDATE words
+      SET 
+        "previousStatus" = status,
+        status = 'APPROVED',
+        "updatedAt" = NOW()
+      WHERE id IN (:ids)
+      `,
       {
-        where: {
-          id: {
-            [Op.in]: ids,
-          },
-        },
+        replacements: { ids },
       }
     );
 
@@ -154,7 +159,7 @@ async function denyWordRequest(
     const word = await Word.findByPk(id);
 
     if (word) {
-      await word.update({ status: WordStatus.Denied });
+      await word.update({ status: WordStatus.Denied, previousStatus: word.status });
     } else {
       throw new Error('No Word Found');
     }
@@ -173,14 +178,67 @@ async function bulkDenyWordRequests(
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
 
-    await Word.update(
-      { status: WordStatus.Denied },
+    await sequelize.query(
+      `
+      UPDATE words
+      SET 
+        "previousStatus" = status,
+        status = 'DENIED',
+        "updatedAt" = NOW()
+      WHERE id IN (:ids)
+      `,
       {
-        where: {
-          id: {
-            [Op.in]: ids,
-          },
-        },
+        replacements: { ids },
+      }
+    );
+
+    return true;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function recoverWordRequest(
+  root: any,
+  { id }: { id: string },
+  { currentUser }: Context,
+): Promise<boolean> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    const word = await Word.findByPk(id);
+
+    if (word) {
+      await word.update({ status: word.previousStatus || WordStatus.Pending, previousStatus: word.status });
+    } else {
+      throw new Error('No Word Found');
+    }
+
+    return true;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function bulkRecoverWordRequests(
+  root: any,
+  { ids }: { ids: string[] },
+  { currentUser }: Context,
+): Promise<boolean> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    await sequelize.query(
+      `
+      UPDATE words
+      SET 
+        "previousStatus" = status,
+        status = "previousStatus",
+        "updatedAt" = NOW()
+      WHERE id IN (:ids)
+      `,
+      {
+        replacements: { ids },
       }
     );
 

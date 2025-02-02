@@ -2,16 +2,17 @@ import { Box, Chip, CircularProgress, Tooltip } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
-import { CheckCircleOutline, DeleteForever, HighlightOff } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Restore } from "@mui/icons-material";
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import UserInfoPopUp from "./UserInfoPopUp/UserInfoPopUp";
 import { useMutation } from "@apollo/client";
-import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation } from "./query";
+import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation, recoverWordRequestMutation } from "./query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import ConfirmDialog from "../../shared/ConfirmDialog";
+import RequestManagementBulkAction from "./RequestManagementBulkAction/RequestManagementBulkAction";
 
 const RequestManagementTable = ({
   loading,
@@ -22,6 +23,8 @@ const RequestManagementTable = ({
   setPaginationModel,
   wordRequestStatus,
   refetch,
+  selectedRequests,
+  setSelectedRequests,
 } : {
   loading: boolean;
   words: WordRequestItemsFragment[];
@@ -37,6 +40,8 @@ const RequestManagementTable = ({
   }>>;
   wordRequestStatus: WordStatus;
   refetch: () => void;
+  selectedRequests: string[];
+  setSelectedRequests: (value: string[]) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   
@@ -44,12 +49,14 @@ const RequestManagementTable = ({
   const [openUserInfoPopUp, setOpenUserInfoPopUp] = useState<boolean>(false);
   const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
+  const [getRecoverLoader, setRecoverLoader] = useState<{ [key: string]: boolean }>({});
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [selectedWordId, setSelectedWordId] = useState<string>('');
 
   const [approveWordRequest] = useMutation(approveWordRequestMutation);
   const [denyWordRequest] = useMutation(denyWordRequestMutation);
+  const [recoverWordRequest] = useMutation(recoverWordRequestMutation);
   const [deleteWordRequest] = useMutation(deleteWordRequestMutation);
 
   const onApproval = (id: string) => {
@@ -70,6 +77,7 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
+        setSelectedRequests([]);
         setApprovalLoader({[id]: false});
         dispatchCurrentSnackBar({
           payload: {
@@ -100,12 +108,44 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
+        setSelectedRequests([]);
         setDenyLoader({[id]: false});
         dispatchCurrentSnackBar({
           payload: {
             open: true,
             type: 'success',
             message: '성공적으로 거절되었습니다.',
+          },
+        });
+      },
+    });
+  }
+
+  const onRecover = (id: string) => {
+    setRecoverLoader({[id]: true});
+    recoverWordRequest({
+      variables: {
+        recoverWordRequestId: id,
+      },
+      onError: (error) => {
+        setRecoverLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+      onCompleted: () => {
+        refetch();
+        setSelectedRequests([]);
+        setRecoverLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '성공적으로 복구되었습니다.',
           },
         });
       },
@@ -183,7 +223,7 @@ const RequestManagementTable = ({
     {
       field: 'actions',
       type: 'actions',
-      width: wordRequestStatus === WordStatus.Approved ? 40 : 80,
+      width: wordRequestStatus !== WordStatus.Pending ? 40 : 80,
       getActions: (params) => {
         if (params.row.status === 'APPROVED') {
           return [
@@ -205,18 +245,16 @@ const RequestManagementTable = ({
         } else if (params.row.status === 'DENIED') {
           return [
             <GridActionsCellItem
-              key="approve"
+              key="recover"
               icon={
-                getApprovalLoader[params.row.id] ?
+                getRecoverLoader[params.row.id] ?
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
-                <Tooltip title={'승인'}>
-                  <CheckCircleOutline color="success" />
-                </Tooltip>
+                <Restore color='primary' />
               }
-              label="승인"
-              showInMenu={false}
-              onClick={() => {onApproval(params.row.id)}}
+              label="복구"
+              showInMenu={true}
+              onClick={() => {onRecover(params.row.id)}}
             />,
             <GridActionsCellItem
               key="delete"
@@ -224,12 +262,25 @@ const RequestManagementTable = ({
                 getDeleteLoader[params.row.id] ?
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
-                <Tooltip title={'삭제'}>
-                  <DeleteForever color="error" />
-                </Tooltip>
+                <DeleteForever color="error" />
               }
               label="삭제"
-              showInMenu={false}
+              showInMenu={true}
+              onClick={() => {
+                setSelectedWordId(params.row.id);
+                setOpenConfirmDialog(true);
+              }}
+            />,
+            <GridActionsCellItem
+              key="reason"
+              icon={
+                getDeleteLoader[params.row.id] ?
+                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+                : 
+                <Create color='action'/>
+              }
+              label="거절 사유"
+              showInMenu={true}
               onClick={() => {
                 setSelectedWordId(params.row.id);
                 setOpenConfirmDialog(true);
@@ -305,6 +356,7 @@ const RequestManagementTable = ({
         onCompleted: () => {
           refetch();
           setSelectedWordId('');
+          setSelectedRequests([]);
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
             payload: {
@@ -320,11 +372,21 @@ const RequestManagementTable = ({
   
   return (
     <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+      <RequestManagementBulkAction
+        ids={selectedRequests}
+        setSelectedRequests={setSelectedRequests}
+        status={wordRequestStatus}
+        refetch={refetch}
+      />
       <DataGrid
         pagination
         disableColumnMenu
         checkboxSelection
         keepNonExistentRowsSelected
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setSelectedRequests(newRowSelectionModel as string[]);
+        }}
+        rowSelectionModel={selectedRequests || []}
         loading={loading}
         columns={columns}
         rows={words}

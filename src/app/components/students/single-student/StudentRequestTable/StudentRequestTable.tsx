@@ -7,14 +7,15 @@ import { SyntheticEvent, useState } from "react";
 import { getStudentRequestsQuery } from "./query";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, CircularProgress, Stack, Tab, Tooltip } from "@mui/material";
-import { CheckCircleOutline, DeleteForever, HighlightOff } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Restore } from "@mui/icons-material";
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { TabContext, TabList } from "@mui/lab";
 import CustomNoRowsOverlay from "@/app/components/shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
-import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation } from "@/app/components/request-management/RequestManagementTable/query";
+import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation, recoverWordRequestMutation } from "@/app/components/request-management/RequestManagementTable/query";
 import ConfirmDialog from "@/app/components/shared/ConfirmDialog";
+import RequestManagementBulkAction from "@/app/components/request-management/RequestManagementTable/RequestManagementBulkAction/RequestManagementBulkAction";
 
 const a11yProps = (index: string) => {
   return {
@@ -36,12 +37,15 @@ const StudentRequestTable = ({
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
+  const [getRecoverLoader, setRecoverLoader] = useState<{ [key: string]: boolean }>({});
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [selectedWordId, setSelectedWordId] = useState<string>('');
+  const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   
   const [approveWordRequest] = useMutation(approveWordRequestMutation);
   const [denyWordRequest] = useMutation(denyWordRequestMutation);
+  const [recoverWordRequest] = useMutation(recoverWordRequestMutation);
   const [deleteWordRequest] = useMutation(deleteWordRequestMutation);
   
   const { data, loading, refetch } =
@@ -86,6 +90,7 @@ const StudentRequestTable = ({
       },
       onCompleted: () => {
         refetch();
+        setSelectedRequests([]);
         setApprovalLoader({[id]: false});
         dispatchCurrentSnackBar({
           payload: {
@@ -116,6 +121,7 @@ const StudentRequestTable = ({
       },
       onCompleted: () => {
         refetch();
+        setSelectedRequests([]);
         setDenyLoader({[id]: false});
         dispatchCurrentSnackBar({
           payload: {
@@ -128,8 +134,40 @@ const StudentRequestTable = ({
     });
   }
 
+  const onRecover = (id: string) => {
+    setRecoverLoader({[id]: true});
+    recoverWordRequest({
+      variables: {
+        recoverWordRequestId: id,
+      },
+      onError: (error) => {
+        setRecoverLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+      onCompleted: () => {
+        refetch();
+        setSelectedRequests([]);
+        setRecoverLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '성공적으로 복구되었습니다.',
+          },
+        });
+      },
+    });
+  }
+
   const handleTabChange = (event: SyntheticEvent, newValue: WordStatus) => {
     setWordRequestStatus(newValue);
+    setSelectedRequests([]);
     router.push(`?status=${newValue}`);
   };
       
@@ -184,7 +222,7 @@ const StudentRequestTable = ({
     {
       field: 'actions',
       type: 'actions',
-      width: wordRequestStatus === WordStatus.Approved ? 40 : 80,
+      width: wordRequestStatus !== WordStatus.Pending ? 40 : 80,
       getActions: (params) => {
         if (params.row.status === 'APPROVED') {
           return [
@@ -206,18 +244,16 @@ const StudentRequestTable = ({
         } else if (params.row.status === 'DENIED') {
           return [
             <GridActionsCellItem
-              key="approve"
+              key="recover"
               icon={
-                getApprovalLoader[params.row.id] ?
+                getRecoverLoader[params.row.id] ?
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
-                <Tooltip title={'승인'}>
-                  <CheckCircleOutline color="success" />
-                </Tooltip>
+                <Restore color='primary' />
               }
-              label="승인"
-              showInMenu={false}
-              onClick={() => {onApproval(params.row.id)}}
+              label="복구"
+              showInMenu={true}
+              onClick={() => {onRecover(params.row.id)}}
             />,
             <GridActionsCellItem
               key="delete"
@@ -225,12 +261,25 @@ const StudentRequestTable = ({
                 getDeleteLoader[params.row.id] ?
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
-                <Tooltip title={'삭제'}>
-                  <DeleteForever color="error" />
-                </Tooltip>
+                <DeleteForever color="error" />
               }
               label="삭제"
-              showInMenu={false}
+              showInMenu={true}
+              onClick={() => {
+                setSelectedWordId(params.row.id);
+                setOpenConfirmDialog(true);
+              }}
+            />,
+            <GridActionsCellItem
+              key="reason"
+              icon={
+                getDeleteLoader[params.row.id] ?
+                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+                : 
+                <Create color='action'/>
+              }
+              label="거절 사유"
+              showInMenu={true}
               onClick={() => {
                 setSelectedWordId(params.row.id);
                 setOpenConfirmDialog(true);
@@ -305,6 +354,7 @@ const StudentRequestTable = ({
         },
         onCompleted: () => {
           refetch();
+          setSelectedRequests([]);
           setSelectedWordId('');
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
@@ -318,7 +368,7 @@ const StudentRequestTable = ({
       });
     }
   }
-
+  
   return (
     <Stack width={'90%'} spacing={2} mb={2}>
       <TabContext value={wordRequestStatus}>
@@ -342,64 +392,76 @@ const StudentRequestTable = ({
           </TabList>
         </Box>
       </TabContext>
-      <DataGrid
-        pagination
-        disableColumnMenu
-        checkboxSelection
-        keepNonExistentRowsSelected
-        loading={loading}
-        columns={columns}
-        rows={data?.getWords.records || []}
-        pageSizeOptions={[10, 20, 50, 100]}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
+      <Box>
+        <RequestManagementBulkAction
+          ids={selectedRequests}
+          setSelectedRequests={setSelectedRequests}
+          status={wordRequestStatus}
+          refetch={refetch}
+        />
+        <DataGrid
+          pagination
+          disableColumnMenu
+          checkboxSelection
+          keepNonExistentRowsSelected
+          onRowSelectionModelChange={(newRowSelectionModel) => {
+            setSelectedRequests(newRowSelectionModel as string[]);
+          }}
+          rowSelectionModel={selectedRequests || []}
+          loading={loading}
+          columns={columns}
+          rows={data?.getWords.records || []}
+          pageSizeOptions={[10, 20, 50, 100]}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              },
             },
-          },
-        }}
-        paginationModel={paginationModel}
-        onPaginationModelChange={(values, details) => {
-          if (!details.reason) return;
-          setPaginationModel(values);
-        }}
-        getRowHeight={() => 'auto'}
-        slots={{
-          noRowsOverlay: CustomNoRowsOverlay,
-          pagination: () => (
-            <GridPagination
-              ActionsComponent={({ className }) => (
-                <MuiPagination
-                  className={className}
-                  color="primary"
-                  size="small"
-                  defaultPage={6}
-                  boundaryCount={2}
-                  showFirstButton
-                  showLastButton
-                  count={data?.getWords.pageInfo.pageCount || 0}
-                  page={paginationModel.page+1}
-                  onChange={(event, page) => 
-                    setPaginationModel((value) => {
-                      return {
-                        ...value,
-                        page: page - 1,
-                      };
-                    })
-                  }
-                />
-              )}
-            />
-          ),
-        }}
-        localeText={{
-          footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
-          footerTotalRows: '총 행 수:',
-          MuiTablePagination: {
-            labelRowsPerPage: '페이지 당 행 수:',
-          }
-        }}
-      />
+          }}
+          paginationModel={paginationModel}
+          onPaginationModelChange={(values, details) => {
+            if (!details.reason) return;
+            setPaginationModel(values);
+          }}
+          getRowHeight={() => 'auto'}
+          slots={{
+            noRowsOverlay: CustomNoRowsOverlay,
+            pagination: () => (
+              <GridPagination
+                ActionsComponent={({ className }) => (
+                  <MuiPagination
+                    className={className}
+                    color="primary"
+                    size="small"
+                    defaultPage={6}
+                    boundaryCount={2}
+                    showFirstButton
+                    showLastButton
+                    count={data?.getWords.pageInfo.pageCount || 0}
+                    page={paginationModel.page+1}
+                    onChange={(event, page) => 
+                      setPaginationModel((value) => {
+                        return {
+                          ...value,
+                          page: page - 1,
+                        };
+                      })
+                    }
+                  />
+                )}
+              />
+            ),
+          }}
+          localeText={{
+            footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
+            footerTotalRows: '총 행 수:',
+            MuiTablePagination: {
+              labelRowsPerPage: '페이지 당 행 수:',
+            }
+          }}
+        />
+      </Box>
       <ConfirmDialog
         open={openConfirmDialog}
         handleClose={handleClose}

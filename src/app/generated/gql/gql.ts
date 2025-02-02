@@ -22,8 +22,13 @@ const documents = {
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  fragment RequestorDropDownItems on User {\n    id\n    name\n  }\n": types.RequestorDropDownItemsFragmentDoc,
     "\n  query GetRequestorsDropDown($paginationOptions: OffsetPaginationOptions!, $filterOptions: RequestorFilterOptions!) {\n    getRequestors(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...RequestorDropDownItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetRequestorsDropDownDocument,
+    "\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n": types.BulkApproveWordRequestsDocument,
+    "\n  mutation BulkDenyWordRequests($ids: [ID!]!) {\n    bulkDenyWordRequests(ids: $ids)\n  }\n": types.BulkDenyWordRequestsDocument,
+    "\n  mutation BulkRecoverWordRequests($ids: [ID!]!) {\n    bulkRecoverWordRequests(ids: $ids)\n  }\n": types.BulkRecoverWordRequestsDocument,
+    "\n  mutation BulkDeleteWordRequests($ids: [ID!]!) {\n    bulkDeleteWordRequests(ids: $ids)\n  }\n": types.BulkDeleteWordRequestsDocument,
     "\n  mutation ApproveWordRequest($approveWordRequestId: ID!) {\n    approveWordRequest(id: $approveWordRequestId)\n  }\n": types.ApproveWordRequestDocument,
     "\n  mutation DenyWordRequest($denyWordRequestId: ID!) {\n    denyWordRequest(id: $denyWordRequestId)\n  }\n": types.DenyWordRequestDocument,
+    "\n  mutation RecoverWordRequest($recoverWordRequestId: ID!) {\n    recoverWordRequest(id: $recoverWordRequestId)\n  }\n": types.RecoverWordRequestDocument,
     "\n  mutation DeleteWordRequest($deleteWordRequestId: ID!) {\n    deleteWordRequest(id: $deleteWordRequestId)\n  }\n": types.DeleteWordRequestDocument,
     "\n  fragment StudentRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    page\n    example\n    deniedReason\n  }\n": types.StudentRequestItemsFragmentDoc,
     "\n  query GetStudentRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...StudentRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetStudentRequestsDocument,
@@ -95,11 +100,31 @@ export function gql(source: "\n  query GetRequestorsDropDown($paginationOptions:
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkDenyWordRequests($ids: [ID!]!) {\n    bulkDenyWordRequests(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkDenyWordRequests($ids: [ID!]!) {\n    bulkDenyWordRequests(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkRecoverWordRequests($ids: [ID!]!) {\n    bulkRecoverWordRequests(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkRecoverWordRequests($ids: [ID!]!) {\n    bulkRecoverWordRequests(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkDeleteWordRequests($ids: [ID!]!) {\n    bulkDeleteWordRequests(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkDeleteWordRequests($ids: [ID!]!) {\n    bulkDeleteWordRequests(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  mutation ApproveWordRequest($approveWordRequestId: ID!) {\n    approveWordRequest(id: $approveWordRequestId)\n  }\n"): (typeof documents)["\n  mutation ApproveWordRequest($approveWordRequestId: ID!) {\n    approveWordRequest(id: $approveWordRequestId)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation DenyWordRequest($denyWordRequestId: ID!) {\n    denyWordRequest(id: $denyWordRequestId)\n  }\n"): (typeof documents)["\n  mutation DenyWordRequest($denyWordRequestId: ID!) {\n    denyWordRequest(id: $denyWordRequestId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RecoverWordRequest($recoverWordRequestId: ID!) {\n    recoverWordRequest(id: $recoverWordRequestId)\n  }\n"): (typeof documents)["\n  mutation RecoverWordRequest($recoverWordRequestId: ID!) {\n    recoverWordRequest(id: $recoverWordRequestId)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

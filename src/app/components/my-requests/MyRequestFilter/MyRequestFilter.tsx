@@ -16,16 +16,19 @@ const MyRequestFilter = ({
   setWordRequestStatus,
   wordKeyword,
   setWordKeyword,
+  setSelectedRequests,
 } : {
   wordRequestStatus: WordStatus;
   setWordRequestStatus: Dispatch<SetStateAction<WordStatus>>;
   wordKeyword: string;
   setWordKeyword: (value: string) => void;
+  setSelectedRequests: (value: string[]) => void;
 }) => {
   const router = useRouter();
   
   const handleTabChange = (event: SyntheticEvent, newValue: WordStatus) => {
     setWordRequestStatus(newValue);
+    setSelectedRequests([]);
     router.push(`?status=${newValue}`);
   };
   

@@ -12,6 +12,12 @@ export const denyWordRequestMutation = gql(`
   }
 `);
 
+export const recoverWordRequestMutation = gql(`
+  mutation RecoverWordRequest($recoverWordRequestId: ID!) {
+    recoverWordRequest(id: $recoverWordRequestId)
+  }
+`);
+
 export const deleteWordRequestMutation = gql(`
   mutation DeleteWordRequest($deleteWordRequestId: ID!) {
     deleteWordRequest(id: $deleteWordRequestId)

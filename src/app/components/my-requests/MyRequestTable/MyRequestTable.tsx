@@ -11,6 +11,7 @@ import ConfirmDialog from "../../shared/ConfirmDialog";
 import { useMutation } from "@apollo/client";
 import { deleteWordRequestMutation } from "../../request-management/RequestManagementTable/query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
+import MyRequestBulkAction from "./MyRequestBulkAction/MyRequestBulkAction";
 
 const MyRequestTable = ({
   loading,
@@ -21,6 +22,8 @@ const MyRequestTable = ({
   setPaginationModel,
   wordRequestStatus,
   refetch,
+  selectedRequests,
+  setSelectedRequests,
 }: {
   loading: boolean;
   words: MyRequestItemsFragment[];
@@ -36,6 +39,8 @@ const MyRequestTable = ({
   }>>;
   wordRequestStatus: WordStatus;
   refetch: () => void;
+  selectedRequests: string[];
+  setSelectedRequests: (value: string[]) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   
@@ -103,7 +108,7 @@ const MyRequestTable = ({
       width: 40,
       getActions: (params) => [
         <GridActionsCellItem
-          key="approve"
+          key="cancel"
           icon={
             getDeleteLoader[params.row.id] ?
             <CircularProgress style={{ width: '20px', height: '20px' }}/>  
@@ -155,13 +160,14 @@ const MyRequestTable = ({
         },
         onCompleted: () => {
           refetch();
+          setSelectedRequests([]);
           setSelectedWordId('');
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
             payload: {
               open: true,
               type: 'success',
-              message: '성공적으로 삭제되었습니다.',
+              message: '성공적으로 취소되었습니다.',
             },
           });
         },
@@ -171,9 +177,21 @@ const MyRequestTable = ({
 
   return (
     <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+      <MyRequestBulkAction
+        ids={selectedRequests}
+        setSelectedRequests={setSelectedRequests}
+        status={wordRequestStatus}
+        refetch={refetch}
+      />
       <DataGrid
         pagination
         disableColumnMenu
+        checkboxSelection={wordRequestStatus === WordStatus.Pending}
+        keepNonExistentRowsSelected={wordRequestStatus === WordStatus.Pending}
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setSelectedRequests(newRowSelectionModel as string[]);
+        }}
+        rowSelectionModel={selectedRequests || []}
         loading={loading}
         columns={columns}
         rows={words}

@@ -23,6 +23,7 @@ const RequestManagementFilter = ({
   setYear,
   getClass,
   setClass,
+  setSelectedRequests,
 } : {
   wordRequestStatus: WordStatus;
   setWordRequestStatus: Dispatch<SetStateAction<WordStatus>>;
@@ -34,11 +35,13 @@ const RequestManagementFilter = ({
   setYear: (value: string) => void;
   getClass: string;
   setClass: (value: string) => void;
+  setSelectedRequests: (value: string[]) => void;
 }) => {
   const router = useRouter();
 
   const handleTabChange = (event: SyntheticEvent, newValue: WordStatus) => {
     setWordRequestStatus(newValue);
+    setSelectedRequests([]);
     router.push(`?status=${newValue}`);
   };
 

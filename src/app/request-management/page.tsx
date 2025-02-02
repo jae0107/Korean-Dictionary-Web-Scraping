@@ -21,6 +21,7 @@ const RequestManagement = () => {
   const [getRequestorId, setRequestorId] = useState<string>('');
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
+  const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   
   const { data, loading, refetch } =
     useQuery(getWordRequestsQuery, {
@@ -48,7 +49,7 @@ const RequestManagement = () => {
         });
       },
     });
-
+    
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
       <Box display={'flex'} justifyContent={'center'}>
@@ -63,6 +64,7 @@ const RequestManagement = () => {
           setYear={setYear}
           getClass={getClass}
           setClass={setClass}
+          setSelectedRequests={setSelectedRequests}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
@@ -75,6 +77,8 @@ const RequestManagement = () => {
           setPaginationModel={setPaginationModel}
           wordRequestStatus={wordRequestStatus}
           refetch={refetch}
+          selectedRequests={selectedRequests}
+          setSelectedRequests={setSelectedRequests}
         />
       </Box>
     </Box>
