@@ -1,8 +1,8 @@
-import { Box, Chip, CircularProgress, Tooltip } from "@mui/material";
+import { Box, Chip, CircularProgress, Tooltip, Typography } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
-import { CheckCircleOutline, Create, DeleteForever, HighlightOff, MoreVert, Restore } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, HighlightOff, MoreVert, Remove, Restore } from "@mui/icons-material";
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
@@ -159,7 +159,18 @@ const RequestManagementTable = ({
   }
 
   const columns: GridColDef[] = [
-    { field: 'page', headerName: '페이지', width: 60, filterable: false, sortable: false },
+    { 
+      field: 'page', 
+      headerName: '페이지', 
+      width: 60, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+        return (
+          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
     { 
       field: 'korDicResults', 
@@ -177,9 +188,9 @@ const RequestManagementTable = ({
       },
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         return (
-          params.row.korDicResults && params.row.korDicResults.map((result, i) => {
+          params.row.korDicResults && params.row.korDicResults.length > 0 ? params.row.korDicResults.map((result, i) => {
             return params.row.korDicResults && params.row.korDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
-          })
+          }) : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },
@@ -199,13 +210,24 @@ const RequestManagementTable = ({
       },
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         return (
-          params.row.naverDicResults && params.row.naverDicResults.map((result, i) => {
+          params.row.naverDicResults && params.row.naverDicResults.length > 0 ? params.row.naverDicResults.map((result, i) => {
             return params.row.naverDicResults && params.row.naverDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
-          })
+          }) : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },
-    { field: 'example', headerName: '예문', flex: 1, filterable: false, sortable: false },
+    { 
+      field: 'example',
+      headerName: '예문', 
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+        return (
+          params.row.example ? params.row.example : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
     { 
       field: 'requestor', 
       headerName: '요청자', 
@@ -214,16 +236,22 @@ const RequestManagementTable = ({
       sortable: false,
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         return (
-          <Chip 
-            label={params.row.requestor.name} 
-            color="primary" 
-            variant="outlined" 
-            onClick={() => {
-              setRequestor(params.row.requestor);
-              setOpenUserInfoPopUp(true);
-            }} 
-          />
-      );
+          params.row.requestor ?
+          <Box display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
+            <Chip 
+              label={params.row.requestor.name} 
+              color="primary" 
+              variant="outlined" 
+              onClick={() => {
+                setRequestor(params.row.requestor);
+                setOpenUserInfoPopUp(true);
+              }} 
+            /> 
+          </Box> : 
+          <Box display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
+            <Remove/>
+          </Box>
+        );
       },
     },
     {

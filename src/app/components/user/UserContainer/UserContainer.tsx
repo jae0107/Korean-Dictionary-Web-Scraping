@@ -4,7 +4,7 @@ import { useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, SyntheticEvent, useState } from "react";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
-import { Box, CircularProgress, Stack, Tab, Tooltip } from "@mui/material";
+import { Box, CircularProgress, Stack, Tab, Tooltip, Typography } from "@mui/material";
 import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Restore } from "@mui/icons-material";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
@@ -172,7 +172,18 @@ const UserContainer = ({
   };
       
   const columns: GridColDef[] = [
-    { field: 'page', headerName: '페이지', width: 60, filterable: false, sortable: false },
+    { 
+      field: 'page', 
+      headerName: '페이지', 
+      width: 60, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
+        return (
+          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
     { 
       field: 'korDicResults', 
@@ -190,9 +201,9 @@ const UserContainer = ({
       },
       renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
         return (
-          params.row.korDicResults && params.row.korDicResults.map((result, i) => {
+          params.row.korDicResults && params.row.korDicResults.length > 0 ? params.row.korDicResults.map((result, i) => {
             return params.row.korDicResults && params.row.korDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
-          })
+          }) : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },
@@ -212,13 +223,24 @@ const UserContainer = ({
       },
       renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
         return (
-          params.row.naverDicResults && params.row.naverDicResults.map((result, i) => {
+          params.row.naverDicResults && params.row.naverDicResults.length > 0 ? params.row.naverDicResults.map((result, i) => {
             return params.row.naverDicResults && params.row.naverDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
-          })
+          }) : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },
-    { field: 'example', headerName: '예문', flex: 1, filterable: false, sortable: false },
+    { 
+      field: 'example',
+      headerName: '예문', 
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
+        return (
+          params.row.example ? params.row.example : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
     {
       field: 'actions',
       type: 'actions',

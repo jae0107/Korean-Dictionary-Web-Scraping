@@ -1,6 +1,6 @@
 import { AdminItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Visibility } from "@mui/icons-material";
-import { Box, Tooltip } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction } from "react";
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
@@ -42,7 +42,7 @@ const AdminTable = ({
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<AdminItemsFragment>) => {
-        return params.row.year ? params.row.year : '-';
+        return params.row.year ? params.row.year : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
       },
     },
     { 
@@ -52,7 +52,7 @@ const AdminTable = ({
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<AdminItemsFragment>) => {
-        return params.row.class ? params.row.class : '-';
+        return params.row.class ? params.row.class : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
       },
     },
     {

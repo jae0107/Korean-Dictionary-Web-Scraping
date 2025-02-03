@@ -1,6 +1,6 @@
 import { MyRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Cancel } from "@mui/icons-material";
-import { Box, Button, CircularProgress, Tooltip } from "@mui/material";
+import { Box, Button, CircularProgress, Tooltip, Typography } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
@@ -51,7 +51,18 @@ const MyRequestTable = ({
   const [deleteWordRequest] = useMutation(deleteWordRequestMutation);
   
   const columns: GridColDef[] = [
-    { field: 'page', headerName: '페이지', width: 60, filterable: false, sortable: false },
+    { 
+      field: 'page', 
+      headerName: '페이지', 
+      width: 60, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<MyRequestItemsFragment>) => {
+        return (
+          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
     { 
       field: 'korDicResults', 
@@ -69,9 +80,9 @@ const MyRequestTable = ({
       },
       renderCell: (params: GridRenderCellParams<MyRequestItemsFragment>) => {
         return (
-          params.row.korDicResults && params.row.korDicResults.map((result, i) => {
-            return `${i+1}. ${result}\n`;
-          })
+          params.row.korDicResults && params.row.korDicResults.length > 0 ? params.row.korDicResults.map((result, i) => {
+            return params.row.korDicResults && params.row.korDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
+          }) : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },
@@ -91,13 +102,24 @@ const MyRequestTable = ({
       },
       renderCell: (params: GridRenderCellParams<MyRequestItemsFragment>) => {
         return (
-          params.row.naverDicResults && params.row.naverDicResults.map((result, i) => {
-            return `${i+1}. ${result}\n`;
-          })
+          params.row.naverDicResults && params.row.naverDicResults.length > 0 ? params.row.naverDicResults.map((result, i) => {
+            return params.row.naverDicResults && params.row.naverDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
+          }) : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },
-    { field: 'example', headerName: '예문', flex: 1, filterable: false, sortable: false },
+    { 
+      field: 'example',
+      headerName: '예문', 
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<MyRequestItemsFragment>) => {
+        return (
+          params.row.example ? params.row.example : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
   ];
 
   if (wordRequestStatus === 'PENDING') {
@@ -176,12 +198,15 @@ const MyRequestTable = ({
 
   return (
     <Box display={'flex'} flexDirection={'column'} width={'90%'}>
-      <MyRequestBulkAction
-        ids={selectedRequests}
-        setSelectedRequests={setSelectedRequests}
-        status={wordRequestStatus}
-        refetch={refetch}
-      />
+      {
+        wordRequestStatus === WordStatus.Pending && 
+        <MyRequestBulkAction
+          ids={selectedRequests}
+          setSelectedRequests={setSelectedRequests}
+          status={wordRequestStatus}
+          refetch={refetch}
+        />
+      }
       <DataGrid
         pagination
         disableColumnMenu
