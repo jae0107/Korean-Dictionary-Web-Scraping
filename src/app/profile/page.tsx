@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
-import UserContainer from '../components/user/UserContainer/UserContainer';
+import UserForm from '../components/user/UserForm/UserForm';
 import { useQuery } from '@apollo/client';
 import { getMyProfileQuery } from './query';
 import { useSnackbar } from '../hooks/useSnackbar';
@@ -61,7 +61,7 @@ const Profile = () => {
             <Skeleton variant="rounded" height={56} />
           </Stack>
         }
-        {data && <UserContainer defaultValues={defaultValues} editMode={editMode}/>}
+        {data && <UserForm defaultValues={defaultValues} editMode={editMode}/>}
       </Stack>
     </Box>
   );

@@ -1,18 +1,19 @@
 import { Box, Chip, CircularProgress, Tooltip } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
-import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Restore } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, HighlightOff, MoreVert, Restore } from "@mui/icons-material";
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import UserInfoPopUp from "./UserInfoPopUp/UserInfoPopUp";
 import { useMutation } from "@apollo/client";
-import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation, recoverWordRequestMutation } from "./query";
+import { approveWordRequestMutation, deleteWordRequestMutation, denyWordRequestMutation, recoverWordRequestMutation, updateDeniedReasonMutation } from "./query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import ConfirmDialog from "../../shared/ConfirmDialog";
 import RequestManagementBulkAction from "./RequestManagementBulkAction/RequestManagementBulkAction";
+import DeniedReasonPopUp from "../../shared/DeniedReasonPopUp";
 
 const RequestManagementTable = ({
   loading,
@@ -51,13 +52,17 @@ const RequestManagementTable = ({
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
   const [getRecoverLoader, setRecoverLoader] = useState<{ [key: string]: boolean }>({});
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
+  const [getDeniedReasonLoader, setDeniedReasonLoader] = useState<{ [key: string]: boolean }>({});
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
+  const [openDeniedReasonPopUp, setOpenDeniedReasonPopUp] = useState<boolean>(false);
   const [selectedWordId, setSelectedWordId] = useState<string>('');
+  const [selectedDeniedReason, setSelectedDeniedReason] = useState<string>('');
 
   const [approveWordRequest] = useMutation(approveWordRequestMutation);
   const [denyWordRequest] = useMutation(denyWordRequestMutation);
   const [recoverWordRequest] = useMutation(recoverWordRequestMutation);
   const [deleteWordRequest] = useMutation(deleteWordRequestMutation);
+  const [updateDeniedReason] = useMutation(updateDeniedReasonMutation);
 
   const onApproval = (id: string) => {
     setApprovalLoader({[id]: true});
@@ -90,11 +95,12 @@ const RequestManagementTable = ({
     });
   }
 
-  const onDeny = (id: string) => {
+  const onDeny = (id: string, deniedReason: string) => {
     setDenyLoader({[id]: true});
     denyWordRequest({
       variables: {
         denyWordRequestId: id,
+        deniedReason: deniedReason,
       },
       onError: (error) => {
         setDenyLoader({[id]: false});
@@ -172,7 +178,7 @@ const RequestManagementTable = ({
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         return (
           params.row.korDicResults && params.row.korDicResults.map((result, i) => {
-            return `${i+1}. ${result}\n`;
+            return params.row.korDicResults && params.row.korDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
           })
         );
       }
@@ -194,7 +200,7 @@ const RequestManagementTable = ({
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         return (
           params.row.naverDicResults && params.row.naverDicResults.map((result, i) => {
-            return `${i+1}. ${result}\n`;
+            return params.row.naverDicResults && params.row.naverDicResults.length > 1 ? `${i+1}. ${result}\n` : result;
           })
         );
       }
@@ -224,7 +230,7 @@ const RequestManagementTable = ({
       field: 'actions',
       type: 'actions',
       width: wordRequestStatus !== WordStatus.Pending ? 40 : 80,
-      getActions: (params) => {
+      getActions: (params: GridRowParams<WordRequestItemsFragment>) => {
         if (params.row.status === 'APPROVED') {
           return [
             <GridActionsCellItem
@@ -239,10 +245,24 @@ const RequestManagementTable = ({
               }
               label="거절"
               showInMenu={false}
-              onClick={() => {onDeny(params.row.id)}}
+              onClick={() => {
+                setSelectedWordId(params.row.id);
+                setOpenDeniedReasonPopUp(true);
+              }}
             />
           ];
         } else if (params.row.status === 'DENIED') {
+          if (getRecoverLoader[params.row.id] || getDeleteLoader[params.row.id] || getDeniedReasonLoader[params.row.id]) {
+            return [
+              <GridActionsCellItem
+                key="more"
+                icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+                label="더보기"
+                showInMenu={false}
+                onClick={() => {onRecover(params.row.id)}}
+              />
+            ];
+          }
           return [
             <GridActionsCellItem
               key="recover"
@@ -274,7 +294,7 @@ const RequestManagementTable = ({
             <GridActionsCellItem
               key="reason"
               icon={
-                getDeleteLoader[params.row.id] ?
+                getDeniedReasonLoader[params.row.id] ?
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
                 <Create color='action'/>
@@ -283,7 +303,8 @@ const RequestManagementTable = ({
               showInMenu={true}
               onClick={() => {
                 setSelectedWordId(params.row.id);
-                setOpenConfirmDialog(true);
+                setSelectedDeniedReason(params.row.deniedReason || '');
+                setOpenDeniedReasonPopUp(true);
               }}
             />
           ];
@@ -315,7 +336,10 @@ const RequestManagementTable = ({
             }
             label="거절"
             showInMenu={false}
-            onClick={() => {onDeny(params.row.id)}}
+            onClick={() => {
+              setSelectedWordId(params.row.id);
+              setOpenDeniedReasonPopUp(true);
+            }}
           />
         ]
       }
@@ -334,7 +358,7 @@ const RequestManagementTable = ({
     columns.filter((column) => column.field !== "deniedReason");
   }
 
-  const handleClose = (isConfirm: boolean) => {
+  const handleCloseConfirmDialog = (isConfirm: boolean) => {
     setOpenConfirmDialog(false);
     if (isConfirm) {
       setDeleteLoader({[selectedWordId]: true});
@@ -343,7 +367,6 @@ const RequestManagementTable = ({
           deleteWordRequestId: selectedWordId,
         },
         onError: (error) => {
-          setSelectedWordId('');
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
             payload: {
@@ -355,7 +378,6 @@ const RequestManagementTable = ({
         },
         onCompleted: () => {
           refetch();
-          setSelectedWordId('');
           setSelectedRequests([]);
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
@@ -368,6 +390,49 @@ const RequestManagementTable = ({
         },
       });
     }
+    setSelectedWordId('');
+  }
+
+  const handleCloseDeniedReasonPopUp = (isConfirm: boolean, deniedReason: string) => {
+    setOpenDeniedReasonPopUp(false);
+    if (isConfirm) {
+      if (wordRequestStatus === WordStatus.Denied) {
+        setDeniedReasonLoader({[selectedWordId]: true});
+        updateDeniedReason({
+          variables: {
+            updateDeniedReasonId: selectedWordId,
+            deniedReason: deniedReason,
+          },
+          onError: (error) => {
+            setDeniedReasonLoader({[selectedWordId]: false});
+            dispatchCurrentSnackBar({
+              payload: {
+                open: true,
+                type: 'error',
+                message: error.message,
+              },
+            });
+          },
+          onCompleted: () => {
+            refetch();
+            setSelectedRequests([]);
+            setDeniedReasonLoader({[selectedWordId]: false});
+            dispatchCurrentSnackBar({
+              payload: {
+                open: true,
+                type: 'success',
+                message: '성공적으로 거절 사유가 제출되었습니다.',
+              },
+            });
+          },
+        });
+      } else {
+        onDeny(selectedWordId, deniedReason);
+      }
+    }
+      
+    setSelectedWordId('');
+    setSelectedDeniedReason('');
   }
   
   return (
@@ -448,9 +513,15 @@ const RequestManagementTable = ({
       />
       <ConfirmDialog
         open={openConfirmDialog}
-        handleClose={handleClose}
+        handleClose={handleCloseConfirmDialog}
         title={'주의'}
         content={'정말 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.'}
+      />
+      <DeniedReasonPopUp
+        open={openDeniedReasonPopUp}
+        handleClose={handleCloseDeniedReasonPopUp}
+        getDeniedReason={selectedDeniedReason}
+        setDeniedReason={setSelectedDeniedReason}
       />
     </Box>
   );

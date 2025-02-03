@@ -148,7 +148,6 @@ const MyRequestTable = ({
           deleteWordRequestId: selectedWordId,
         },
         onError: (error) => {
-          setSelectedWordId('');
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
             payload: {
@@ -161,7 +160,6 @@ const MyRequestTable = ({
         onCompleted: () => {
           refetch();
           setSelectedRequests([]);
-          setSelectedWordId('');
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
             payload: {
@@ -173,6 +171,7 @@ const MyRequestTable = ({
         },
       });
     }
+    setSelectedWordId('');
   }
 
   return (

@@ -7,8 +7,8 @@ export const approveWordRequestMutation = gql(`
 `);
 
 export const denyWordRequestMutation = gql(`
-  mutation DenyWordRequest($denyWordRequestId: ID!) {
-    denyWordRequest(id: $denyWordRequestId)
+  mutation DenyWordRequest($denyWordRequestId: ID!, $deniedReason: String) {
+    denyWordRequest(id: $denyWordRequestId, deniedReason: $deniedReason)
   }
 `);
 
@@ -21,5 +21,14 @@ export const recoverWordRequestMutation = gql(`
 export const deleteWordRequestMutation = gql(`
   mutation DeleteWordRequest($deleteWordRequestId: ID!) {
     deleteWordRequest(id: $deleteWordRequestId)
+  }
+`);
+
+export const updateDeniedReasonMutation = gql(`
+  mutation UpdateDeniedReason($updateDeniedReasonId: ID!, $deniedReason: String) {
+    updateDeniedReason(id: $updateDeniedReasonId, deniedReason: $deniedReason) {
+      id
+      deniedReason
+    }
   }
 `);

@@ -1,21 +1,27 @@
 'use client'
 
-import { UserInput, UserRole } from '@/app/generated/gql/graphql';
+import { UserInput, UserRole, WordStatus } from '@/app/generated/gql/graphql';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
 import { useQuery } from '@apollo/client';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { getStudentQuery } from './query';
 import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { AccountBox } from '@mui/icons-material';
+import UserForm from '@/app/components/user/UserForm/UserForm';
+import usePaginationModel from '@/app/hooks/usePaginationModel';
 import UserContainer from '@/app/components/user/UserContainer/UserContainer';
-import StudentRequestTable from '@/app/components/students/single-student/StudentRequestTable/StudentRequestTable';
+import { getUserRequestsQuery } from '@/app/components/user/UserContainer/query';
 
 const SingleStudent = () => {
   const params = useParams();
+  const { dispatchCurrentSnackBar } = useSnackbar();
+  const { paginationModel, setPaginationModel } = usePaginationModel();
+  const searchParams = useSearchParams();
+
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const { dispatchCurrentSnackBar } = useSnackbar();
+  const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [editMode, setEditMode] = useState(false);
 
   const { data, loading } = useQuery(getStudentQuery, {
@@ -42,6 +48,30 @@ const SingleStudent = () => {
     number: data?.getUser.number || 0,
     role: data?.getUser.role || UserRole.Student,
   }
+
+  const { data: userRequestData, loading: userRequestLoading, refetch: userRequestRefetch } =
+      useQuery(getUserRequestsQuery, {
+        fetchPolicy: 'network-only',
+        variables: {
+          paginationOptions: {
+            limit: paginationModel.pageSize,
+            pageNum: paginationModel.page,
+          },
+          filterOptions: {
+            status: wordRequestStatus,
+            requestorId: id,
+          },
+        },
+        onError: (error) => {
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+      });
   
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
@@ -69,11 +99,18 @@ const SingleStudent = () => {
             <Skeleton variant="rounded" height={56} />
           </Stack>
         }
-        {data && <UserContainer defaultValues={defaultValues} editMode={editMode}/>}
+        {data && <UserForm defaultValues={defaultValues} editMode={editMode}/>}
       </Stack>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mt={4}>
-        <StudentRequestTable id={id}/>
-      </Box>
+      <UserContainer
+        wordRequestStatus={wordRequestStatus}
+        setWordRequestStatus={setWordRequestStatus}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        refetch={userRequestRefetch}
+        userRequests={userRequestData ? userRequestData.getWords.records : []}
+        pageInfo={userRequestData ? userRequestData.getWords.pageInfo : { totalRowCount:0, pageCount: 0 }}
+        loading={userRequestLoading}
+      />
     </Box>
   );
 }

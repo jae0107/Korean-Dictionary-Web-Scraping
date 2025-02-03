@@ -60,11 +60,12 @@ export const wordTypeDefs = gql`
     createWordRequest(input: WordInput!): Word!
     approveWordRequest(id: ID!): Boolean!
     recoverWordRequest(id: ID!): Boolean!
-    denyWordRequest(id: ID!): Boolean!
+    denyWordRequest(id: ID!, deniedReason: String): Boolean!
     deleteWordRequest(id: ID!): Boolean!
     bulkApproveWordRequests(ids: [ID!]!): Boolean!
     bulkRecoverWordRequests(ids: [ID!]!): Boolean!
     bulkDenyWordRequests(ids: [ID!]!): Boolean!
     bulkDeleteWordRequests(ids: [ID!]!): Boolean!
+    updateDeniedReason(id: ID!, deniedReason: String): Word!
   }
 `;

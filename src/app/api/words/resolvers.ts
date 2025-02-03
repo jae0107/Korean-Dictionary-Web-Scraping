@@ -23,6 +23,7 @@ export const wordResolvers = {
     bulkRecoverWordRequests,
     bulkDenyWordRequests,
     bulkDeleteWordRequests,
+    updateDeniedReason,
   },
   Word: {
     async requestor(word: Word, _args: unknown, { dataloaders }: Context) {
@@ -36,9 +37,12 @@ async function getWords(
   {
     paginationOptions,
     filterOptions,
-  }: { paginationOptions: OffsetPaginationOptions; filterOptions: WordFilterOptions }
+  }: { paginationOptions: OffsetPaginationOptions; filterOptions: WordFilterOptions },
+  { currentUser }: Context
 ): Promise<OffsetPaginationResponse<Word>> {
   return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
     const searcher = new WordSearch({ ...paginationOptions }, { ...filterOptions });
     const offsetWordsResponse: OffsetPaginationResponse<Word> = await searcher.process();
     return offsetWordsResponse;
@@ -150,7 +154,7 @@ async function bulkApproveWordRequests(
 
 async function denyWordRequest(
   root: any,
-  { id }: { id: string },
+  { id, deniedReason }: { id: string; deniedReason: string; },
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
@@ -159,7 +163,7 @@ async function denyWordRequest(
     const word = await Word.findByPk(id);
 
     if (word) {
-      await word.update({ status: WordStatus.Denied, previousStatus: word.status });
+      await word.update({ status: WordStatus.Denied, previousStatus: word.status, deniedReason: deniedReason });
     } else {
       throw new Error('No Word Found');
     }
@@ -287,6 +291,28 @@ async function bulkDeleteWordRequests(
     });
 
     return true;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function updateDeniedReason(
+  root: any,
+  { id, deniedReason }: { id: string; deniedReason: string; },
+  { currentUser }: Context,
+): Promise<Word> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    let word = await Word.findByPk(id);
+
+    if (word) {
+      word = await word.update({ deniedReason: deniedReason });
+    } else {
+      throw new Error('No Word Found');
+    }
+
+    return word;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

@@ -12,10 +12,6 @@ const ConfirmDialog = ({
   title: string;
   content: string;
 }) => {
-  // const handleClose = (isConfirm: boolean) => {
-  //   setOpen(false);
-  // };
-
   return (
     <Dialog
       open={open}
