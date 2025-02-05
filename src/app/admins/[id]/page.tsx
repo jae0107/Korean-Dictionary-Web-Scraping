@@ -8,10 +8,10 @@ import { useState } from 'react';
 import { getAdminQuery } from './query';
 import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { AccountBox } from '@mui/icons-material';
-import UserForm from '@/app/components/user/UserForm/UserForm';
-import { getUserRequestsQuery } from '@/app/components/user/UserContainer/query';
+import UserForm from '@/app/components/users/user/UserForm/UserForm';
+import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/query';
 import usePaginationModel from '@/app/hooks/usePaginationModel';
-import UserContainer from '@/app/components/user/UserContainer/UserContainer';
+import UserContainer from '@/app/components/users/user/UserContainer/UserContainer';
 
 const SingleAdmin = () => {
   const params = useParams();

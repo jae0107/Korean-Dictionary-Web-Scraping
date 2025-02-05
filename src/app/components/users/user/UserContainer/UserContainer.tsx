@@ -6,8 +6,8 @@ import { Dispatch, SetStateAction, SyntheticEvent, useState } from "react";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import { Box, CircularProgress, Stack, Tab, Tooltip, Typography } from "@mui/material";
 import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Restore } from "@mui/icons-material";
-import korDicLogo from "../../../../assets/images/korDicLogo.png";
-import naverLogo from "../../../../assets/images/naverLogo.png";
+import korDicLogo from "../../../../../assets/images/korDicLogo.png";
+import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { TabContext, TabList } from "@mui/lab";
 import CustomNoRowsOverlay from "@/app/components/shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
@@ -274,7 +274,7 @@ const UserContainer = ({
                 icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
                 label="더보기"
                 showInMenu={false}
-                onClick={() => {onRecover(params.row.id)}}
+                onClick={() => onRecover(params.row.id)}
               />
             ];
           }
@@ -289,7 +289,7 @@ const UserContainer = ({
               }
               label="복구"
               showInMenu={true}
-              onClick={() => {onRecover(params.row.id)}}
+              onClick={() => onRecover(params.row.id)}
             />,
             <GridActionsCellItem
               key="delete"
@@ -337,7 +337,7 @@ const UserContainer = ({
             }
             label="승인"
             showInMenu={false}
-            onClick={() => {onApproval(params.row.id)}}
+            onClick={() => onApproval(params.row.id)}
           />,
           <GridActionsCellItem
             key="deny"

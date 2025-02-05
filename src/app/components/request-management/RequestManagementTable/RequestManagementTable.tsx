@@ -287,7 +287,7 @@ const RequestManagementTable = ({
                 icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
                 label="더보기"
                 showInMenu={false}
-                onClick={() => {onRecover(params.row.id)}}
+                onClick={() => onRecover(params.row.id)}
               />
             ];
           }
@@ -302,7 +302,7 @@ const RequestManagementTable = ({
               }
               label="복구"
               showInMenu={true}
-              onClick={() => {onRecover(params.row.id)}}
+              onClick={() => onRecover(params.row.id)}
             />,
             <GridActionsCellItem
               key="delete"
@@ -350,7 +350,7 @@ const RequestManagementTable = ({
             }
             label="승인"
             showInMenu={false}
-            onClick={() => {onApproval(params.row.id)}}
+            onClick={() => onApproval(params.row.id)}
           />,
           <GridActionsCellItem
             key="deny"

@@ -11,27 +11,30 @@ const a11yProps = (index: string) => {
   };
 };
 
-const StudentFilter = ({
+const TeacherFilter = ({
   userNameKeyword,
   setUserNameKeyword,
-  studentStatus,
-  setStudentStatus,
+  teacherStatus,
+  setTeacherStatus,
+  setSelectedTeachers,
 } : {
   userNameKeyword: string;
   setUserNameKeyword: (value: string) => void;
-  studentStatus: UserStatus;
-  setStudentStatus: Dispatch<SetStateAction<UserStatus>>;
+  teacherStatus: UserStatus;
+  setTeacherStatus: Dispatch<SetStateAction<UserStatus>>;
+  setSelectedTeachers: (value: string[]) => void;
 }) => {
   const router = useRouter();
 
   const handleTabChange = (event: SyntheticEvent, newValue: UserStatus) => {
-    setStudentStatus(newValue);
+    setTeacherStatus(newValue);
+    setSelectedTeachers([]);
     router.push(`?status=${newValue}`);
   };
   
   return (
     <Stack width={'90%'} spacing={2} mb={2}>
-      <TabContext value={studentStatus}>
+      <TabContext value={teacherStatus}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleTabChange}>
             <Tab
@@ -62,4 +65,4 @@ const StudentFilter = ({
   );
 }
 
-export default StudentFilter;
+export default TeacherFilter;

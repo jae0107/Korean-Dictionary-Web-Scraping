@@ -8,8 +8,8 @@ import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { useQuery } from "@apollo/client";
 import { getTeachersQuery } from "./query";
 import { Box } from "@mui/material";
-import TeacherFilter from "../components/teachers/TeacherFilter/TeacherFilter";
-import TeacherTable from "../components/teachers/TeacherTable/TeacherTable";
+import TeacherFilter from "../components/users/teachers/TeacherFilter/TeacherFilter";
+import TeacherTable from "../components/users/teachers/TeacherTable/TeacherTable";
 
 const TeacherManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -18,8 +18,9 @@ const TeacherManagement = () => {
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [teacherStatus, setTeacherStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
-  
-  const { data, loading } =
+  const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+
+  const { data, loading, refetch } =
     useQuery(getTeachersQuery, {
       fetchPolicy: 'network-only',
       variables: {
@@ -52,6 +53,7 @@ const TeacherManagement = () => {
           setUserNameKeyword={setUserNameKeyword}
           teacherStatus={teacherStatus}
           setTeacherStatus={setTeacherStatus}
+          setSelectedTeachers={setSelectedTeachers}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
@@ -63,6 +65,9 @@ const TeacherManagement = () => {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           teacherStatus={teacherStatus}
+          refetch={refetch}
+          selectedTeachers={selectedTeachers}
+          setSelectedTeachers={setSelectedTeachers}
         />
       </Box>
     </Box>

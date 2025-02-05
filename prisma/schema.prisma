@@ -26,6 +26,7 @@ model User {
   password String
   role     String
   status   String  @default("PENDING")
+  previousStatus String?
   words    Word[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -75,4 +75,15 @@ export const userTypeDefs = gql`
       filterOptions: RequestorFilterOptions!
     ): UserOffsetPaginationResponse!
   }
+
+  type Mutation {
+    approveUser(id: ID!): Boolean!
+    bulkApproveUsers(ids: [ID!]!): Boolean!
+    denyUser(id: ID!): Boolean!
+    bulkDenyUsers(ids: [ID!]!): Boolean!
+    recoverUser(id: ID!): Boolean!
+    bulkRecoverUsers(ids: [ID!]!): Boolean!
+    deleteUser(id: ID!): Boolean!
+    bulkDeleteUsers(ids: [ID!]!): Boolean!
+  }
 `;

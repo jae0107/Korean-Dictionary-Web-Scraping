@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
-import UserForm from '../components/user/UserForm/UserForm';
+import UserForm from '../components/users/user/UserForm/UserForm';
 import { useQuery } from '@apollo/client';
 import { getMyProfileQuery } from './query';
 import { useSnackbar } from '../hooks/useSnackbar';

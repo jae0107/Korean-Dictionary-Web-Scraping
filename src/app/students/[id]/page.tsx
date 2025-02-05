@@ -8,10 +8,10 @@ import { useState } from 'react';
 import { getStudentQuery } from './query';
 import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import { AccountBox } from '@mui/icons-material';
-import UserForm from '@/app/components/user/UserForm/UserForm';
+import UserForm from '@/app/components/users/user/UserForm/UserForm';
 import usePaginationModel from '@/app/hooks/usePaginationModel';
-import UserContainer from '@/app/components/user/UserContainer/UserContainer';
-import { getUserRequestsQuery } from '@/app/components/user/UserContainer/query';
+import UserContainer from '@/app/components/users/user/UserContainer/UserContainer';
+import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/query';
 
 const SingleStudent = () => {
   const params = useParams();

@@ -8,8 +8,8 @@ import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { Box } from "@mui/material";
 import { useQuery } from "@apollo/client";
 import { getAdminsQuery } from "./query";
-import AdminFilter from "../components/admins/AdminFilter/AdminFilter";
-import AdminTable from "../components/admins/AdminTable/AdminTable";
+import AdminFilter from "../components/users/admins/AdminFilter/AdminFilter";
+import AdminTable from "../components/users/admins/AdminTable/AdminTable";
 
 const AdminManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -18,8 +18,9 @@ const AdminManagement = () => {
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
-  
-  const { data, loading } =
+  const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
+
+  const { data, loading, refetch } =
     useQuery(getAdminsQuery, {
       fetchPolicy: 'network-only',
       variables: {
@@ -52,6 +53,7 @@ const AdminManagement = () => {
           setUserNameKeyword={setUserNameKeyword}
           adminStatus={adminStatus}
           setAdminStatus={setAdminStatus}
+          setSelectedAdmins={setSelectedAdmins}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
@@ -63,6 +65,9 @@ const AdminManagement = () => {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           adminStatus={adminStatus}
+          refetch={refetch}
+          selectedAdmins={selectedAdmins}
+          setSelectedAdmins={setSelectedAdmins}
         />
       </Box>
     </Box>

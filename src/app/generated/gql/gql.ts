@@ -31,6 +31,14 @@ const documents = {
     "\n  mutation RecoverWordRequest($recoverWordRequestId: ID!) {\n    recoverWordRequest(id: $recoverWordRequestId)\n  }\n": types.RecoverWordRequestDocument,
     "\n  mutation DeleteWordRequest($deleteWordRequestId: ID!) {\n    deleteWordRequest(id: $deleteWordRequestId)\n  }\n": types.DeleteWordRequestDocument,
     "\n  mutation UpdateDeniedReason($updateDeniedReasonId: ID!, $deniedReason: String) {\n    updateDeniedReason(id: $updateDeniedReasonId, deniedReason: $deniedReason) {\n      id\n      deniedReason\n    }\n  }\n": types.UpdateDeniedReasonDocument,
+    "\n  mutation BulkApproveUsers($ids: [ID!]!) {\n    bulkApproveUsers(ids: $ids)\n  }\n": types.BulkApproveUsersDocument,
+    "\n  mutation BulkDenyUsers($ids: [ID!]!) {\n    bulkDenyUsers(ids: $ids)\n  }\n": types.BulkDenyUsersDocument,
+    "\n  mutation BulkRecoverUsers($ids: [ID!]!) {\n    bulkRecoverUsers(ids: $ids)\n  }\n": types.BulkRecoverUsersDocument,
+    "\n  mutation BulkDeleteUsers($ids: [ID!]!) {\n    bulkDeleteUsers(ids: $ids)\n  }\n": types.BulkDeleteUsersDocument,
+    "\n  mutation ApproveUser($approveUserId: ID!) {\n    approveUser(id: $approveUserId)\n  }\n": types.ApproveUserDocument,
+    "\n  mutation DenyUser($denyUserId: ID!) {\n    denyUser(id: $denyUserId)\n  }\n": types.DenyUserDocument,
+    "\n  mutation RecoverUser($recoverUserId: ID!) {\n    recoverUser(id: $recoverUserId)\n  }\n": types.RecoverUserDocument,
+    "\n  mutation DeleteUser($deleteUserId: ID!) {\n    deleteUser(id: $deleteUserId)\n  }\n": types.DeleteUserDocument,
     "\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    page\n    example\n    deniedReason\n  }\n": types.UserRequestItemsFragmentDoc,
     "\n  query GetUserRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetUserRequestsDocument,
     "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    page\n    example\n    deniedReason\n  }\n": types.MyRequestItemsFragmentDoc,
@@ -134,6 +142,38 @@ export function gql(source: "\n  mutation DeleteWordRequest($deleteWordRequestId
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation UpdateDeniedReason($updateDeniedReasonId: ID!, $deniedReason: String) {\n    updateDeniedReason(id: $updateDeniedReasonId, deniedReason: $deniedReason) {\n      id\n      deniedReason\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateDeniedReason($updateDeniedReasonId: ID!, $deniedReason: String) {\n    updateDeniedReason(id: $updateDeniedReasonId, deniedReason: $deniedReason) {\n      id\n      deniedReason\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkApproveUsers($ids: [ID!]!) {\n    bulkApproveUsers(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkApproveUsers($ids: [ID!]!) {\n    bulkApproveUsers(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkDenyUsers($ids: [ID!]!) {\n    bulkDenyUsers(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkDenyUsers($ids: [ID!]!) {\n    bulkDenyUsers(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkRecoverUsers($ids: [ID!]!) {\n    bulkRecoverUsers(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkRecoverUsers($ids: [ID!]!) {\n    bulkRecoverUsers(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkDeleteUsers($ids: [ID!]!) {\n    bulkDeleteUsers(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkDeleteUsers($ids: [ID!]!) {\n    bulkDeleteUsers(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ApproveUser($approveUserId: ID!) {\n    approveUser(id: $approveUserId)\n  }\n"): (typeof documents)["\n  mutation ApproveUser($approveUserId: ID!) {\n    approveUser(id: $approveUserId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation DenyUser($denyUserId: ID!) {\n    denyUser(id: $denyUserId)\n  }\n"): (typeof documents)["\n  mutation DenyUser($denyUserId: ID!) {\n    denyUser(id: $denyUserId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RecoverUser($recoverUserId: ID!) {\n    recoverUser(id: $recoverUserId)\n  }\n"): (typeof documents)["\n  mutation RecoverUser($recoverUserId: ID!) {\n    recoverUser(id: $recoverUserId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation DeleteUser($deleteUserId: ID!) {\n    deleteUser(id: $deleteUserId)\n  }\n"): (typeof documents)["\n  mutation DeleteUser($deleteUserId: ID!) {\n    deleteUser(id: $deleteUserId)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

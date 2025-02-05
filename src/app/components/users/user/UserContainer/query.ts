@@ -1,4 +1,4 @@
-import { gql } from "../../../generated/gql";
+import { gql } from "../../../../generated/gql";
 
 export const userRequestFragment = gql(`
   fragment UserRequestItems on Word {

@@ -8,8 +8,8 @@ import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Box } from "@mui/material";
-import StudentFilter from "../components/students/StudentFilter/StudentFilter";
-import StudentTable from "../components/students/StudentTable/StudentTable";
+import StudentFilter from "../components/users/students/StudentFilter/StudentFilter";
+import StudentTable from "../components/users/students/StudentTable/StudentTable";
 
 const StudentManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -18,8 +18,9 @@ const StudentManagement = () => {
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
-  
-  const { data, loading } =
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+
+  const { data, loading, refetch } =
     useQuery(getStudentsQuery, {
       fetchPolicy: 'network-only',
       variables: {
@@ -52,6 +53,7 @@ const StudentManagement = () => {
           setUserNameKeyword={setUserNameKeyword}
           studentStatus={studentStatus}
           setStudentStatus={setStudentStatus}
+          setSelectedStudents={setSelectedStudents}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
@@ -63,6 +65,9 @@ const StudentManagement = () => {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           studentStatus={studentStatus}
+          refetch={refetch}
+          selectedStudents={selectedStudents}
+          setSelectedStudents={setSelectedStudents}
         />
       </Box>
     </Box>
