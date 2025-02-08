@@ -1,7 +1,7 @@
 import { User, Word } from "../models";
 import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
-import { OffsetPaginationOptions, RequestorFilterOptions, UserFilterOptions, UserStatus } from "../../generated/gql/graphql";
+import { OffsetPaginationOptions, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
@@ -17,6 +17,7 @@ export const userResolvers = {
     getRequestors,
   },
   Mutation: {
+    updateUser,
     approveUser,
     bulkApproveUsers,
     denyUser,
@@ -87,6 +88,35 @@ async function getCurrentUser(_: any, { id }: { id: string }, { currentUser }: C
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
     return currentUser;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function updateUser(
+  root: any,
+  { id, input }: { id: string; input: UserInput; },
+  { currentUser }: Context,
+): Promise<User> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    let user = await User.findByPk(id);
+
+    if (user) {
+      user = await user.update({
+        name: input.name || '',
+        email: input.email || '',
+        year: input.year || undefined,
+        class: input.class || '',
+        number: input.number || undefined,
+        role: input.role || '',
+      });
+    } else {
+      throw new Error('No User Found');
+    }
+
+    return user;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

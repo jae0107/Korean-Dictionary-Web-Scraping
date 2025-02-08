@@ -50,12 +50,12 @@ export const userTypeDefs = gql`
   }
 
   input UserInput {
-    name: String!
-    email: String!
+    name: String
+    email: String
     year: Int
     class: String
     number: Int
-    role: UserRole!
+    role: UserRole
   }
 
   type UserOffsetPaginationResponse {
@@ -77,6 +77,7 @@ export const userTypeDefs = gql`
   }
 
   type Mutation {
+    updateUser(id: ID!, input: UserInput!): User!
     approveUser(id: ID!): Boolean!
     bulkApproveUsers(ids: [ID!]!): Boolean!
     denyUser(id: ID!): Boolean!

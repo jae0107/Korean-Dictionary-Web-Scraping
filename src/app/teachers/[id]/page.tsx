@@ -6,12 +6,12 @@ import { useQuery } from '@apollo/client';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { getTeacherQuery } from './query';
-import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
-import { AccountBox } from '@mui/icons-material';
-import UserForm from '@/app/components/users/user/UserForm/UserForm';
+import { Box } from '@mui/material';
 import usePaginationModel from '@/app/hooks/usePaginationModel';
 import UserContainer from '@/app/components/users/user/UserContainer/UserContainer';
 import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/query';
+import DummyUserForm from '@/app/components/users/user/UserFormContainer/DummyUserForm/DummyUserForm';
+import UserFormContainer from '@/app/components/users/user/UserFormContainer/UserFormContainer';
 
 const SingleTeacher = () => {
   const params = useParams();
@@ -22,9 +22,8 @@ const SingleTeacher = () => {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
-  const [editMode, setEditMode] = useState(false);
 
-  const { data, loading } = useQuery(getTeacherQuery, {
+  const { data, loading, refetch } = useQuery(getTeacherQuery, {
     fetchPolicy: 'network-only',
     variables: {
       getUserId: id,
@@ -74,31 +73,23 @@ const SingleTeacher = () => {
   
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-      <Stack spacing={4} width={'300px'} mt={2} alignSelf={'center'}>  
-        <Box display={'flex'} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-            <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/>
-            <Typography variant="h5">선생님 프로필</Typography>
-          </Box>
-          <Button 
-            variant='outlined' 
-            onClick={() => {
-              setEditMode(!editMode);
-            }}>
-            {editMode ? '저장' : '수정'}
-          </Button>
-        </Box>
-        {loading && 
-          <Stack spacing={2}>
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-          </Stack>
-        }
-        {data && <UserForm defaultValues={defaultValues} editMode={editMode}/>}
-      </Stack>
+      {
+        loading && 
+        <DummyUserForm
+          userType={'선생님'}
+          loading={loading}
+          role={UserRole.Teacher}
+        />
+      }
+      {
+        data && 
+        <UserFormContainer
+          id={id}
+          defaultValues={defaultValues}
+          userType={'선생님'}
+          refetch={refetch}
+        />
+      }
       <UserContainer
         wordRequestStatus={wordRequestStatus}
         setWordRequestStatus={setWordRequestStatus}

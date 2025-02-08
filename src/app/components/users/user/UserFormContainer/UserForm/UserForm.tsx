@@ -1,34 +1,20 @@
-import { UserInput } from "@/app/generated/gql/graphql";
-import { Controller, useForm } from "react-hook-form";
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { UserInput, UserRole } from "@/app/generated/gql/graphql";
+import { Controller, UseFormReturn } from "react-hook-form";
 import { FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useCurrentUser } from "@/app/hooks/useCurrentUser";
 
-const schema = z.object({
-  name: z.string().nonempty(),
-  email: z.string().email().nonempty(),
-  year: z.number().int(),
-  class: z.string().nonempty(),
-  number: z.number().int(),
-  role: z.string().nonempty(),
-});
-
 const UserForm = ({
-  defaultValues,
   editMode,
+  form,
+  setRole,
 } : {
-  defaultValues: UserInput;
   editMode: boolean;
+  form: UseFormReturn<UserInput>;
+  setRole?: (role: UserRole) => void;
 }) => {
   const { userRole } = useCurrentUser();
   
-  const form = useForm({
-    defaultValues,
-    resolver: zodResolver(schema),
-  });
-  
-  const { register, control } = form;
+  const { register, control, watch, setValue } = form;
   
   return (
     <Stack spacing={2}>
@@ -57,7 +43,10 @@ const UserForm = ({
             <Select
               value={field.value}
               label="역할"
-              onChange={field.onChange}
+              onChange={(e) => {
+                field.onChange(e);
+                setRole && setRole(e.target.value as UserRole);
+              }}
               disabled={!editMode || userRole === 'STUDENT' || userRole === 'TEACHER'}
             >
               <MenuItem value={''}><em>-</em></MenuItem>
@@ -117,10 +106,9 @@ const UserForm = ({
         />
       </FormControl>
       {
-        userRole === 'STUDENT' || userRole === 'TEACHER' && 
+        watch('role') === 'STUDENT' && 
         <FormControl component='fieldset'>
           <TextField
-            {...register('number')}
             type='number'
             label='번호'
             disabled={!editMode}
@@ -129,6 +117,8 @@ const UserForm = ({
                 min: 0
               }
             }}
+            value={watch('number')}
+            onChange={(e) => setValue('number', parseInt(e.target.value))}
           />
         </FormControl>
       }
