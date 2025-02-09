@@ -1,19 +1,19 @@
 'use client'
 
-import { Box, Button, Skeleton, Stack, Typography } from '@mui/material';
-import UserForm from '../components/users/user/UserFormContainer/UserForm/UserForm';
+import { Box } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { getMyProfileQuery } from './query';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { UserInput, UserRole } from '../generated/gql/graphql';
-import { AccountBox } from '@mui/icons-material';
-import { useState } from 'react';
+import DummyUserForm from '../components/users/user/UserFormContainer/DummyUserForm/DummyUserForm';
+import UserFormContainer from '../components/users/user/UserFormContainer/UserFormContainer';
+import { useSession } from 'next-auth/react';
 
 const Profile = () => {
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const [editMode, setEditMode] = useState(false);
+  const { data: myData } = useSession();
 
-  const { data, loading } = useQuery(getMyProfileQuery, {
+  const { data, loading, refetch } = useQuery(getMyProfileQuery, {
     fetchPolicy: 'network-only',
     onError: (error) => {
       dispatchCurrentSnackBar({
@@ -37,32 +37,23 @@ const Profile = () => {
   
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'}>
-      <Stack spacing={4} width={'300px'} mt={2}>  
-        <Box display={'flex'} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-            <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/>
-            <Typography variant="h5">프로필</Typography>
-          </Box>
-          <Button 
-            variant='outlined' 
-            onClick={() => {
-              setEditMode(!editMode);
-            }}>
-            {editMode ? '저장' : '수정'}
-          </Button>
-        </Box>
-        {loading && 
-          <Stack spacing={2}>
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            <Skeleton variant="rounded" height={56} />
-            {defaultValues.role === 'STUDENT' && <Skeleton variant="rounded" height={56} />}
-          </Stack>
-        }
-        {data && <UserForm defaultValues={defaultValues} editMode={editMode}/>}
-      </Stack>
+      {
+        loading && 
+        <DummyUserForm
+          userType={'나의'}
+          loading={loading}
+          role={myData?.user.role as UserRole || UserRole.Student}
+        />
+      }
+      {
+        data && 
+        <UserFormContainer
+          id={data.getCurrentUser.id}
+          defaultValues={defaultValues}
+          userType={'나의'}
+          refetch={refetch}
+        />
+      }
     </Box>
   );
 }

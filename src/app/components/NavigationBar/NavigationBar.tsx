@@ -73,6 +73,16 @@ const NavigationBar = ({
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
+
+  const navigationUser = (url: string) => {
+    router.push(url);
+    setAnchorElUserManagement(null);
+  }
+
+  const navigationMyInfo = (url: string) => {
+    router.push(url);
+    setAnchorElUser(null);
+  }
   
   return (
     <AppBar position="static" sx={{ mb: 2 }}>
@@ -153,7 +163,7 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer',
                   }} 
-                  onClick={() => router.push('/students')}
+                  onClick={() => navigationUser('/students')}
                 >
                   학생
                 </Typography>
@@ -164,7 +174,7 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer',
                   }} 
-                  onClick={() => router.push('/teachers')}
+                  onClick={() => navigationUser('/teachers')}
                 >
                   선생님
                 </Typography>
@@ -175,7 +185,7 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer',
                   }} 
-                  onClick={() => router.push('/admins')}
+                  onClick={() => navigationUser('/admins')}
                 >
                   관리자
                 </Typography>
@@ -215,7 +225,7 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer' 
                   }} 
-                  onClick={() => router.push('/profile')}
+                  onClick={() => navigationMyInfo('/profile')}
                   >
                     프로필
                   </Typography>
@@ -227,7 +237,7 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer',
                   }} 
-                  onClick={() => router.push('/my-requests')}
+                  onClick={() => navigationMyInfo('/my-requests')}
                 >
                   나의 요청
                 </Typography>
