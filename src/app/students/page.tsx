@@ -10,11 +10,13 @@ import { useSearchParams } from "next/navigation";
 import { Box } from "@mui/material";
 import StudentFilter from "../components/users/students/StudentFilter/StudentFilter";
 import StudentTable from "../components/users/students/StudentTable/StudentTable";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 const StudentManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
+  const { userRole } = useCurrentUser();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
@@ -34,6 +36,7 @@ const StudentManagement = () => {
           userName: userNameKeyword,
         },
       },
+      skip: userRole === "STUDENT",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -44,6 +47,14 @@ const StudentManagement = () => {
         });
       },
     });
+
+  if (userRole === 'STUDENT') {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
+        접근 권한이 없습니다.
+      </Box>
+    );
+  }
 
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>

@@ -12,12 +12,14 @@ import UserContainer from '@/app/components/users/user/UserContainer/UserContain
 import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/query';
 import UserFormContainer from '@/app/components/users/user/UserFormContainer/UserFormContainer';
 import DummyUserForm from '@/app/components/users/user/UserFormContainer/DummyUserForm/DummyUserForm';
+import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 
 const SingleStudent = () => {
   const params = useParams();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const searchParams = useSearchParams();
+  const { userRole } = useCurrentUser();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -28,6 +30,7 @@ const SingleStudent = () => {
     variables: {
       getUserId: id,
     },
+    skip: userRole === "STUDENT",
     onError: (error) => {
       dispatchCurrentSnackBar({
         payload: {
@@ -61,6 +64,7 @@ const SingleStudent = () => {
           requestorId: id,
         },
       },
+      skip: userRole === "STUDENT",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -71,6 +75,14 @@ const SingleStudent = () => {
         });
       },
     });
+  
+  if (userRole === 'STUDENT') {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
+        접근 권한이 없습니다.
+      </Box>
+    );
+  }
   
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>

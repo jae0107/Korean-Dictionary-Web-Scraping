@@ -10,11 +10,13 @@ import { getTeachersQuery } from "./query";
 import { Box } from "@mui/material";
 import TeacherFilter from "../components/users/teachers/TeacherFilter/TeacherFilter";
 import TeacherTable from "../components/users/teachers/TeacherTable/TeacherTable";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 const TeacherManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
+  const { userRole } = useCurrentUser();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [teacherStatus, setTeacherStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
@@ -34,6 +36,7 @@ const TeacherManagement = () => {
           userName: userNameKeyword,
         },
       },
+      skip: userRole === "STUDENT" || userRole === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -44,6 +47,14 @@ const TeacherManagement = () => {
         });
       },
     });
+  
+  if (userRole === 'STUDENT' || userRole === 'TEACHER') {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
+        접근 권한이 없습니다.
+      </Box>
+    );
+  }
       
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>

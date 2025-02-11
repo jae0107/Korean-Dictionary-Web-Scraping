@@ -8,6 +8,7 @@ export const adminFragment = gql(`
     class
     email
     status
+    role
   }
 `);
 

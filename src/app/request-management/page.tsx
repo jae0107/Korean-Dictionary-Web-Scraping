@@ -10,11 +10,13 @@ import { useSnackbar } from "../hooks/useSnackbar";
 import RequestManagementTable from "../components/request-management/RequestManagementTable/RequestManagementTable";
 import RequestManagementFilter from "../components/request-management/RequestManagementFilter/RequestManagementFilter";
 import { useSearchParams } from "next/navigation";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 const RequestManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
+  const { userRole } = useCurrentUser();
   
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [wordKeyword, setWordKeyword] = useState<string>('');
@@ -39,6 +41,7 @@ const RequestManagement = () => {
           class: getClass.toString(),
         },
       },
+      skip: userRole === "STUDENT",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -50,6 +53,14 @@ const RequestManagement = () => {
       },
     });
     
+  if (userRole === 'STUDENT') {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
+        접근 권한이 없습니다.
+      </Box>
+    );
+  }
+
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
       <Box display={'flex'} justifyContent={'center'}>

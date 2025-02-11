@@ -1,7 +1,7 @@
-import { AdminItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
+import { AdminItemsFragment, UserRole, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Restore, Visibility } from "@mui/icons-material";
 import { Box, CircularProgress, Tooltip, Typography } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useState } from "react";
 import CustomNoRowsOverlay from "../../../shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
@@ -23,6 +23,7 @@ const AdminTable = ({
   refetch,
   selectedAdmins,
   setSelectedAdmins,
+  userRole,
 }: {
   loading: boolean;
   admins: AdminItemsFragment[];
@@ -40,6 +41,7 @@ const AdminTable = ({
   refetch: () => void;
   selectedAdmins: string[];
   setSelectedAdmins: (value: string[]) => void;
+  userRole: string;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -176,19 +178,21 @@ const AdminTable = ({
       field: 'actions',
       type: 'actions',
       width: adminStatus === UserStatus.Pending ? 120 : 80,
-      getActions: (params) => {
+      getActions: (params: GridRowParams<AdminItemsFragment>) => {
+        const disabled = userRole !== 'SUPERADMIN' && params.row.role === UserRole.Superadmin;
         if (params.row.status === 'APPROVED') {
           return [
             <GridActionsCellItem
               key="view"
               icon={
                 <Tooltip title={'프로필 보기'}>
-                  <Visibility color='action' />
+                  <Visibility color={disabled ? 'disabled' : 'action'} />
                 </Tooltip>
               }
               label="프로필 보기"
               showInMenu={false}
               onClick={() => router.push(`/admins/${params.row.id}`)}
+              disabled={disabled}
             />,
             <GridActionsCellItem
               key="deny"
@@ -197,12 +201,13 @@ const AdminTable = ({
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
                 <Tooltip title={'거절'}>
-                  <HighlightOff color="error" />
+                  <HighlightOff color={disabled ? 'disabled' : 'error'} />
                 </Tooltip>
               }
               label="거절"
               showInMenu={false}
               onClick={() => onDeny(params.row.id)}
+              disabled={disabled}
             />,
           ];
         } else if (params.row.status === 'DENIED') {
@@ -214,12 +219,13 @@ const AdminTable = ({
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
                 <Tooltip title={'복구'}>
-                  <Restore color='primary' />
+                  <Restore color={disabled ? 'disabled' : 'primary'} />
                 </Tooltip>
               }
               label="복구"
               showInMenu={false}
               onClick={() => onRecover(params.row.id)}
+              disabled={disabled}
             />,
             <GridActionsCellItem
               key="delete"
@@ -228,7 +234,7 @@ const AdminTable = ({
                 <CircularProgress style={{ width: '20px', height: '20px' }}/>  
                 : 
                 <Tooltip title={'삭제'}>
-                  <DeleteForever color="error" />
+                  <DeleteForever color={disabled ? 'disabled' : 'error'} />
                 </Tooltip>
               }
               label="삭제"
@@ -237,6 +243,7 @@ const AdminTable = ({
                 setSelectedUserId(params.row.id);
                 setOpenConfirmDialog(true);
               }}
+              disabled={disabled}
             />,
           ];
         }
@@ -245,12 +252,13 @@ const AdminTable = ({
             key="view"
             icon={
               <Tooltip title={'프로필 보기'}>
-                <Visibility color='action' />
+                <Visibility color={disabled ? 'disabled' : 'action'} />
               </Tooltip>
             }
             label="프로필 보기"
             showInMenu={false}
             onClick={() => router.push(`/admins/${params.row.id}`)}
+            disabled={disabled}
           />,
           <GridActionsCellItem
             key="approve"
@@ -259,12 +267,13 @@ const AdminTable = ({
               <CircularProgress style={{ width: '20px', height: '20px' }}/>  
               : 
               <Tooltip title={'승인'}>
-                <CheckCircleOutline color="success" />
+                <CheckCircleOutline color={disabled ? 'disabled' : 'success'} />
               </Tooltip>
             }
             label="승인"
             showInMenu={false}
             onClick={() => onApproval(params.row.id)}
+            disabled={disabled}
           />,
           <GridActionsCellItem
             key="deny"
@@ -273,12 +282,13 @@ const AdminTable = ({
               <CircularProgress style={{ width: '20px', height: '20px' }}/>  
               : 
               <Tooltip title={'거절'}>
-                <HighlightOff color="error" />
+                <HighlightOff color={disabled ? 'disabled' : 'error'} />
               </Tooltip>
             }
             label="거절"
             showInMenu={false}
             onClick={() => onDeny(params.row.id)}
+            disabled={disabled}
           />
         ]
       }
@@ -337,6 +347,7 @@ const AdminTable = ({
           setSelectedAdmins(newRowSelectionModel as string[]);
         }}
         rowSelectionModel={selectedAdmins || []}
+        isRowSelectable={(params: GridRowParams<AdminItemsFragment>) => params.row.role !== UserRole.Superadmin}
         loading={loading}
         columns={columns}
         rows={admins}

@@ -10,11 +10,13 @@ import { useQuery } from "@apollo/client";
 import { getAdminsQuery } from "./query";
 import AdminFilter from "../components/users/admins/AdminFilter/AdminFilter";
 import AdminTable from "../components/users/admins/AdminTable/AdminTable";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 const AdminManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
+  const { userRole } = useCurrentUser();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
@@ -34,6 +36,7 @@ const AdminManagement = () => {
           userName: userNameKeyword,
         },
       },
+      skip: userRole === "STUDENT" || userRole === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -44,6 +47,14 @@ const AdminManagement = () => {
         });
       },
     });
+
+  if (userRole === 'STUDENT' || userRole === 'TEACHER') {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
+        접근 권한이 없습니다.
+      </Box>
+    );
+  }
 
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
@@ -68,6 +79,7 @@ const AdminManagement = () => {
           refetch={refetch}
           selectedAdmins={selectedAdmins}
           setSelectedAdmins={setSelectedAdmins}
+          userRole={userRole}
         />
       </Box>
     </Box>

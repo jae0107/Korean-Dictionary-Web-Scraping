@@ -12,12 +12,14 @@ import UserContainer from '@/app/components/users/user/UserContainer/UserContain
 import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/query';
 import DummyUserForm from '@/app/components/users/user/UserFormContainer/DummyUserForm/DummyUserForm';
 import UserFormContainer from '@/app/components/users/user/UserFormContainer/UserFormContainer';
+import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 
 const SingleTeacher = () => {
   const params = useParams();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const searchParams = useSearchParams();
+  const { userRole } = useCurrentUser();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -28,6 +30,7 @@ const SingleTeacher = () => {
     variables: {
       getUserId: id,
     },
+    skip: userRole === "STUDENT" || userRole === "TEACHER",
     onError: (error) => {
       dispatchCurrentSnackBar({
         payload: {
@@ -60,6 +63,7 @@ const SingleTeacher = () => {
           requestorId: id,
         },
       },
+      skip: userRole === "STUDENT" || userRole === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -70,6 +74,14 @@ const SingleTeacher = () => {
         });
       },
     });
+  
+  if (userRole === 'STUDENT' || userRole === 'TEACHER') {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
+        접근 권한이 없습니다.
+      </Box>
+    );
+  }
   
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>

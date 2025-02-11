@@ -16,7 +16,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  fragment SingleAdminItems on User {\n    email\n    name\n    year\n    class\n    role\n  }\n": types.SingleAdminItemsFragmentDoc,
     "\n  query GetAdmin($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleAdminItems\n    }\n  }\n": types.GetAdminDocument,
-    "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    email\n    status\n  }\n": types.AdminItemsFragmentDoc,
+    "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    email\n    status\n    role\n  }\n": types.AdminItemsFragmentDoc,
     "\n  query GetAdmins($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...AdminItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetAdminsDocument,
     "\n  query GetMyRole {\n    getCurrentUser {\n      role\n    }\n  }\n": types.GetMyRoleDocument,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
@@ -86,7 +86,7 @@ export function gql(source: "\n  query GetAdmin($getUserId: ID!) {\n    getUser(
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    email\n    status\n  }\n"): (typeof documents)["\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    email\n    status\n  }\n"];
+export function gql(source: "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    email\n    status\n    role\n  }\n"): (typeof documents)["\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    email\n    status\n    role\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

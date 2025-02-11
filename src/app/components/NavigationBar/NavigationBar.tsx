@@ -1,3 +1,4 @@
+import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { AccountCircle } from '@mui/icons-material';
 import { AppBar, Box, Button, Container, FormControlLabel, IconButton, Menu, MenuItem, styled, Switch, Theme, Toolbar, Tooltip, Typography } from '@mui/material'
 import { usePathname, useRouter } from 'next/navigation';
@@ -70,6 +71,7 @@ const NavigationBar = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { userRole } = useCurrentUser();
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
@@ -117,30 +119,36 @@ const NavigationBar = ({
             >
               단어장
             </Button>
-            <Button
-              sx={{ 
-                my: 2, 
-                color: 'white', 
-                display: 'block',
-                borderRadius: '0px',
-                borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-              }}
-              onClick={() => router.push('/request-management')}
-            >
-              요청 관리
-            </Button>
-            <Button
-              sx={{ 
-                my: 2, 
-                color: 'white', 
-                display: 'block',
-                borderRadius: '0px',
-                borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-              }}
-              onClick={(e) => setAnchorElUserManagement(e.currentTarget)}
-            >
-              사용자 관리
-            </Button>
+            {
+              userRole && userRole !== 'STUDENT' && 
+              <Button
+                sx={{ 
+                  my: 2, 
+                  color: 'white', 
+                  display: 'block',
+                  borderRadius: '0px',
+                  borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                }}
+                onClick={() => router.push('/request-management')}
+              >
+                요청 관리
+              </Button>
+            }
+            {
+              userRole && userRole !== 'STUDENT' && 
+              <Button
+                sx={{ 
+                  my: 2, 
+                  color: 'white', 
+                  display: 'block',
+                  borderRadius: '0px',
+                  borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                }}
+                onClick={(e) => setAnchorElUserManagement(e.currentTarget)}
+              >
+                사용자 관리
+              </Button>
+            }
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
@@ -168,28 +176,34 @@ const NavigationBar = ({
                   학생
                 </Typography>
               </MenuItem>
-              <MenuItem sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <Typography sx={{ 
-                    textAlign: 'center', 
-                    color: 'inherit', 
-                    cursor: 'pointer',
-                  }} 
-                  onClick={() => navigationUser('/teachers')}
-                >
-                  선생님
-                </Typography>
-              </MenuItem>
-              <MenuItem sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <Typography sx={{ 
-                    textAlign: 'center', 
-                    color: 'inherit', 
-                    cursor: 'pointer',
-                  }} 
-                  onClick={() => navigationUser('/admins')}
-                >
-                  관리자
-                </Typography>
-              </MenuItem>
+              {
+                userRole === 'SUPERADMIN' || userRole === 'ADMIN' &&
+                <MenuItem sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                  <Typography sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    onClick={() => navigationUser('/teachers')}
+                  >
+                    선생님
+                  </Typography>
+                </MenuItem>
+              }
+              {
+                userRole === 'SUPERADMIN' || userRole === 'ADMIN' &&
+                <MenuItem sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                  <Typography sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    onClick={() => navigationUser('/admins')}
+                  >
+                    관리자
+                  </Typography>
+                </MenuItem>
+              }
             </Menu>
           </Box>
           <Box sx={{ flexGrow: 0 }}>
