@@ -11,6 +11,7 @@ import { Box } from "@mui/material";
 import StudentFilter from "../components/users/students/StudentFilter/StudentFilter";
 import StudentTable from "../components/users/students/StudentTable/StudentTable";
 import { useCurrentUser } from "../hooks/useCurrentUser";
+import AccessDenied from "../components/shared/AccessDenied";
 
 const StudentManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -49,11 +50,7 @@ const StudentManagement = () => {
     });
 
   if (userRole === 'STUDENT') {
-    return (
-      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
-        접근 권한이 없습니다.
-      </Box>
-    );
+    return <AccessDenied/>;
   }
 
   return (

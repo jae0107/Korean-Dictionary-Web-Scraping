@@ -14,7 +14,9 @@ export async function POST(request: Request) {
     where: {
       email: body.username,
     },
-  })
+  });
+
+  console.log("user: ", user)
   
   if (user && (await bcrypt.compare(body.password, user.password))) {
     const { password, ...userWithoutPass } = user

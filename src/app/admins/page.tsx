@@ -11,6 +11,7 @@ import { getAdminsQuery } from "./query";
 import AdminFilter from "../components/users/admins/AdminFilter/AdminFilter";
 import AdminTable from "../components/users/admins/AdminTable/AdminTable";
 import { useCurrentUser } from "../hooks/useCurrentUser";
+import AccessDenied from "../components/shared/AccessDenied";
 
 const AdminManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -49,11 +50,7 @@ const AdminManagement = () => {
     });
 
   if (userRole === 'STUDENT' || userRole === 'TEACHER') {
-    return (
-      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
-        접근 권한이 없습니다.
-      </Box>
-    );
+    return <AccessDenied/>;
   }
 
   return (

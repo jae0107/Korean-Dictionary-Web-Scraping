@@ -13,6 +13,7 @@ import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/
 import DummyUserForm from '@/app/components/users/user/UserFormContainer/DummyUserForm/DummyUserForm';
 import UserFormContainer from '@/app/components/users/user/UserFormContainer/UserFormContainer';
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
+import AccessDenied from '@/app/components/shared/AccessDenied';
 
 const SingleTeacher = () => {
   const params = useParams();
@@ -76,11 +77,7 @@ const SingleTeacher = () => {
     });
   
   if (userRole === 'STUDENT' || userRole === 'TEACHER') {
-    return (
-      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
-        접근 권한이 없습니다.
-      </Box>
-    );
+    return <AccessDenied/>;
   }
   
   return (

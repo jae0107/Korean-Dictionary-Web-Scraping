@@ -1,6 +1,7 @@
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { AccountCircle } from '@mui/icons-material';
 import { AppBar, Box, Button, Container, FormControlLabel, IconButton, Menu, MenuItem, styled, Switch, Theme, Toolbar, Tooltip, Typography } from '@mui/material'
+import { signOut, useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -72,6 +73,7 @@ const NavigationBar = ({
   const router = useRouter();
   const pathname = usePathname();
   const { userRole } = useCurrentUser();
+  const { data: session } = useSession();
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
@@ -177,7 +179,7 @@ const NavigationBar = ({
                 </Typography>
               </MenuItem>
               {
-                userRole === 'SUPERADMIN' || userRole === 'ADMIN' &&
+                userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
                 <MenuItem sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                   <Typography sx={{ 
                       textAlign: 'center', 
@@ -191,7 +193,7 @@ const NavigationBar = ({
                 </MenuItem>
               }
               {
-                userRole === 'SUPERADMIN' || userRole === 'ADMIN' &&
+                userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
                 <MenuItem sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                   <Typography sx={{ 
                       textAlign: 'center', 
@@ -256,9 +258,17 @@ const NavigationBar = ({
                   나의 요청
                 </Typography>
               </MenuItem>
-              <MenuItem>
-                <Typography sx={{ textAlign: 'center' }}>로그아웃</Typography>
-              </MenuItem>
+              {
+                session &&
+                <MenuItem>
+                  <Typography 
+                    sx={{ textAlign: 'center' }}
+                    onClick={() => signOut()}
+                  >
+                    로그아웃
+                  </Typography>
+                </MenuItem>
+              }
             </Menu>
           </Box>
         </Toolbar>

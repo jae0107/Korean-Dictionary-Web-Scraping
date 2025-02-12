@@ -11,6 +11,7 @@ import { Box } from "@mui/material";
 import TeacherFilter from "../components/users/teachers/TeacherFilter/TeacherFilter";
 import TeacherTable from "../components/users/teachers/TeacherTable/TeacherTable";
 import { useCurrentUser } from "../hooks/useCurrentUser";
+import AccessDenied from "../components/shared/AccessDenied";
 
 const TeacherManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -49,11 +50,7 @@ const TeacherManagement = () => {
     });
   
   if (userRole === 'STUDENT' || userRole === 'TEACHER') {
-    return (
-      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
-        접근 권한이 없습니다.
-      </Box>
-    );
+    return <AccessDenied/>;
   }
       
   return (

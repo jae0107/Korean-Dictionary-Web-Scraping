@@ -56,6 +56,7 @@ export const userTypeDefs = gql`
     class: String
     number: Int
     role: UserRole
+    password: String
   }
 
   type UserOffsetPaginationResponse {
@@ -77,6 +78,7 @@ export const userTypeDefs = gql`
   }
 
   type Mutation {
+    createUser(input: UserInput!): User!
     updateUser(id: ID!, input: UserInput!): User!
     approveUser(id: ID!): Boolean!
     bulkApproveUsers(ids: [ID!]!): Boolean!

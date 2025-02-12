@@ -31,34 +31,34 @@ const UserFormContainer = ({
 
   const schema = z.object({
     name: z.string().nonempty({ message: "이름을 작성하십시오." }),
-    email: z.string().email({ message: "잘못된 이메일 형식입니다." }).nonempty({ message: "이메일을 작성하십시오." }),
+    email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
     year: z.number({ message: "학년은 숫자여야 합니다." }).optional()
-    .refine((year) => {
-      if (getRole === UserRole.Student) {
-        if (year === null || year === undefined || year <= 0) {
-          return false;
+      .refine((year) => {
+        if (getRole === UserRole.Student) {
+          if (year === null || year === undefined || year <= 0) {
+            return false;
+          }
         }
-      }
-      return true
-    },{ message: "학년은 숫자여야 합니다." }),
+        return true
+      },{ message: "학년은 숫자여야 합니다." }),
     class: z.string().nonempty({ message: "반을 입력하십시오." }).optional()
-    .refine((classValue) => {
-      if (getRole === UserRole.Student) {
-        if (classValue === null || classValue === undefined || classValue === "0" || classValue.trim() === "") {
-          return false;
+      .refine((classValue) => {
+        if (getRole === UserRole.Student) {
+          if (classValue === null || classValue === undefined || classValue === "0" || classValue.trim() === "") {
+            return false;
+          }
         }
-      }
-      return true;
-    },{ message: "반을 입력하십시오." }),
+        return true;
+      },{ message: "반을 입력하십시오." }),
     number: z.number({ message: "번호는 숫자여야 합니다." }).optional()
-    .refine((number) => {
-      if (getRole === UserRole.Student) {
-        if (number === null || number === undefined || number <= 0) {
-          return false;
+      .refine((number) => {
+        if (getRole === UserRole.Student) {
+          if (number === null || number === undefined || number <= 0) {
+            return false;
+          }
         }
-      }
-      return true;
-    },{ message: "번호는 숫자여야 합니다." }),
+        return true;
+      },{ message: "번호는 숫자여야 합니다." }),
     role: z.string().nonempty({ message: "역할을 작성하십시오." }),
   });
 

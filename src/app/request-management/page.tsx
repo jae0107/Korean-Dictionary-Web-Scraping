@@ -11,6 +11,7 @@ import RequestManagementTable from "../components/request-management/RequestMana
 import RequestManagementFilter from "../components/request-management/RequestManagementFilter/RequestManagementFilter";
 import { useSearchParams } from "next/navigation";
 import { useCurrentUser } from "../hooks/useCurrentUser";
+import AccessDenied from "../components/shared/AccessDenied";
 
 const RequestManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -54,11 +55,7 @@ const RequestManagement = () => {
     });
     
   if (userRole === 'STUDENT') {
-    return (
-      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
-        접근 권한이 없습니다.
-      </Box>
-    );
+    return <AccessDenied/>;
   }
 
   return (

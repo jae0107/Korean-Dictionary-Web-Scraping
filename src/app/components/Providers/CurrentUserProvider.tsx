@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { ReactNode } from "react";
 import { CurrentUserContext } from "./Providers";
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { gql } from "@/app/generated/gql";
 
 const getMyRoleQuery = gql(`
@@ -18,11 +18,14 @@ export function CurrentUserProvider({
   children: ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const { data, loading, refetch } = useQuery(getMyRoleQuery, {
     fetchPolicy: 'network-only',
     onError: (e) => {
-      e && router.push('/signin');
+      if (e && pathname !== '/signup') {
+        router.push('/signin');
+      }
     },
   });
 

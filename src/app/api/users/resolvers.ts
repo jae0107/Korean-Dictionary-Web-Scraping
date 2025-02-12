@@ -17,6 +17,7 @@ export const userResolvers = {
     getRequestors,
   },
   Mutation: {
+    createUser,
     updateUser,
     approveUser,
     bulkApproveUsers,
@@ -88,6 +89,28 @@ async function getCurrentUser(_: any, { id }: { id: string }, { currentUser }: C
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
     return currentUser;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function createUser(
+  root: any,
+  { input }: { input: UserInput; },
+): Promise<User> {
+  return await transaction(async (t) => {
+    const user = await User.create({
+      name: input.name || '',
+      email: input.email || '',
+      year: input.year || undefined,
+      class: input.class || '',
+      number: input.number || undefined,
+      role: input.role || '',
+      password: input.password || '',
+      status: UserStatus.Pending,
+    });
+
+    return user;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

@@ -53,6 +53,15 @@ export const authOptions: AuthOptions = {
       session.user = token as any;
       return session;
     },
+    // Redirection logic for unauthorized access
+    async redirect({ url, baseUrl }) {
+      // If the user is not logged in, redirect to the sign-in page
+      if (!url.startsWith(baseUrl)) {
+        console.log("baseUrl: ", baseUrl)
+        return `${baseUrl}/not-authorized`;
+      }
+      return url;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {

@@ -3,6 +3,7 @@ import { ID } from "../utils/shared-types";
 import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 import { Word } from "./word";
+import * as bcrypt from 'bcrypt';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<ID>;
@@ -17,6 +18,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare number?: CreationOptional<number>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  declare accessToken?: string;
 
   declare words?: Word[];
   declare getWords: HasManyGetAssociationsMixin<Word>;
@@ -50,6 +52,7 @@ User.init(
     number: DataTypes.INTEGER,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
+    accessToken: DataTypes.VIRTUAL,
   },
   {
     sequelize,
@@ -62,6 +65,25 @@ User.init(
         if (!isPresent(this.password)) throw new Error('Password is required.');
         if (!isPresent(this.role)) throw new Error('Role is required.');
         if (!isPresent(this.status)) throw new Error('Status is required.');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email as string)) {
+          throw new Error('Invalid email format.');
+        }
+        if (!isPresent(this.password)) throw new Error('Password is required.');
+        if ((this.password as string).length < 8) {
+          throw new Error('Password must be at least 8 characters long.');
+        }
+        if (!/[A-Z]/.test(this.password as string)) {
+          throw new Error('Password must contain at least one uppercase letter.');
+        }
+        if (!/[a-z]/.test(this.password as string)) {
+          throw new Error('Password must contain at least one lowercase letter.');
+        }
+        if (!/[0-9]/.test(this.password as string)) {
+          throw new Error('Password must contain at least one number.');
+        }
+        if (!/[\W_]/.test(this.password as string)) {
+          throw new Error('Password must contain at least one special character (!@#$%^&*).');
+        }
       },
     },
   },
@@ -71,6 +93,10 @@ User.addHook('beforeValidate', 'defaultValues', (user: User) => {
   if (user.isNewRecord) {
     user.status = user.status || 'PENDING';
   }
+});
+
+User.addHook('beforeSave', 'hashPassword', async (user: User) => {
+  user.password = await bcrypt.hash(user.password, 10);
 });
 
 export { User };
