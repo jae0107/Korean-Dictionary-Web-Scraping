@@ -17,6 +17,10 @@ export async function POST(request: Request) {
   });
   
   if (user && (await bcrypt.compare(body.password, user.password))) {
+    // if (user.status !== 'APPROVED') {
+    //   return new Response(JSON.stringify(null));
+    // }
+
     const { password, ...userWithoutPass } = user
 
     const accessToken = signJwtAccessToken(userWithoutPass);

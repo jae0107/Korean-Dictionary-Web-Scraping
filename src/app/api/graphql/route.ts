@@ -20,6 +20,7 @@ export interface Context {
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
+  introspection: process.env.NODE_ENV !== "production", // Disable in production
 });
 
 // export const config = {

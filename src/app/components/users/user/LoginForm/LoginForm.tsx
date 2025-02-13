@@ -68,12 +68,24 @@ const LoginForm = () => {
 
   const onSubmit = async () => {
     setLoading(true);
-    await signIn('credentials', {
+    const res = await signIn('credentials', {
       username: watch('email'),
       password: watch('password'),
-      redirect: true,
+      redirect: false,
       callbackUrl: '/',
     });
+
+    if (res && res.error) {
+      dispatchCurrentSnackBar({
+        payload: {
+          open: true,
+          type: 'error',
+          message: res.error,
+        },
+      });
+    } else {
+      router.push('/');
+    }
     setLoading(false);
   };
 

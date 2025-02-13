@@ -1,3 +1,4 @@
+import { User, UserStatus } from "@/app/generated/gql/graphql";
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from 'next-auth/providers/credentials';
 
@@ -47,10 +48,18 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       return { ...token, ...user };
     },
-
     async session({ session, token }) {
       session.user = token as any;
       return session;
+    },
+    async signIn({ user }) {
+      const tmpUser = user as User;
+      if (tmpUser.status === UserStatus.Pending) {
+        throw new Error('승인 대기중인 계정입니다.');
+      } else if (tmpUser.status === UserStatus.Denied) {
+        throw new Error('승인이 거부된 계정입니다.');
+      }
+      return true;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
