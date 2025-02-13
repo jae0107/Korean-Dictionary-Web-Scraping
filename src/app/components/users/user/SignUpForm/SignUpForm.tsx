@@ -3,8 +3,8 @@ import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PersonAdd } from "@mui/icons-material";
-import { Box, Button, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,6 +18,7 @@ const SignUpForm = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [getRole, setRole] = useState<UserRole | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [createUser] = useMutation(createUserMutation);
 
@@ -170,9 +171,21 @@ const SignUpForm = () => {
             <TextField
               placeholder="비밀번호를 입력하세요."
               {...register('password')}
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               fullWidth
               error={!!errors.password}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              variant="outlined" 
             />
           </Box>
           <Box width={'100%'}>

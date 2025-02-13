@@ -6,8 +6,8 @@ import { useState } from "react";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { Box, Button, Divider, InputLabel, Stack, TextField, Typography } from "@mui/material";
-import { Login } from "@mui/icons-material";
+import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
+import { Login, Visibility, VisibilityOff } from "@mui/icons-material";
 
 const schema = z.object({
   email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
@@ -25,6 +25,7 @@ const LoginForm = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const form = useForm({
     defaultValues: {
@@ -111,8 +112,20 @@ const LoginForm = () => {
             <TextField
               placeholder="비밀번호를 입력하세요."
               {...register('password')}
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              variant="outlined" 
             />
           </Box>
           <Button fullWidth type='submit' variant="contained" loading={loading}>
