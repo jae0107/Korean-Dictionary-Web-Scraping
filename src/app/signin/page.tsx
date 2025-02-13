@@ -10,14 +10,13 @@ const LoginForm = dynamic(() => import('../components/users/user/LoginForm/Login
 
 const Login = () => {
   const searchParams = useSearchParams();
-  const isNotAuthorized = searchParams?.get('callbackUrl');
   const error = searchParams?.get("error");
   const { dispatchCurrentSnackBar } = useSnackbar();
   
   useEffect(() => {
     const isNotAuthorized = searchParams?.get('callbackUrl');
     
-    if (isNotAuthorized && isNotAuthorized.includes('not-authorized') && !error) {
+    if (isNotAuthorized && !error) {
       dispatchCurrentSnackBar({
         payload: {
           open: true,
@@ -37,7 +36,7 @@ const Login = () => {
   }, [searchParams, dispatchCurrentSnackBar]);
   
   return (
-    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} minHeight={'calc(100vh - 86.5px)'} mb={2}>
+    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} minHeight={'100vh'} mb={2}>
       <LoginForm/>
     </Box>
   );

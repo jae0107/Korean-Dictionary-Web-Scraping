@@ -30,7 +30,6 @@ export const authOptions: AuthOptions = {
           }),
         })
         const user = await res.json()
-        console.log(user)
 
         if (user) {
           // Any object returned will be saved in `user` property of the JWT
@@ -52,15 +51,6 @@ export const authOptions: AuthOptions = {
     async session({ session, token }) {
       session.user = token as any;
       return session;
-    },
-    // Redirection logic for unauthorized access
-    async redirect({ url, baseUrl }) {
-      // If the user is not logged in, redirect to the sign-in page
-      if (!url.startsWith(baseUrl)) {
-        console.log("baseUrl: ", baseUrl)
-        return `${baseUrl}/not-authorized`;
-      }
-      return url;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

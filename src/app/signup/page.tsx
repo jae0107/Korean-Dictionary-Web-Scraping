@@ -7,7 +7,7 @@ const SignUpForm = dynamic(() => import('../components/users/user/SignUpForm/Sig
 
 const SignUp = () => {
   return (
-    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} minHeight={'calc(100vh - 86.5px)'} mb={2}>
+    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} minHeight={'100vh'} mb={2}>
       <SignUpForm/>
     </Box>
   );

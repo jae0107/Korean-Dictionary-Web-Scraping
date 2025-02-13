@@ -87,6 +87,10 @@ const NavigationBar = ({
     router.push(url);
     setAnchorElUser(null);
   }
+
+  if (!session) {
+    return <></>;
+  }
   
   return (
     <AppBar position="static" sx={{ mb: 2 }}>
@@ -263,7 +267,7 @@ const NavigationBar = ({
                 <MenuItem>
                   <Typography 
                     sx={{ textAlign: 'center' }}
-                    onClick={() => signOut()}
+                    onClick={() => signOut({ callbackUrl: '/signin' })}
                   >
                     로그아웃
                   </Typography>
