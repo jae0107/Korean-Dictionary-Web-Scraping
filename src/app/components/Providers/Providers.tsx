@@ -13,6 +13,7 @@ import { CurrentUserProvider } from "./CurrentUserProvider";
 import { SnackbarProvider } from "@/app/hooks/useSnackbar";
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
+export const useColorModeContext = () => useContext(ColorModeContext);
 
 export interface CurrentUserContextValue {
   refetch: () => void;

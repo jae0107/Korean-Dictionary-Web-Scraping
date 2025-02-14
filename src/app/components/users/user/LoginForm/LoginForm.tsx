@@ -1,4 +1,4 @@
-import { useThemeContext } from "@/app/components/Providers/Providers";
+import { useColorModeContext, useThemeContext } from "@/app/components/Providers/Providers";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { z } from "zod";
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
 import { Cancel, Login, Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
+import ColourModeSwitch from "@/app/components/shared/ColourModeSwitch";
 
 const schema = z.object({
   email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
@@ -95,10 +96,13 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit(onSubmit, onError)}>
       <Stack spacing={4} width={'500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
         <Stack spacing={4}>
-          <Stack spacing={2} direction={'row'} alignItems={'center'}>
-            <Login color='primary' sx={{ width: '40px', height: '40px' }}/>
-            <Typography variant="h4">로그인</Typography>
-          </Stack>
+          <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
+            <Stack spacing={2} direction={'row'} alignItems={'center'}>
+              <Login color='primary' sx={{ width: '40px', height: '40px' }}/>
+              <Typography variant="h4">로그인</Typography>
+            </Stack>
+            <ColourModeSwitch/>
+          </Box>
           <Box width={'100%'}>
             <InputLabel sx={{ marginBottom: 1 }}>이메일</InputLabel>
             <TextField

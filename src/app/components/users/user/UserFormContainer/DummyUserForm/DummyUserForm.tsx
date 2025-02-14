@@ -18,11 +18,6 @@ const DummyUserForm = ({
           <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/>
           <Typography variant="h5">{`${userType} 프로필`}</Typography>
         </Box>
-        <Button 
-          variant='outlined' 
-        >
-          {'수정'}
-        </Button>
       </Box>
       {loading && 
         <Stack spacing={2}>

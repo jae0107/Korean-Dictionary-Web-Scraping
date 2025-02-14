@@ -11,6 +11,7 @@ import { z } from "zod";
 import { createUserMutation } from "./query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ColourModeSwitch from "@/app/components/shared/ColourModeSwitch";
 
 const SignUpForm = () => {
   const theme = useThemeContext();
@@ -143,10 +144,13 @@ const SignUpForm = () => {
     <form onSubmit={handleSubmit(onSubmit, onError)}>
       <Stack spacing={4} width={'500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
         <Stack spacing={2}>
-          <Stack spacing={2} direction={'row'} alignItems={'center'}>
-            <PersonAdd color='primary' sx={{ width: '40px', height: '40px' }}/>
-            <Typography variant="h4">회원가입</Typography>
-          </Stack>
+          <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
+            <Stack spacing={2} direction={'row'} alignItems={'center'}>
+              <PersonAdd color='primary' sx={{ width: '40px', height: '40px' }}/>
+              <Typography variant="h4">회원가입</Typography>
+            </Stack>
+            <ColourModeSwitch/>
+          </Box>
           <Box width={'100%'}>
             <InputLabel 
               sx={{ marginBottom: 1 }}

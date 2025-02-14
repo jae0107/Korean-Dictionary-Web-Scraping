@@ -1,14 +1,11 @@
 import { AccountBox } from "@mui/icons-material";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import UserForm from "./UserForm/UserForm";
 import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { useState } from "react";
-import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@apollo/client";
-import { updateUserMutation } from "./query";
-import { useSnackbar } from "@/app/hooks/useSnackbar";
 
 const UserFormContainer = ({
   id,
@@ -21,13 +18,8 @@ const UserFormContainer = ({
   userType: string;
   refetch: () => void;
 }) => {
-  const { dispatchCurrentSnackBar } = useSnackbar();
-  
   const [editMode, setEditMode] = useState(false);
-  const [getUpdateLoader, setUpdateLoader] = useState<boolean>(false);
   const [getRole, setRole] = useState<UserRole>(defaultValues.role || UserRole.Student);
-
-  const [updateUser] = useMutation(updateUserMutation);
 
   const schema = z.object({
     name: z.string().nonempty({ message: "이름을 작성하십시오." }),
@@ -67,93 +59,15 @@ const UserFormContainer = ({
     resolver: zodResolver(schema),
   });
   
-  const { handleSubmit } = form;
-
-  const getErrorMsg = (errors: FieldErrors<UserInput>) => {
-    console.log("errors: ", errors)
-    console.log("form: ", form.getValues())
-    if (errors) {
-      return Object.keys(errors)
-        .reduce((messages: string[], key) => {
-          const index = key as keyof UserInput;
-
-          if (errors && errors[index]) {
-            const error = errors[index];
-            error && error.message && messages.push(error.message);
-          }
-
-          return messages;
-        }, [])
-        .join('\n');
-    }
-    return '';
-  };
-
-  const onError: SubmitErrorHandler<UserInput> = (errors) => {
-    if (Object.keys(errors).length) {
-      dispatchCurrentSnackBar({
-        payload: {
-          open: true,
-          type: 'error',
-          message: getErrorMsg(errors),
-        },
-      });
-    }
-  };
-
-  const onUpdateUser = (userInput: UserInput) => {
-    setUpdateLoader(true);
-    updateUser({
-      variables: {
-        updateUserId: id,
-        input: userInput,
-      },
-      onError: (error) => {
-        setUpdateLoader(false);
-        dispatchCurrentSnackBar({
-          payload: {
-            open: true,
-            type: 'error',
-            message: error.message,
-          },
-        });
-      },
-      onCompleted: () => {
-        refetch();
-        setEditMode(false);
-        setUpdateLoader(false);
-        dispatchCurrentSnackBar({
-          payload: {
-            open: true,
-            type: 'success',
-            message: '성공적으로 업데이트 되었습니다.',
-          },
-        });
-      },
-    });
-  }
-  
   return (
     <Stack spacing={4} width={'300px'} mt={2} alignSelf={'center'}>  
       <Box display={'flex'} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
         <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-          <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/>
+          <AccountBox color='info' sx={{ width: '40px', height: '40px' }}/>
           <Typography variant="h5">{`${userType} 프로필`}</Typography>
         </Box>
-        <Button 
-          variant='outlined' 
-          loading={getUpdateLoader}
-          onClick={() => {
-            if (editMode) {
-              handleSubmit(onUpdateUser, onError)();
-            } else {
-              setEditMode(!editMode);
-            }
-          }}>
-          {editMode ? '저장' : '수정'}
-        </Button>
       </Box>
-      <UserForm editMode={editMode} form={form} setRole={setRole}/>
+      <UserForm id={id} editMode={editMode} setEditMode={setEditMode} form={form} setRole={setRole} refetch={refetch} />
     </Stack>
   );
 }

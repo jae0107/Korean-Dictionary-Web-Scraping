@@ -1,21 +1,100 @@
 import { UserInput, UserRole } from "@/app/generated/gql/graphql";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { Controller, FieldErrors, SubmitErrorHandler, UseFormReturn } from "react-hook-form";
+import { Button, FormControl, Grid2, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useCurrentUser } from "@/app/hooks/useCurrentUser";
-import { Cancel } from "@mui/icons-material";
+import { Cancel, Edit, HighlightOff, SaveAlt } from "@mui/icons-material";
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { updateUserMutation } from "./query";
+import { useSnackbar } from "@/app/hooks/useSnackbar";
 
 const UserForm = ({
+  id,
   editMode,
+  setEditMode,
   form,
   setRole,
+  refetch,
 } : {
+  id: string;
   editMode: boolean;
+  setEditMode: (value: boolean) => void;
   form: UseFormReturn<UserInput>;
   setRole?: (role: UserRole) => void;
+  refetch: () => void;
 }) => {
+  const { dispatchCurrentSnackBar } = useSnackbar();
   const { userRole } = useCurrentUser();
+
+  const [getUpdateLoader, setUpdateLoader] = useState<boolean>(false);
+
+  const [updateUser] = useMutation(updateUserMutation);
   
-  const { register, control, watch, setValue } = form;
+  const { register, control, watch, setValue, handleSubmit } = form;
+
+  const getErrorMsg = (errors: FieldErrors<UserInput>) => {
+      console.log("errors: ", errors)
+      console.log("form: ", form.getValues())
+      if (errors) {
+        return Object.keys(errors)
+          .reduce((messages: string[], key) => {
+            const index = key as keyof UserInput;
+  
+            if (errors && errors[index]) {
+              const error = errors[index];
+              error && error.message && messages.push(error.message);
+            }
+  
+            return messages;
+          }, [])
+          .join('\n');
+      }
+      return '';
+    };
+  
+    const onError: SubmitErrorHandler<UserInput> = (errors) => {
+      if (Object.keys(errors).length) {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: getErrorMsg(errors),
+          },
+        });
+      }
+    };
+  
+    const onUpdateUser = (userInput: UserInput) => {
+      setUpdateLoader(true);
+      updateUser({
+        variables: {
+          updateUserId: id,
+          input: userInput,
+        },
+        onError: (error) => {
+          setUpdateLoader(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+        onCompleted: () => {
+          refetch();
+          setEditMode(false);
+          setUpdateLoader(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'success',
+              message: '성공적으로 업데이트 되었습니다.',
+            },
+          });
+        },
+      });
+    }
   
   return (
     <Stack spacing={2}>
@@ -153,6 +232,26 @@ const UserForm = ({
             onChange={(e) => setValue('number', parseInt(e.target.value))}
           />
         </FormControl>
+      }
+      {
+        !editMode ? (
+          <Button variant='outlined' fullWidth onClick={() => setEditMode(true)} startIcon={<Edit/>}>
+            수정
+          </Button>
+        ) : (
+          <Grid2 container spacing={1}>
+            <Grid2 size={6}>
+              <Button variant='outlined' fullWidth onClick={() => setEditMode(false)} color="error" startIcon={<HighlightOff/>} disabled={getUpdateLoader}>
+                취소
+              </Button>
+            </Grid2>
+            <Grid2 size={6}>
+              <Button variant='outlined' fullWidth startIcon={<SaveAlt/>} onClick={handleSubmit(onUpdateUser, onError)} loading={getUpdateLoader}>
+                저장
+              </Button>
+            </Grid2>
+          </Grid2>
+        )
       }
     </Stack>
   )
