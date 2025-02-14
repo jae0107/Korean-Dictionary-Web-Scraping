@@ -1,24 +1,27 @@
 import { User, Word } from "../models";
 import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
-import { OffsetPaginationOptions, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
+import { FindPasswordInput, OffsetPaginationOptions, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
 import { RequestorSearch } from "./requestor-search";
 import { sequelize } from "../initialisers";
 import { Op } from "sequelize";
+import * as bcrypt from 'bcrypt';
 
 export const userResolvers = {
   Query: {
     getCurrentUser,
     getUsers,
     getUser,
+    findPassword,
     getRequestors,
   },
   Mutation: {
     createUser,
     updateUser,
+    changeCurrentPassword,
     approveUser,
     bulkApproveUsers,
     denyUser,
@@ -78,7 +81,7 @@ async function getUser(_: any, { id }: { id: string }, { currentUser }: Context)
     if (!currentUser) throw new Error('No Current User Found');
     if (!id) throw new Error('ID is required');
     const user = await User.findByPk(id);
-    if (!user) throw new Error('No Procedure Template Found');
+    if (!user) throw new Error('No User Found');
     return user;
   }).catch((e) => {
     throw new ApolloResponseError(e);
@@ -89,6 +92,17 @@ async function getCurrentUser(_: any, { id }: { id: string }, { currentUser }: C
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
     return currentUser;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function findPassword(_: any, { email }: { email: string }): Promise<string> {
+  return await transaction(async (t) => {
+    if (!email) throw new Error('ID is required');
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) throw new Error('No User Found');
+    return user.password;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });
@@ -135,6 +149,33 @@ async function updateUser(
         number: input.number || undefined,
         role: input.role || '',
       });
+    } else {
+      throw new Error('No User Found');
+    }
+
+    return user;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function changeCurrentPassword(
+  root: any,
+  { id, input }: { id: string; input: FindPasswordInput; },
+  { currentUser }: Context,
+): Promise<User> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    let user = await User.findByPk(id);
+
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(input.currentPassword, user.password);
+      if (isPasswordValid) {
+        user = await user.update({ password: input.newPassword });
+      } else {
+        throw new Error('입력한 현재 비밀번호가 일치하지 않습니다.');
+      }
     } else {
       throw new Error('No User Found');
     }

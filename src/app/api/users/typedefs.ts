@@ -40,6 +40,7 @@ export const userTypeDefs = gql`
     id: ID!
     name: String!
     email: String!
+    password: String
     year: Int
     class: String
     number: Int
@@ -59,6 +60,11 @@ export const userTypeDefs = gql`
     password: String
   }
 
+  input FindPasswordInput {
+    currentPassword: String!
+    newPassword: String!
+  }
+
   type UserOffsetPaginationResponse {
     records: [User!]!
     pageInfo: OffsetPaginationPageInfo!
@@ -71,6 +77,7 @@ export const userTypeDefs = gql`
       filterOptions: UserFilterOptions!
     ): UserOffsetPaginationResponse!
     getUser(id: ID!): User!
+    findPassword(email: String!): String!
     getRequestors(
       paginationOptions: OffsetPaginationOptions!
       filterOptions: RequestorFilterOptions!
@@ -79,6 +86,7 @@ export const userTypeDefs = gql`
 
   type Mutation {
     createUser(input: UserInput!): User!
+    changeCurrentPassword(id: ID!, input: FindPasswordInput!): User!
     updateUser(id: ID!, input: UserInput!): User!
     approveUser(id: ID!): Boolean!
     bulkApproveUsers(ids: [ID!]!): Boolean!

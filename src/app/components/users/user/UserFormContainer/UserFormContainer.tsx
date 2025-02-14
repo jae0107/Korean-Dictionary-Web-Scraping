@@ -6,6 +6,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { StudentIcon } from "@/app/components/shared/icons/StudentIcon";
+import { useThemeContext } from "@/app/components/Providers/Providers";
+import { HipTeacherIcon } from "@/app/components/shared/icons/HipTeacherIcon";
+import { AdminIcon } from "@/app/components/shared/icons/AdminIcon";
 
 const UserFormContainer = ({
   id,
@@ -18,6 +22,8 @@ const UserFormContainer = ({
   userType: string;
   refetch: () => void;
 }) => {
+  const theme = useThemeContext();
+  
   const [editMode, setEditMode] = useState(false);
   const [getRole, setRole] = useState<UserRole>(defaultValues.role || UserRole.Student);
 
@@ -58,16 +64,58 @@ const UserFormContainer = ({
     defaultValues,
     resolver: zodResolver(schema),
   });
+
+  const getIcon = () => {
+    if (userType === '학생') {
+      return (
+        <Box 
+          display={'flex'} 
+          alignItems={'center'} 
+          justifyContent={'center'}
+          bgcolor={theme?.palette.mode === 'dark'  ? theme?.palette.info.dark : theme?.palette.info.light}
+          borderRadius={'5px'}
+          marginRight={1}
+        >
+          <StudentIcon style={{ width: '40px', height: '40px', color: '#fff' }}/>
+        </Box>
+      );
+    } else if (userType === '선생님') {
+      return (
+        <Box 
+          display={'flex'} 
+          alignItems={'center'} 
+          justifyContent={'center'}
+          bgcolor={theme?.palette.mode === 'dark'  ? theme?.palette.info.dark : theme?.palette.info.light}
+          borderRadius={'5px'}
+          marginRight={1}
+        >
+          <HipTeacherIcon style={{ width: '40px', height: '40px', color: '#fff', padding: '5px' }}/>
+        </Box>
+      );
+    } else if (userType === '관리자') {
+      return (
+        <Box 
+          display={'flex'} 
+          alignItems={'center'} 
+          justifyContent={'center'}
+          bgcolor={theme?.palette.mode === 'dark'  ? theme?.palette.info.dark : theme?.palette.info.light}
+          borderRadius={'5px'}
+          marginRight={1}
+        >
+          <AdminIcon style={{ width: '40px', height: '40px', color: '#fff', padding: '3px' }}/>
+        </Box>
+      );
+    }
+    return <AccountBox color='info' sx={{ width: '40px', height: '40px', mr: 1 }}/>;
+  }
   
   return (
     <Stack spacing={4} width={'300px'} mt={2} alignSelf={'center'}>  
-      <Box display={'flex'} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-        <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-          <AccountBox color='info' sx={{ width: '40px', height: '40px' }}/>
-          <Typography variant="h5">{`${userType} 프로필`}</Typography>
-        </Box>
+      <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
+        {getIcon()}
+        <Typography variant="h5">{`${userType} 프로필`}</Typography>
       </Box>
-      <UserForm id={id} editMode={editMode} setEditMode={setEditMode} form={form} setRole={setRole} refetch={refetch} />
+      <UserForm id={id} editMode={editMode} setEditMode={setEditMode} form={form} setRole={setRole} refetch={refetch}/>
     </Stack>
   );
 }

@@ -33,24 +33,22 @@ const UserForm = ({
   const { register, control, watch, setValue, handleSubmit } = form;
 
   const getErrorMsg = (errors: FieldErrors<UserInput>) => {
-      console.log("errors: ", errors)
-      console.log("form: ", form.getValues())
-      if (errors) {
-        return Object.keys(errors)
-          .reduce((messages: string[], key) => {
-            const index = key as keyof UserInput;
+    if (errors) {
+      return Object.keys(errors)
+        .reduce((messages: string[], key) => {
+          const index = key as keyof UserInput;
   
-            if (errors && errors[index]) {
-              const error = errors[index];
-              error && error.message && messages.push(error.message);
-            }
+          if (errors && errors[index]) {
+            const error = errors[index];
+            error && error.message && messages.push(error.message);
+          }
   
-            return messages;
-          }, [])
-          .join('\n');
-      }
-      return '';
-    };
+          return messages;
+        }, [])
+        .join('\n');
+    }
+    return '';
+  };
   
     const onError: SubmitErrorHandler<UserInput> = (errors) => {
       if (Object.keys(errors).length) {

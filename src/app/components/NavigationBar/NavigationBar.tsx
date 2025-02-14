@@ -1,12 +1,14 @@
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { NetworkStatus } from '@apollo/client';
-import { AccountCircle } from '@mui/icons-material';
+import { AccountCircle, AdminPanelSettings, Checklist, Logout, Portrait, School, VpnKey } from '@mui/icons-material';
 import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Theme, Toolbar, Typography } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ColourModeSwitch from '../shared/ColourModeSwitch';
+import { StudentIcon } from '../shared/icons/StudentIcon';
+import { TeacherIcon } from '../shared/icons/TeacherIcon';
 
 const NavigationBar = ({
   theme,
@@ -156,8 +158,10 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer',
                   }} 
+                  display={'flex'}
+                  alignItems={'center'}
                 >
-                  학생
+                  <StudentIcon style={{ height: '24px', width: '24px', marginRight: '4px' }}/>학생
                 </Typography>
               </MenuItem>
               {
@@ -172,8 +176,10 @@ const NavigationBar = ({
                       color: 'inherit', 
                       cursor: 'pointer',
                     }} 
+                    display={'flex'}
+                    alignItems={'center'}
                   >
-                    선생님
+                    <TeacherIcon style={{ height: '24px', width: '24px', marginRight: '4px' }}/>선생님
                   </Typography>
                 </MenuItem>
               }
@@ -189,8 +195,10 @@ const NavigationBar = ({
                       color: 'inherit', 
                       cursor: 'pointer',
                     }}
+                    display={'flex'}
+                    alignItems={'center'}
                   >
-                    관리자
+                    <AdminPanelSettings sx={{ mr: '4px' }}/>관리자
                   </Typography>
                 </MenuItem>
               }
@@ -226,8 +234,26 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer' 
                   }}
+                  display={'flex'}
+                  alignItems={'center'}
                 >
-                  프로필
+                  <Portrait sx={{ mr: '4px' }}/>프로필
+                </Typography>
+              </MenuItem>
+              <MenuItem 
+                sx={{ backgroundColor: pathname === '/password-change' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                onClick={() => navigationMyInfo('/password-change')}
+              >
+                <Typography 
+                  sx={{ 
+                    textAlign: 'center', 
+                    color: 'inherit', 
+                    cursor: 'pointer' 
+                  }}
+                  display={'flex'}
+                  alignItems={'center'}
+                >
+                  <VpnKey sx={{ mr: '4px' }}/>비밀번호 변경
                 </Typography>
               </MenuItem>
               <MenuItem 
@@ -240,20 +266,24 @@ const NavigationBar = ({
                     color: 'inherit', 
                     cursor: 'pointer',
                   }}
+                  display={'flex'}
+                  alignItems={'center'}
                 >
-                  나의 요청
+                  <Checklist sx={{ mr: '4px' }}/>나의 요청
                 </Typography>
               </MenuItem>
               {
                 session &&
-                <MenuItem onClick={logOut} sx={{ justifyContent: 'center' }}>
+                <MenuItem onClick={logOut}>
                   {
                     logoutLoading ?
                     <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px !important' }}/> :
                     <Typography 
                       sx={{ textAlign: 'center' }}
+                      display={'flex'}
+                      alignItems={'center'}
                     >
-                      로그아웃
+                      <Logout sx={{ mr: '4px' }}/>로그아웃
                     </Typography>
                   }
                 </MenuItem>
