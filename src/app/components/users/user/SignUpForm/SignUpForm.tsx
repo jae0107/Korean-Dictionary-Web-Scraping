@@ -3,13 +3,14 @@ import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Login, PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { createUserMutation } from "./query";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const SignUpForm = () => {
   const theme = useThemeContext();
@@ -318,6 +319,15 @@ const SignUpForm = () => {
             <Button fullWidth type='submit' variant="contained" loading={loading} sx={{ mt: 3 }}>
               가입하기
             </Button>
+          </Box>
+          <Box>
+            <Typography variant={'body2'} mt={1} display={'flex'} alignItems={'center'} flexDirection={'row'}>
+              계정이 이미 있으신가요? 
+              <Link href={'/signin'} style={{ marginLeft: 10, display: 'flex', alignItems: 'center' }}>
+                <Login sx={{ mr: 1, width: '20px', height: '20px' }}/>
+                로그인
+              </Link>
+            </Typography>
           </Box>
         </Stack>
       </Stack>

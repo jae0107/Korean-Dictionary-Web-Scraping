@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
 import { Login, Visibility, VisibilityOff } from "@mui/icons-material";
+import Link from "next/link";
 
 const schema = z.object({
   email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
@@ -138,7 +139,14 @@ const LoginForm = () => {
             <Typography variant={'body2'} mb={1}>
               계정이 없으신가요?
             </Typography>
-            <Button fullWidth variant='outlined' onClick={() => router.push('/signup')}>회원가입</Button>
+            <Button
+              fullWidth
+              variant='outlined'
+              component={Link}
+              href={'/signup'}
+            >
+              회원가입
+            </Button>
           </Box>
           <Typography variant={'body2'}>
             비밀번호를 잊으셨나요? <a href={'/forgot-password'}>비밀번호 찾기</a>

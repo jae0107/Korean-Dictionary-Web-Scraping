@@ -2,8 +2,9 @@ import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { AccountCircle } from '@mui/icons-material';
 import { AppBar, Box, Button, Container, FormControlLabel, IconButton, Menu, MenuItem, styled, Switch, Theme, Toolbar, Tooltip, Typography } from '@mui/material'
 import { signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
@@ -72,11 +73,17 @@ const NavigationBar = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { userRole } = useCurrentUser();
+  const { userRole, refetch, loading } = useCurrentUser();
   const { data: session } = useSession();
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    if (session) {
+      refetch();
+    }
+  }, [session, refetch]);
 
   const navigationUser = (url: string) => {
     router.push(url);
@@ -91,6 +98,12 @@ const NavigationBar = ({
   if (!session) {
     return <></>;
   }
+
+  const getDisplay = (show: boolean) => {
+    if (loading) return 'inline-flex';
+    if (show) return 'block';
+    return 'none';
+  }
   
   return (
     <AppBar position="static" sx={{ mb: 2 }}>
@@ -99,7 +112,8 @@ const NavigationBar = ({
           <Typography
             variant="h6"
             noWrap
-            onClick={() => router.push('/home')}
+            component={Link}
+            href={'/home'}
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -108,6 +122,7 @@ const NavigationBar = ({
               letterSpacing: '.3rem',
               color: 'inherit',
               cursor: 'pointer',
+              textDecoration: 'none',
             }}
           >
             Home
@@ -117,39 +132,45 @@ const NavigationBar = ({
               sx={{ 
                 my: 2, 
                 color: 'white', 
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 borderRadius: '0px',
                 borderBottom: `2px solid ${pathname === '/vocabulary-list' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
               }}
-              onClick={() => router.push('/vocabulary-list')}
+              component={Link}
+              href={'/vocabulary-list'}
             >
               단어장
             </Button>
             {
-              userRole && userRole !== 'STUDENT' && 
+              session.user.role !== 'STUDENT' &&
               <Button
                 sx={{ 
                   my: 2, 
                   color: 'white', 
-                  display: 'block',
+                  display: getDisplay(!!userRole && userRole !== 'STUDENT'),
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                 }}
-                onClick={() => router.push('/request-management')}
+                loading={loading}
+                component={Link}
+                href={'/request-management'}
               >
                 요청 관리
               </Button>
             }
             {
-              userRole && userRole !== 'STUDENT' && 
+              session.user.role !== 'STUDENT' && 
               <Button
                 sx={{ 
                   my: 2, 
                   color: 'white', 
-                  display: 'block',
+                  display: getDisplay(!!userRole && userRole !== 'STUDENT'),
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                 }}
+                loading={loading}
                 onClick={(e) => setAnchorElUserManagement(e.currentTarget)}
               >
                 사용자 관리
@@ -171,26 +192,32 @@ const NavigationBar = ({
               open={Boolean(anchorElUserManagement)}
               onClose={() => setAnchorElUserManagement(null)}
             >
-              <MenuItem sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <Typography sx={{ 
+              <MenuItem 
+                sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                onClick={() => navigationUser('/students')}
+              >
+                <Typography 
+                  sx={{ 
                     textAlign: 'center', 
                     color: 'inherit', 
                     cursor: 'pointer',
                   }} 
-                  onClick={() => navigationUser('/students')}
                 >
                   학생
                 </Typography>
               </MenuItem>
               {
                 userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
-                <MenuItem sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                  <Typography sx={{ 
+                <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/teachers')}
+                >
+                  <Typography 
+                    sx={{ 
                       textAlign: 'center', 
                       color: 'inherit', 
                       cursor: 'pointer',
                     }} 
-                    onClick={() => navigationUser('/teachers')}
                   >
                     선생님
                   </Typography>
@@ -198,13 +225,16 @@ const NavigationBar = ({
               }
               {
                 userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
-                <MenuItem sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                  <Typography sx={{ 
+                <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/admins')}
+                >
+                  <Typography 
+                    sx={{ 
                       textAlign: 'center', 
                       color: 'inherit', 
                       cursor: 'pointer',
-                    }} 
-                    onClick={() => navigationUser('/admins')}
+                    }}
                   >
                     관리자
                   </Typography>
@@ -238,36 +268,39 @@ const NavigationBar = ({
               open={Boolean(anchorElUser)}
               onClose={() => setAnchorElUser(null)}
             >
-              <MenuItem sx={{ backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+              <MenuItem 
+                sx={{ backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                onClick={() => navigationMyInfo('/profile')}
+              >
                 <Typography 
                   sx={{ 
                     textAlign: 'center', 
                     color: 'inherit', 
                     cursor: 'pointer' 
-                  }} 
-                  onClick={() => navigationMyInfo('/profile')}
-                  >
-                    프로필
-                  </Typography>
+                  }}
+                >
+                  프로필
+                </Typography>
               </MenuItem>
-              <MenuItem sx={{ backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+              <MenuItem 
+                sx={{ backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                onClick={() => navigationMyInfo('/my-requests')}
+              >
                 <Typography 
                   sx={{ 
                     textAlign: 'center', 
                     color: 'inherit', 
                     cursor: 'pointer',
-                  }} 
-                  onClick={() => navigationMyInfo('/my-requests')}
+                  }}
                 >
                   나의 요청
                 </Typography>
               </MenuItem>
               {
                 session &&
-                <MenuItem>
+                <MenuItem onClick={() => signOut({ callbackUrl: '/signin' })}>
                   <Typography 
                     sx={{ textAlign: 'center' }}
-                    onClick={() => signOut({ callbackUrl: '/signin' })}
                   >
                     로그아웃
                   </Typography>
