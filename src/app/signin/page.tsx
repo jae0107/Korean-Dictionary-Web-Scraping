@@ -15,8 +15,9 @@ const Login = () => {
   
   useEffect(() => {
     const isNotAuthorized = searchParams?.get('callbackUrl');
+    const baseURL = typeof window !== "undefined" ? window.location.origin+'/' : "";
     
-    if (isNotAuthorized && !error) {
+    if (isNotAuthorized && !error && baseURL !== isNotAuthorized) {
       dispatchCurrentSnackBar({
         payload: {
           open: true,
