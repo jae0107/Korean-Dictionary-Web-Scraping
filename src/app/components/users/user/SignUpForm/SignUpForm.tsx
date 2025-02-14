@@ -3,7 +3,7 @@ import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Login, PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Cancel, Login, PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
@@ -160,6 +160,17 @@ const SignUpForm = () => {
               type='email'
               fullWidth
               error={!!errors.email}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setValue('email', '')}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           </Box>
           <Box width={'100%'}>
@@ -179,8 +190,11 @@ const SignUpForm = () => {
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
+                      <IconButton onClick={() => setValue('password', '')} sx={{ mr: '2px' }}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
                       <IconButton onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -202,6 +216,17 @@ const SignUpForm = () => {
               type='text'
               fullWidth
               error={!!errors.name}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setValue('name', '')}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           </Box>
           <Box width={'100%'}>
@@ -307,7 +332,16 @@ const SignUpForm = () => {
                 slotProps={{
                   htmlInput: {
                     min: 0
-                  }
+                  },
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setValue('number', 0)}>
+                          <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
                 }}
                 value={watch('number')}
                 onChange={(e) => setValue('number', parseInt(e.target.value))}

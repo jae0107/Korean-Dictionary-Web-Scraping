@@ -7,7 +7,7 @@ import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
-import { Login, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Cancel, Login, Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
 
 const schema = z.object({
@@ -36,7 +36,7 @@ const LoginForm = () => {
     resolver: zodResolver(schema),
   });
 
-  const { register, handleSubmit, watch } = form;
+  const { register, handleSubmit, watch, setValue } = form;
 
   const getErrorMsg = (errors: FieldErrors<LoginInput>) => {
     if (errors) {
@@ -106,6 +106,17 @@ const LoginForm = () => {
               {...register('email')}
               type='email'
               fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setValue('email', '')}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           </Box>
           <Box width={'100%'}>
@@ -119,8 +130,11 @@ const LoginForm = () => {
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
+                      <IconButton onClick={() => setValue('password', '')} sx={{ mr: '2px' }}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
                       <IconButton onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
                       </IconButton>
                     </InputAdornment>
                   ),

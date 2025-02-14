@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, IconButton, InputAdornment, Skeleton, Stack, TextField } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import { Cancel, Search } from '@mui/icons-material';
 import { useState } from 'react';
 import { SearchResult } from '@/app/types/types';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -60,6 +60,9 @@ const Home = () => {
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
+                      <IconButton loading={isLoading} onClick={() => setValue('kWord', '')} sx={{ mr: 1 }}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
                       <span
                         style={{
                           cursor:

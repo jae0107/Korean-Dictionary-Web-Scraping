@@ -1,9 +1,10 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, Stack, Tab, TextField, Tooltip } from "@mui/material";
+import { Box, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, Tab, TextField, Tooltip } from "@mui/material";
 import { TabContext, TabList } from '@mui/lab';
 import { Dispatch, SetStateAction, SyntheticEvent } from "react";
 import { WordStatus } from "@/app/generated/gql/graphql";
 import { useRouter } from "next/navigation";
 import RequestorDropDown from "./RequestorDropDown/RequestorDropDown";
+import { Cancel } from "@mui/icons-material";
 
 const a11yProps = (index: string) => {
   return {
@@ -74,6 +75,17 @@ const RequestManagementFilter = ({
           value={wordKeyword}
           onChange={(e) => setWordKeyword(e.target.value)}
           sx={{ flex: 2 }}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setWordKeyword('')}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
         <FormControl sx={{ flex: 1 }}>
           <InputLabel>학년</InputLabel>

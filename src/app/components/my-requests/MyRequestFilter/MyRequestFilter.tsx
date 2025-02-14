@@ -1,6 +1,7 @@
 import { WordStatus } from "@/app/generated/gql/graphql";
+import { Cancel } from "@mui/icons-material";
 import { TabContext, TabList } from "@mui/lab";
-import { Box, Stack, Tab, TextField } from "@mui/material";
+import { Box, IconButton, InputAdornment, Stack, Tab, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, SyntheticEvent } from "react";
 
@@ -61,6 +62,17 @@ const MyRequestFilter = ({
           value={wordKeyword}
           onChange={(e) => setWordKeyword(e.target.value)}
           sx={{ width: '250px' }}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setWordKeyword('')}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </Stack>
     </Stack>

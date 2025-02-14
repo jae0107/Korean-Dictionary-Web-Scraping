@@ -1,7 +1,8 @@
 import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useCurrentUser } from "@/app/hooks/useCurrentUser";
+import { Cancel } from "@mui/icons-material";
 
 const UserForm = ({
   editMode,
@@ -24,6 +25,17 @@ const UserForm = ({
           type='text'
           label='이름'
           disabled={!editMode}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setValue('name', '')} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </FormControl>
       <FormControl component='fieldset'>
@@ -32,6 +44,17 @@ const UserForm = ({
           type='email'
           label='이메일'
           disabled={!editMode}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setValue('email', '')} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </FormControl>
       <FormControl component='fieldset'>
@@ -115,7 +138,16 @@ const UserForm = ({
             slotProps={{
               htmlInput: {
                 min: 0
-              }
+              },
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setValue('number', 0)} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                      <Cancel sx={{ width: '15px', height: '15px' }}/>
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
             }}
             value={watch('number')}
             onChange={(e) => setValue('number', parseInt(e.target.value))}

@@ -1,6 +1,7 @@
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
+import { NetworkStatus } from '@apollo/client';
 import { AccountCircle } from '@mui/icons-material';
-import { AppBar, Box, Button, Container, FormControlLabel, IconButton, Menu, MenuItem, styled, Switch, Theme, Toolbar, Tooltip, Typography } from '@mui/material'
+import { AppBar, Box, Button, CircularProgress, Container, FormControlLabel, IconButton, Menu, MenuItem, styled, Switch, Theme, Toolbar, Tooltip, Typography } from '@mui/material'
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -73,11 +74,12 @@ const NavigationBar = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { userRole, refetch, loading } = useCurrentUser();
+  const { userRole, refetch, loading, networkStatus } = useCurrentUser();
   const { data: session } = useSession();
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -100,9 +102,16 @@ const NavigationBar = ({
   }
 
   const getDisplay = (show: boolean) => {
-    if (loading) return 'inline-flex';
+    if (loading || networkStatus === NetworkStatus.refetch) return 'inline-flex';
     if (show) return 'block';
     return 'none';
+  }
+
+  const logOut = async () => {
+    setLogoutLoading(true);
+    await signOut({ callbackUrl: '/signin' });
+    setLogoutLoading(false);
+    setAnchorElUser(null);
   }
   
   return (
@@ -298,12 +307,16 @@ const NavigationBar = ({
               </MenuItem>
               {
                 session &&
-                <MenuItem onClick={() => signOut({ callbackUrl: '/signin' })}>
-                  <Typography 
-                    sx={{ textAlign: 'center' }}
-                  >
-                    로그아웃
-                  </Typography>
+                <MenuItem onClick={logOut} sx={{ justifyContent: 'center' }}>
+                  {
+                    logoutLoading ?
+                    <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px !important' }}/> :
+                    <Typography 
+                      sx={{ textAlign: 'center' }}
+                    >
+                      로그아웃
+                    </Typography>
+                  }
                 </MenuItem>
               }
             </Menu>

@@ -18,6 +18,7 @@ export interface CurrentUserContextValue {
   refetch: () => void;
   loading: boolean;
   userRole: string | null;
+  networkStatus: number;
 }
 
 export interface CurrentUserContextValueWithUser

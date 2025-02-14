@@ -1,9 +1,9 @@
 import { SearchResult } from "@/app/types/types";
-import { Box, Button, CircularProgress, IconButton, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
-import { AddCircle, ArrowRightAlt, DeleteForever } from "@mui/icons-material";
+import { AddCircle, ArrowRightAlt, Cancel, DeleteForever } from "@mui/icons-material";
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { createWordRequestMutation } from "./query";
@@ -170,6 +170,17 @@ const SearchResults = ({
               sx={{ width: '100%' }}
               value={dicType === 'koDic' ? getKorDic : getNaverDic}
               onChange={(e) => dicType === 'koDic' ? setKorDic(e.target.value) : setNaverDic(e.target.value)}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => dicType === 'koDic' ? setKorDic('') : setNaverDic('')}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
             <IconButton 
               type='submit'
@@ -208,7 +219,16 @@ const SearchResults = ({
           slotProps={{
             htmlInput: {
               min: 0
-            }
+            },
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setValue('page', 0)}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
         <TextField
@@ -217,6 +237,17 @@ const SearchResults = ({
           type='text'
           multiline
           rows={4}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setValue('example', '')}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
         <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
         <Button

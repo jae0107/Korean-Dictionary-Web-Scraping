@@ -1,5 +1,5 @@
-import { DoDisturb } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Cancel, DoDisturb } from "@mui/icons-material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputAdornment, TextField } from "@mui/material";
 import { useState } from "react";
 
 const DeniedReasonPopUp = ({
@@ -30,6 +30,17 @@ const DeniedReasonPopUp = ({
           fullWidth
           value={getDeniedReason}
           onChange={(e) => setDeniedReason(e.target.value)}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setDeniedReason('')}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </DialogContent>
       <DialogActions>

@@ -1,4 +1,5 @@
-import { FormControl, InputLabel, MenuItem, Select, Stack, TextField, Tooltip } from "@mui/material";
+import { Cancel } from "@mui/icons-material";
+import { FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Tooltip } from "@mui/material";
 
 const VocabFilter = ({
   wordKeyword,
@@ -22,6 +23,17 @@ const VocabFilter = ({
         value={wordKeyword}
         onChange={(e) => setWordKeyword(e.target.value)}
         sx={{ flex: 1 }}
+        slotProps={{
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setWordKeyword('')}>
+                  <Cancel sx={{ width: '15px', height: '15px' }}/>
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+        }}
       />
       <FormControl sx={{ flex: 1 }}>
         <InputLabel>학년</InputLabel>
