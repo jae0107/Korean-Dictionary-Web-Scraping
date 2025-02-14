@@ -10,6 +10,7 @@ export const config = {
     "/student/:path*",
     "/vocabulary-list",
     "/my-requests",
+    "/password-change",
     "/((?!signin|signup|api|public).*)", // Protect all pages except these
   ],
 };

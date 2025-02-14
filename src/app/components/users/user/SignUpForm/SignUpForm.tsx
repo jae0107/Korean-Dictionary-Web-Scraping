@@ -3,7 +3,7 @@ import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Cancel, Login, PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Cancel, Close, Done, Login, PersonAdd, RadioButtonUnchecked, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
@@ -80,6 +80,14 @@ const SignUpForm = () => {
   
   const { control, register, handleSubmit, watch, setValue, formState: { errors } } = form;
 
+  const passwordConditions = [
+    { regex: /.{8,}/, message: "비밀번호는 최소 8자 이상이어야 합니다." },
+    { regex: /[A-Z]/, message: "비밀번호에 최소 하나의 대문자가 포함되어야 합니다." },
+    { regex: /[a-z]/, message: "비밀번호에 최소 하나의 소문자가 포함되어야 합니다." },
+    { regex: /[0-9]/, message: "비밀번호에 최소 하나의 숫자가 포함되어야 합니다." },
+    { regex: /[\W_]/, message: "비밀번호에 최소 하나의 특수문자 (!@#$%^&*)가 포함되어야 합니다." },
+  ];
+
   const getErrorMsg = (errors: FieldErrors<UserInput>) => {
     if (errors) {
       return Object.keys(errors)
@@ -139,6 +147,15 @@ const SignUpForm = () => {
       },
     });
   };
+
+  const getIcon = (condition: { regex: RegExp, message: string }) => {
+    if (watch('password') === '') {
+      return <RadioButtonUnchecked color='action' sx={{ width: '10px', height: '10px', mr: 1 }}/>
+    } else if (condition.regex.test(watch('password'))) {
+      return <Done color='success' sx={{ width: '10px', height: '10px', mr: 1 }}/>;
+    }
+    return <Close color='error' sx={{ width: '10px', height: '10px', mr: 1 }}/>;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)}>
@@ -206,6 +223,25 @@ const SignUpForm = () => {
               }}
               variant="outlined" 
             />
+            {
+              watch('password') !== '' &&
+              <Stack spacing={0.5} mt={1}>
+                {passwordConditions.map((condition, index) => {
+                  return (
+                    <Typography
+                      key={index}
+                      variant='body2'
+                      fontSize={'0.80rem'}
+                      display={'flex'}
+                      alignItems={'center'}
+                      color={watch('password') === '' ? 'textSecondary' : condition.regex.test(watch('password')) ? 'success' : 'error'}
+                    >
+                      {getIcon(condition)}{condition.message}
+                    </Typography>
+                  );
+                })}
+              </Stack>
+            }
           </Box>
           <Box width={'100%'}>
             <InputLabel 
