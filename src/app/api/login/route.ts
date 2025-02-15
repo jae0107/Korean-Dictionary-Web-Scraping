@@ -25,6 +25,6 @@ export async function POST(request: Request) {
       accessToken,
     };
 
-    return new Response(JSON.stringify(result))
-  } else return new Response(JSON.stringify(null))
+    return new Response(JSON.stringify(result));
+  } else return new Response(JSON.stringify(null));
 }

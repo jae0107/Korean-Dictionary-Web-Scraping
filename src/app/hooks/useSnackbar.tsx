@@ -4,8 +4,9 @@ import {
   Snackbar,
   SnackbarOrigin,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
-import React, { createContext, useContext, useReducer } from 'react';
+import { createContext, forwardRef, useContext, useReducer } from 'react';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 export type SnackbarType = 'success' | 'warning' | 'error' | 'info';
 
@@ -27,7 +28,7 @@ function snackBarReducer(state: SnackBarOption, action: SnackbarPayload) {
   };
 }
 // snackbar message could stacked
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+const Alert = forwardRef<HTMLDivElement, AlertProps>(
   function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   }
@@ -44,6 +45,8 @@ const SnackbarContext = createContext({
 export let dispatchSnackBar: (action: SnackbarPayload) => void;
 
 function SnackbarProvider({ children }: { children: React.ReactNode }) {
+  const maxWidth600 = useMediaQuery('(max-width:600px)');
+  
   const [currentSnackBar, dispatchCurrentSnackBar] = useReducer(
     snackBarReducer,
     {
@@ -81,7 +84,7 @@ function SnackbarProvider({ children }: { children: React.ReactNode }) {
       >
         <Alert
           severity={currentSnackBar.type}
-          sx={{ width: '100%' }}
+          sx={{ width: maxWidth600 ? '95%' : '100%' }}
           action={
             <IconButton
               sx={{
@@ -103,13 +106,16 @@ function SnackbarProvider({ children }: { children: React.ReactNode }) {
                 sx={{
                   color:
                     currentSnackBar.type === 'success' ? '#081f3e' : '#ffffff',
+                  width: maxWidth600 ? '15px' : '20px',
+                  height: maxWidth600 ? '15px' : '20px',
                 }}
               />
             </IconButton>
           }
         >
           <Typography
-            variant="body1"
+            variant={maxWidth600 ? 'body2' : 'body1'}
+            fontSize={maxWidth600 ? '0.75rem' : '1rem'}
             style={{
               whiteSpace: 'pre-line',
               color: currentSnackBar.type === 'success' ? '#081f3e' : '#ffffff',

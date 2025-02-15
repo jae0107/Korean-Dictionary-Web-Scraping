@@ -1,6 +1,6 @@
 'use client';
 
-import { Box } from '@mui/material';
+import { Box, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useSnackbar } from '../hooks/useSnackbar';
@@ -12,6 +12,7 @@ const Login = () => {
   const searchParams = useSearchParams();
   const error = searchParams?.get("error");
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const maxHeight600 = useMediaQuery('(max-height:600px)');
   
   useEffect(() => {
     const isNotAuthorized = searchParams?.get('callbackUrl');
@@ -37,7 +38,7 @@ const Login = () => {
   }, [searchParams, dispatchCurrentSnackBar]);
   
   return (
-    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} minHeight={'100vh'} mb={2}>
+    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} minHeight={'100vh'} mt={maxHeight600 ? 2 : 0} mb={maxHeight600 ? 2 : 0}>
       <LoginForm/>
     </Box>
   );

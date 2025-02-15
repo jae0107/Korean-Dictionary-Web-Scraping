@@ -4,7 +4,7 @@ import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Cancel, Close, Done, Login, PersonAdd, RadioButtonUnchecked, Visibility, VisibilityOff } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,9 +17,10 @@ const SignUpForm = () => {
   const theme = useThemeContext();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const router = useRouter();
+  const maxWidth600 = useMediaQuery('(max-width:600px)');
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [getRole, setRole] = useState<UserRole | null>(null);
+  const [getRole, setRole] = useState<UserRole | null>(UserRole.Student);
   const [showPassword, setShowPassword] = useState(false);
 
   const [createUser] = useMutation(createUserMutation);
@@ -158,19 +159,19 @@ const SignUpForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)}>
-      <Stack spacing={4} width={'500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
+    <form onSubmit={handleSubmit(onSubmit, onError)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+      <Stack spacing={4} width={maxWidth600 ? '95%' : '500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
         <Stack spacing={2}>
           <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
             <Stack spacing={2} direction={'row'} alignItems={'center'}>
-              <PersonAdd color='primary' sx={{ width: '40px', height: '40px' }}/>
-              <Typography variant="h4">회원가입</Typography>
+              <PersonAdd color='primary' sx={maxWidth600 ? { width: '30px', height: '30px' } : { width: '40px', height: '40px' }}/>
+              <Typography variant={maxWidth600 ? 'h5' : 'h4'}>회원가입</Typography>
             </Stack>
             <ColourModeSwitch/>
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
               required
             >
               이메일
@@ -186,17 +187,18 @@ const SignUpForm = () => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('email', '')}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
+                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
               }}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
               required
             >
               비밀번호
@@ -212,14 +214,15 @@ const SignUpForm = () => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('password', '')} sx={{ mr: '2px' }}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
                       </IconButton>
                       <IconButton onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
+                        {showPassword ? <VisibilityOff sx={maxWidth600 ? { width: '1rem', height: '1rem' } : { width: '20px', height: '20px' }}/> : <Visibility sx={maxWidth600 ? { width: '1rem', height: '1rem' } : { width: '20px', height: '20px' }}/>}
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
+                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
               }}
               variant="outlined" 
             />
@@ -245,7 +248,7 @@ const SignUpForm = () => {
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
               required
             >
               이름
@@ -261,17 +264,18 @@ const SignUpForm = () => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('name', '')}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
+                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
               }}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
               required
             >
               역할
@@ -289,18 +293,19 @@ const SignUpForm = () => {
                   }}
                   fullWidth
                   error={!!errors.role}
+                  sx={{ fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
                 >
-                  <MenuItem value={''}><em>-</em></MenuItem>
-                  <MenuItem value={UserRole.Student}>학생</MenuItem>
-                  <MenuItem value={UserRole.Teacher}>교사</MenuItem>
-                  <MenuItem value={UserRole.Admin}>관리자</MenuItem>
+                  <MenuItem value={''} dense={maxWidth600}><em>-</em></MenuItem>
+                  <MenuItem value={UserRole.Student} dense={maxWidth600}>학생</MenuItem>
+                  <MenuItem value={UserRole.Teacher} dense={maxWidth600}>교사</MenuItem>
+                  <MenuItem value={UserRole.Admin} dense={maxWidth600}>관리자</MenuItem>
                 </Select>
               )}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
               required={getRole === UserRole.Student}
             >
               학년
@@ -315,18 +320,19 @@ const SignUpForm = () => {
                   onChange={field.onChange}
                   fullWidth
                   error={!!errors.year}
+                  sx={{ fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
                 >
-                  <MenuItem value={0}><em>-</em></MenuItem>
-                  <MenuItem value={1}>1학년</MenuItem>
-                  <MenuItem value={2}>2학년</MenuItem>
-                  <MenuItem value={3}>3학년</MenuItem>
+                  <MenuItem value={0} dense={maxWidth600}><em>-</em></MenuItem>
+                  <MenuItem value={1} dense={maxWidth600}>1학년</MenuItem>
+                  <MenuItem value={2} dense={maxWidth600}>2학년</MenuItem>
+                  <MenuItem value={3} dense={maxWidth600}>3학년</MenuItem>
                 </Select>
               )}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
               required={getRole === UserRole.Student}
             >
               반
@@ -341,18 +347,19 @@ const SignUpForm = () => {
                   onChange={field.onChange}
                   fullWidth
                   error={!!errors.class}
+                  sx={{ fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
                 >
-                  <MenuItem value={'0'}><em>-</em></MenuItem>
-                  <MenuItem value={'1'}>1반</MenuItem>
-                  <MenuItem value={'2'}>2반</MenuItem>
-                  <MenuItem value={'3'}>3반</MenuItem>
-                  <MenuItem value={'4'}>4반</MenuItem>
-                  <MenuItem value={'5'}>5반</MenuItem>
-                  <MenuItem value={'6'}>6반</MenuItem>
-                  <MenuItem value={'7'}>7반</MenuItem>
-                  <MenuItem value={'8'}>8반</MenuItem>
-                  <MenuItem value={'9'}>9반</MenuItem>
-                  <MenuItem value={'10'}>10반</MenuItem>
+                  <MenuItem value={'0'} dense={maxWidth600}><em>-</em></MenuItem>
+                  <MenuItem value={'1'} dense={maxWidth600}>1반</MenuItem>
+                  <MenuItem value={'2'} dense={maxWidth600}>2반</MenuItem>
+                  <MenuItem value={'3'} dense={maxWidth600}>3반</MenuItem>
+                  <MenuItem value={'4'} dense={maxWidth600}>4반</MenuItem>
+                  <MenuItem value={'5'} dense={maxWidth600}>5반</MenuItem>
+                  <MenuItem value={'6'} dense={maxWidth600}>6반</MenuItem>
+                  <MenuItem value={'7'} dense={maxWidth600}>7반</MenuItem>
+                  <MenuItem value={'8'} dense={maxWidth600}>8반</MenuItem>
+                  <MenuItem value={'9'} dense={maxWidth600}>9반</MenuItem>
+                  <MenuItem value={'10'} dense={maxWidth600}>10반</MenuItem>
                 </Select>
               )}
             />
@@ -361,7 +368,7 @@ const SignUpForm = () => {
             getRole === UserRole.Student && 
             <Box width={'100%'}>
               <InputLabel 
-                sx={{ marginBottom: 1 }}
+                sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
                 required={getRole === UserRole.Student}
               >
                 번호
@@ -371,13 +378,14 @@ const SignUpForm = () => {
                 error={!!errors.number}
                 slotProps={{
                   htmlInput: {
-                    min: 0
+                    min: 0,
+                    style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' }
                   },
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton onClick={() => setValue('number', 0)}>
-                          <Cancel sx={{ width: '15px', height: '15px' }}/>
+                          <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -390,15 +398,15 @@ const SignUpForm = () => {
             </Box>
           }
           <Box width={'100%'}>
-            <Button fullWidth type='submit' variant="contained" loading={loading} sx={{ mt: 3 }}>
+            <Button fullWidth type='submit' variant="contained" loading={loading} sx={{ mt: 3, fontSize: maxWidth600 ? '0.8rem' : '0.875rem' }}>
               가입하기
             </Button>
           </Box>
           <Box>
-            <Typography variant={'body2'} mt={1} display={'flex'} alignItems={'center'} flexDirection={'row'}>
+            <Typography variant={'body2'} mt={1} display={'flex'} alignItems={'center'} flexDirection={'row'} fontSize={maxWidth600 ? '0.75rem' : '0.875rem'}>
               계정이 이미 있으신가요? 
-              <Link href={'/signin'} style={{ marginLeft: 10, display: 'flex', alignItems: 'center' }}>
-                <Login sx={{ mr: 1, width: '20px', height: '20px' }}/>
+              <Link href={'/signin'} style={{ marginLeft: maxWidth600 ? 6 : 10, display: 'flex', alignItems: 'center' }}>
+                <Login sx={maxWidth600 ? { mr: 0.5, width: '15px', height: '15px' } : { mr: 1, width: '20px', height: '20px' }}/>
                 로그인
               </Link>
             </Typography>

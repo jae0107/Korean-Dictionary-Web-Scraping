@@ -6,7 +6,7 @@ import { useState } from "react";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography, useMediaQuery } from "@mui/material";
 import { Cancel, Login, Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
 import ColourModeSwitch from "@/app/components/shared/ColourModeSwitch";
@@ -25,6 +25,7 @@ const LoginForm = () => {
   const theme = useThemeContext();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const router = useRouter();
+  const maxWidth600 = useMediaQuery('(max-width:600px)');
 
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +38,7 @@ const LoginForm = () => {
     resolver: zodResolver(schema),
   });
 
-  const { register, handleSubmit, watch, setValue } = form;
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = form;
 
   const getErrorMsg = (errors: FieldErrors<LoginInput>) => {
     if (errors) {
@@ -93,68 +94,72 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)}>
-      <Stack spacing={4} width={'500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
+    <form onSubmit={handleSubmit(onSubmit, onError)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+      <Stack spacing={4} width={maxWidth600 ? '95%' : '500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
         <Stack spacing={4}>
           <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
             <Stack spacing={2} direction={'row'} alignItems={'center'}>
-              <Login color='primary' sx={{ width: '40px', height: '40px' }}/>
-              <Typography variant="h4">로그인</Typography>
+              <Login color='primary' sx={maxWidth600 ? { width: '30px', height: '30px' } : { width: '40px', height: '40px' }}/>
+              <Typography variant={maxWidth600 ? 'h5' : 'h4'}>로그인</Typography>
             </Stack>
             <ColourModeSwitch/>
           </Box>
           <Box width={'100%'}>
-            <InputLabel sx={{ marginBottom: 1 }}>이메일</InputLabel>
+            <InputLabel required sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}>이메일</InputLabel>
             <TextField
               placeholder="이메일을 입력하세요."
               {...register('email')}
               type='email'
               fullWidth
+              error={!!errors.email}
               slotProps={{
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('email', '')}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
+                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
               }}
             />
           </Box>
           <Box width={'100%'}>
-            <InputLabel sx={{ marginBottom: 1 }}>비밀번호</InputLabel>
+            <InputLabel required sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}>비밀번호</InputLabel>
             <TextField
               placeholder="비밀번호를 입력하세요."
               {...register('password')}
               type={showPassword ? 'text' : 'password'}
               fullWidth
+              error={!!errors.password}
               slotProps={{
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('password', '')} sx={{ mr: '2px' }}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
                       </IconButton>
                       <IconButton onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
+                        {showPassword ? <VisibilityOff sx={maxWidth600 ? { width: '1rem', height: '1rem' } : { width: '20px', height: '20px' }}/> : <Visibility sx={maxWidth600 ? { width: '1rem', height: '1rem' } : { width: '20px', height: '20px' }}/>}
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
+                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
               }}
               variant="outlined" 
             />
           </Box>
-          <Button fullWidth type='submit' variant="contained" loading={loading}>
+          <Button fullWidth type='submit' variant="contained" loading={loading} sx={{ fontSize: maxWidth600 ? '0.8rem' : '0.875rem' }}>
             로그인
           </Button>
         </Stack>
         <Divider/>
         <Stack spacing={2}>
           <Box>
-            <Typography variant={'body2'} mb={1}>
+            <Typography variant={'body2'} mb={1} fontSize={maxWidth600 ? '0.75rem' : '0.875rem'}>
               계정이 없으신가요?
             </Typography>
             <Button
@@ -162,11 +167,12 @@ const LoginForm = () => {
               variant='outlined'
               component={Link}
               href={'/signup'}
+              sx={{ fontSize: maxWidth600 ? '0.8rem' : '0.875rem' }}
             >
               회원가입
             </Button>
           </Box>
-          <Typography variant={'body2'}>
+          <Typography variant={'body2'} fontSize={maxWidth600 ? '0.75rem' : '0.875rem'}>
             비밀번호를 잊으셨나요? <a href={'/forgot-password'}>비밀번호 찾기</a>
           </Typography>
         </Stack>
