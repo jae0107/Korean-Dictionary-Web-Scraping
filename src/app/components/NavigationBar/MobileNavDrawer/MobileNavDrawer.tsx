@@ -69,7 +69,7 @@ const MobileNavDrawer = ({
             </List>
             <Divider />
             <List sx={{ display: getDisplay(!!userRole && userRole !== 'STUDENT') }}>
-              <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+              <ListItem disablePadding>
                 <ListItemButton LinkComponent={Link} href={'/students'}>
                   <ListItemIcon>
                     {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <Groups/>}
@@ -77,9 +77,9 @@ const MobileNavDrawer = ({
                   {loading ? <Skeleton variant="rounded" height={'24px'} width={'74.55px'}/> : <ListItemText primary={'사용자 관리'} />}
                 </ListItemButton>
               </ListItem>
-              <List disablePadding sx={{ ml: 3 }}>
-                <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                  <ListItemButton LinkComponent={Link} href={'/students'}>
+              <List disablePadding>
+                <ListItem disablePadding sx={{backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                  <ListItemButton LinkComponent={Link} href={'/students'} sx={{ pl: '40px !important' }}>
                     <ListItemIcon>
                       {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <StudentIcon style={{ height: '24px', width: '24px' }}/>}
                     </ListItemIcon>
@@ -89,7 +89,7 @@ const MobileNavDrawer = ({
                 {
                   userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                    <ListItemButton LinkComponent={Link} href={'/teachers'}>
+                    <ListItemButton LinkComponent={Link} href={'/teachers'} sx={{ pl: '40px !important' }}>
                       <ListItemIcon>
                         {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <TeacherIcon style={{ height: '24px', width: '24px' }}/>}
                       </ListItemIcon>
@@ -100,7 +100,7 @@ const MobileNavDrawer = ({
                { 
                   userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                    <ListItemButton LinkComponent={Link} href={'/admins'}>
+                    <ListItemButton LinkComponent={Link} href={'/admins'} sx={{ pl: '40px !important' }}>
                       <ListItemIcon>
                         {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <AdminPanelSettings style={{ height: '24px', width: '24px' }}/>}
                       </ListItemIcon>
