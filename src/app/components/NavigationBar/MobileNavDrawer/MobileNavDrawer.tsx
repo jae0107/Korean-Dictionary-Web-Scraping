@@ -110,6 +110,7 @@ const MobileNavDrawer = ({
                 }
               </List>
             </List>
+            <Divider />
           </>
         }
       </Box>
