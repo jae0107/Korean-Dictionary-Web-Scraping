@@ -1,8 +1,9 @@
 import { FormControlLabel, styled, Switch, Tooltip, useMediaQuery } from '@mui/material';
 import { useColorModeContext, useThemeContext } from '../Providers/Providers';
 
-const MaterialUISwitch = styled(Switch)<{ smaller?: boolean }>(
-  ({ theme, smaller }) => ({
+const MaterialUISwitch = styled(Switch, {
+  shouldForwardProp: (prop) => prop !== 'smaller',
+})<{ smaller?: boolean }>(({ theme, smaller }) => ({
   width: smaller ? 52 : 62,
   height: smaller ? 24 : 34,
   padding: 7,
@@ -68,7 +69,7 @@ const ColourModeSwitch = ({ margin } : { margin?: string }) => {
   return (
     <Tooltip title={theme.palette.mode === 'dark' ? '라이트 모드' : '다크 모드'}>
       <FormControlLabel
-        control={<MaterialUISwitch onChange={toggleColorMode} smaller={maxWidth600}/>}
+        control={<MaterialUISwitch onChange={toggleColorMode} smaller={Boolean(maxWidth600)}/>}
         label={''}
         sx={{ margin: margin || 0 }}
       />

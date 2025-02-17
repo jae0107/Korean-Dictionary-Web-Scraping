@@ -35,7 +35,15 @@ function Row(props: ListChildComponentProps) {
       style={{ ...inlineStyle, paddingLeft: 24 }}
     >
       <Stack>
-        <Typography variant="body1" noWrap>
+        <Typography 
+          variant="body1" 
+          noWrap
+          sx={{
+            '@media (max-width:495px)': {
+              fontSize: '0.875rem', 
+            }
+          }}
+        >
           {option.name}
         </Typography>
       </Stack>

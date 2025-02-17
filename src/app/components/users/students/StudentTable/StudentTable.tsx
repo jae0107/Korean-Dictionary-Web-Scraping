@@ -315,6 +315,7 @@ const StudentTable = ({
         pagination
         disableColumnMenu
         checkboxSelection
+        disableRowSelectionOnClick
         keepNonExistentRowsSelected
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setSelectedStudents(newRowSelectionModel as string[]);

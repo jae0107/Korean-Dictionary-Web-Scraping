@@ -485,6 +485,7 @@ const UserContainer = ({
             pagination
             disableColumnMenu
             checkboxSelection
+            disableRowSelectionOnClick
             keepNonExistentRowsSelected
             onRowSelectionModelChange={(newRowSelectionModel) => {
               setSelectedRequests(newRowSelectionModel as string[]);

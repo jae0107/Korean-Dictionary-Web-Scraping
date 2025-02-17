@@ -1,6 +1,6 @@
 import { RequestorItemsFragment } from "@/app/generated/gql/graphql";
-import { AccountBox } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableRow } from "@mui/material";
+import { AccountBox, Close } from "@mui/icons-material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableRow } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 
@@ -46,32 +46,46 @@ const UserInfoPopUp = ({
     <Dialog
       open={openUserInfoPopUp}
       onClose={() => handleClose()}
-      >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+      sx={{
+        '@media (max-width: 750px)': {
+          '& .MuiDialog-container': {
+            '& .MuiPaper-root': {
+              margin: 1,
+            }
+          }
+        },
+      }}
+    >
+      <Box display={'flex'} justifyContent={'flex-end'}>
+        <IconButton onClick={() => handleClose()}>
+          <Close/>
+        </IconButton>
+      </Box>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0 }}>
         <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/> {`${getRole()} 프로필`}
       </DialogTitle>
       <DialogContent>
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell component="th" scope="row">이름</TableCell>
+              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">이름</TableCell>
               <TableCell>{getRequestor?.name || ''}</TableCell>
             </TableRow>
             {!!getRequestor?.year && <TableRow>
-              <TableCell component="th" scope="row">학년</TableCell>
+              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">학년</TableCell>
               <TableCell>{`${getRequestor?.year}학년` || ''}</TableCell>
             </TableRow>}
             {!!getRequestor?.class && <TableRow>
-              <TableCell component="th" scope="row">반</TableCell>
+              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">반</TableCell>
               <TableCell>{`${getRequestor?.class}반` || ''}</TableCell>
             </TableRow>}
             {!!getRequestor?.number && <TableRow>
-              <TableCell component="th" scope="row">번호</TableCell>
+              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">번호</TableCell>
               <TableCell>{`${getRequestor?.number}번` || ''}</TableCell>
             </TableRow>}
             {!!getRequestor?.email && <TableRow>
-              <TableCell component="th" scope="row">이메일</TableCell>
-              <TableCell>{getRequestor?.email || ''}</TableCell>
+              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">이메일</TableCell>
+              <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{getRequestor?.email || ''}</TableCell>
             </TableRow>}
           </TableBody>
         </Table>

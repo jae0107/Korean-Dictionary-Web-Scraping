@@ -1,5 +1,5 @@
 import { SearchResult } from "@/app/types/types";
-import { Box, Button, CircularProgress, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { WordInput } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import './style.scss';
 
 const mock:SearchResult = {
   title: '강아지',
@@ -118,7 +119,7 @@ const SearchResults = ({
   const getResults = (results: string[], dicType: string) => {
     return (
       <Box display={'flex'} flexDirection={'column'} width={'100%'}>
-        <List sx={{ width: '100%' }}>
+        <List sx={{ width: '100%', pt: 0 }}>
           {
             results.map((item, index) => (
               <ListItem key={index} sx={{ pr: 0, '&.MuiListItem-padding': { pt: 0 } }}>
@@ -131,8 +132,25 @@ const SearchResults = ({
                     const newResults = results.filter((_, i) => i !== index);
                     setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults);
                   }}
+                  sx={{ 
+                    padding: '8px',
+                    fontSize: '1.5rem',
+                    '@media (max-width:500px)': {
+                      padding: '5px',
+                      fontSize: '1.125rem',
+                    }
+                  }}
                 >
-                  <DeleteForever/>
+                  <DeleteForever 
+                    sx={{
+                      width: '20px', 
+                      height: '20px',
+                      '@media (max-width:500px)': {
+                        width: '1.25rem', 
+                        height: '1.25rem',
+                      }
+                    }}
+                  />
                 </IconButton>
               </ListItem>
             ))
@@ -180,13 +198,37 @@ const SearchResults = ({
                     </InputAdornment>
                   ),
                 },
+                htmlInput: { 
+                  style: { 
+                    '@media (max-width:500px)': {
+                      fontSize: '0.8rem'
+                    }
+                  } 
+                },
               }}
             />
             <IconButton 
               type='submit'
               color='primary'
+              sx={{ 
+                padding: '8px',
+                fontSize: '1.5rem',
+                '@media (max-width:500px)': {
+                  padding: '5px',
+                  fontSize: '1.125rem',
+                }
+              }}
             >
-              <AddCircle/>
+              <AddCircle 
+                sx={{
+                  width: '20px', 
+                  height: '20px',
+                  '@media (max-width:500px)': {
+                    width: '1.25rem', 
+                    height: '1.25rem',
+                  }
+                }}
+              />
             </IconButton>
           </Box>
         </form>
@@ -197,18 +239,37 @@ const SearchResults = ({
   return (
     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} width={'100%'}>
       <Stack spacing={2} maxWidth={'700px'}>
-        <Typography variant={'h5'} ml={'66px !important'}>{watch('title')}</Typography>
+        <Typography 
+          variant={'h6'} 
+          ml={'66px !important'}
+          sx={{
+            '@media (max-width:500px)': {
+              fontSize: '1.25rem',
+              fontWeight: 400,
+              lineHeight: 1.334,
+              letterSpacing: '0em',
+            }
+          }}
+        >
+          {watch('title')}
+        </Typography>
         {
           (watch('korDicResults') ?? []).length > 0 && 
           <Box display={'flex'} flexDirection={'row'}>
-            <img src={korDicLogo.src} style={{ width: '50px', height: '50px', background: 'white', borderRadius: '50%', border: '1px solid #807c7c87' }}/>
+            <img 
+              className='korDicLogo'
+              src={korDicLogo.src}
+            />
             {getResults(watch('korDicResults') ?? [], 'koDic')}
           </Box>
         }
         {
           (watch('naverDicResults') ?? []).length > 0 && 
           <Box display={'flex'} flexDirection={'row'}>
-            <img src={naverLogo.src} style={{ width: '50px', height: '50px' }}/>
+            <img 
+              className='naverLogo'
+              src={naverLogo.src}
+            />
             {getResults(watch('naverDicResults') ?? [], 'naverDic')}
           </Box>
         }
@@ -218,7 +279,12 @@ const SearchResults = ({
           type='number'
           slotProps={{
             htmlInput: {
-              min: 0
+              min: 0,
+              style: { 
+                '@media (max-width:500px)': {
+                  fontSize: '0.8rem'
+                }
+              } 
             },
             input: {
               endAdornment: (
@@ -247,30 +313,31 @@ const SearchResults = ({
                 </InputAdornment>
               ),
             },
+            htmlInput: { 
+              sx: {
+                '@media (max-width:500px)': {
+                  fontSize: '0.8rem'
+                }
+              },
+            },
           }}
         />
         <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
-        <Button
-          variant="contained"
-          disabled={getLoader}
-          onClick={handleSubmit(onSubmit, onError)}
-        >
-          추가 요청
-        </Button>
-        {getLoader && (
-          <CircularProgress
-            size={24}
-            color="success"
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: '-12px',
-              marginLeft: '-12px',
+          <Button
+            variant="contained"
+            loading={getLoader}
+            disabled={getLoader}
+            onClick={handleSubmit(onSubmit, onError)}
+            sx={{ 
+              fontSize: '0.875rem',
+              '@media (max-width:500px)': {
+                fontSize: '0.8rem'
+              }
             }}
-          />
-        )}
-      </Box>
+          >
+            추가 요청
+          </Button>
+        </Box>
       </Stack>
     </Box>
   );

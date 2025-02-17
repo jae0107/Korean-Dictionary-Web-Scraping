@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { getWordRequestsQuery } from './query';
 import usePaginationModel from '@/app/hooks/usePaginationModel';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { RequestorDropDownItemsFragment } from '@/app/generated/gql/graphql';
 
 const RequestorDropDown = ({
@@ -45,7 +45,7 @@ const RequestorDropDown = ({
   return (
     <Autocomplete
       loading={loading}
-      sx={{ flex: 1.5 }}
+      sx={{ flex: 1 }}
       noOptionsText="검색 결과가 없습니다."
       options={options}
       disableListWrap
@@ -71,6 +71,11 @@ const RequestorDropDown = ({
                   {params.InputProps.endAdornment}
                 </>
               ),
+              sx: {
+                '@media (max-width:600px)': {
+                  fontSize: '0.8rem'
+                }
+              }
             },
           }}
         />
@@ -83,7 +88,7 @@ const RequestorDropDown = ({
       }}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       renderOption={(props, option, state) => {
-        return [props, option, state] as React.ReactNode;
+        return [props, option, state] as ReactNode;
       }}
     />
   );

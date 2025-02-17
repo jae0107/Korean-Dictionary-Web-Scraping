@@ -61,6 +61,7 @@
     "react-hook-form": "^7.54.2",
     "react-window": "^1.8.11",
     "reflect-metadata": "^0.2.2",
+    "sass": "^1.85.0",
     "sequelize": "^6.37.5",
     "sequelize-auto": "^0.8.8",
     "sequelize-cursor-pagination": "^3.4.0",

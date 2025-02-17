@@ -11,6 +11,8 @@ import client from "@/app/lib/apolloClient";
 import type {} from '@mui/x-data-grid/themeAugmentation';
 import { CurrentUserProvider } from "./CurrentUserProvider";
 import { SnackbarProvider } from "@/app/hooks/useSnackbar";
+import { SearchResult } from "@/app/types/types";
+import SearchProvider from "./SearchProvider";
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 export const useColorModeContext = () => useContext(ColorModeContext);
@@ -39,6 +41,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
   const [queryClient] = useState(new QueryClient());
   const prefersMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [mode, setMode] = useState<'light' | 'dark'>('dark');
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
 
   useEffect(() => {
     setMode(prefersMode ? 'dark' : 'light');
@@ -112,6 +115,18 @@ const Providers = ({ children } : { children: ReactNode }) => {
               },
             },
           },
+          // MuiStack: {
+          //   defaultProps: {
+          //     spacing: 2,
+          //   },
+          //   styleOverrides: {
+          //     root: {
+          //       '& > :not(style) + :not(style)': {
+          //         ml: '4px !important',
+          //       }
+          //     },
+          //   }
+          // }
         }
       }),
     [mode],
@@ -127,12 +142,14 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 <ThemeContext.Provider value={theme}>
                   <CssBaseline enableColorScheme />
                   <Suspense fallback={null}>
-                    <SnackbarProvider>
-                      <CurrentUserProvider>
-                        <NavigationBar theme={theme} colorMode={colorMode} />
-                        {children}
-                      </CurrentUserProvider>
-                    </SnackbarProvider>
+                    <SearchProvider searchResults={searchResults} setSearchResults={setSearchResults}>
+                      <SnackbarProvider>
+                        <CurrentUserProvider>
+                          <NavigationBar theme={theme} colorMode={colorMode} setSearchResults={setSearchResults}/>
+                          {children}
+                        </CurrentUserProvider>
+                      </SnackbarProvider>
+                    </SearchProvider>
                   </Suspense>
                 </ThemeContext.Provider>
               </ThemeProvider>

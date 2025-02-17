@@ -1,10 +1,10 @@
-import { Box, Chip, CircularProgress, Tooltip, Typography } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
+import { Box, Button, Chip, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
-import { CheckCircleOutline, Create, DeleteForever, HighlightOff, MoreVert, Remove, Restore } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Remove, Restore } from "@mui/icons-material";
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import UserInfoPopUp from "./UserInfoPopUp/UserInfoPopUp";
@@ -14,6 +14,8 @@ import { useSnackbar } from "@/app/hooks/useSnackbar";
 import ConfirmDialog from "../../shared/ConfirmDialog";
 import RequestManagementBulkAction from "./RequestManagementBulkAction/RequestManagementBulkAction";
 import DeniedReasonPopUp from "../../shared/DeniedReasonPopUp";
+import CustomExportToolbar from "../../shared/CustomExportToolbar";
+import DetailPopUP from "./DetailPopUP/DetailPopUP";
 
 const RequestManagementTable = ({
   loading,
@@ -45,6 +47,12 @@ const RequestManagementTable = ({
   setSelectedRequests: (value: string[]) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const maxWidth360 = useMediaQuery('(max-width:360px)');
+  const maxWidth495 = useMediaQuery('(max-width:495px)');
+  const maxWidth545 = useMediaQuery('(max-width:545px)');
+  const maxWidth750 = useMediaQuery('(max-width:750px)');
+  const maxWidth850 = useMediaQuery('(max-width:850px)');
+  const maxWidth1000 = useMediaQuery('(max-width:1000px)');
   
   const [getRequestor, setRequestor] = useState<RequestorItemsFragment | null>(null);
   const [openUserInfoPopUp, setOpenUserInfoPopUp] = useState<boolean>(false);
@@ -57,6 +65,31 @@ const RequestManagementTable = ({
   const [openDeniedReasonPopUp, setOpenDeniedReasonPopUp] = useState<boolean>(false);
   const [selectedWordId, setSelectedWordId] = useState<string>('');
   const [selectedDeniedReason, setSelectedDeniedReason] = useState<string>('');
+  const [openDetailPopUp, setOpenDetailPopUp] = useState<boolean>(false);
+  const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
+      page: !maxWidth850,
+      requestor: !maxWidth1000,
+      example: !maxWidth750,
+      title: true,
+      korDicResults: !maxWidth750,
+      naverDicResults: !maxWidth750,
+      detail: maxWidth750,
+      deniedReason: wordRequestStatus === WordStatus.Denied || maxWidth545,
+    });
+  
+    useEffect(() => {
+      setColumnVisibilityModel({
+        page: !maxWidth850,
+        requestor: !maxWidth1000,
+        example: !maxWidth750,
+        title: columnVisibilityModel.title,
+        korDicResults: !maxWidth750,
+        naverDicResults: !maxWidth750,
+        detail: maxWidth750,
+        deniedReason: wordRequestStatus === WordStatus.Denied || maxWidth545,
+      });
+    }, [maxWidth495, maxWidth750, maxWidth850, maxWidth1000]);
 
   const [approveWordRequest] = useMutation(approveWordRequestMutation);
   const [denyWordRequest] = useMutation(denyWordRequestMutation);
@@ -162,6 +195,8 @@ const RequestManagementTable = ({
     { 
       field: 'page', 
       headerName: '페이지', 
+      headerClassName: 'page-header',
+      cellClassName: 'page-cell',
       width: 60, 
       filterable: false, 
       sortable: false,
@@ -171,10 +206,41 @@ const RequestManagementTable = ({
         );
       }
     },
-    { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
+    { 
+      field: 'title', 
+      headerName: '단어', 
+      width: 120, 
+      filterable: false, 
+      sortable: false,
+      flex: maxWidth750 ? 1 : 0,
+    },
+    { 
+      field: 'detail', 
+      headerName: '더보기', 
+      width: 120, 
+      filterable: false, 
+      sortable: false,
+      flex: maxWidth750 ? 1 : 0,
+      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+        return (
+          <Button 
+            variant='text' 
+            color='info'
+            onClick={() => {
+              setWordRequest(params.row);
+              setOpenDetailPopUp(true);
+            }}
+          >
+            더보기 클릭
+          </Button>
+        );
+      }
+    },
     { 
       field: 'korDicResults', 
       headerName: '국립국어원', 
+      headerClassName: 'korDic-header',
+      cellClassName: 'korDic-cell',
       flex: 1, 
       filterable: false, 
       sortable: false,
@@ -197,6 +263,8 @@ const RequestManagementTable = ({
     { 
       field: 'naverDicResults', 
       headerName: '네이버', 
+      headerClassName: 'naver-header',
+      cellClassName: 'naver-cell',
       flex: 1, 
       filterable: false, 
       sortable: false,
@@ -219,6 +287,8 @@ const RequestManagementTable = ({
     { 
       field: 'example',
       headerName: '예문', 
+      headerClassName: 'example-header',
+      cellClassName: 'example-cell',
       flex: 1, 
       filterable: false, 
       sortable: false,
@@ -231,6 +301,8 @@ const RequestManagementTable = ({
     { 
       field: 'requestor', 
       headerName: '요청자', 
+      headerClassName: 'requestor-header',
+      cellClassName: 'requestor-cell',
       width: 100, 
       filterable: false, 
       sortable: false,
@@ -257,7 +329,7 @@ const RequestManagementTable = ({
     {
       field: 'actions',
       type: 'actions',
-      width: wordRequestStatus !== WordStatus.Pending ? 40 : 80,
+      width: wordRequestStatus !== WordStatus.Pending || maxWidth360 ? 40 : 80,
       getActions: (params: GridRowParams<WordRequestItemsFragment>) => {
         if (params.row.status === 'APPROVED') {
           return [
@@ -287,7 +359,6 @@ const RequestManagementTable = ({
                 icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
                 label="더보기"
                 showInMenu={false}
-                onClick={() => onRecover(params.row.id)}
               />
             ];
           }
@@ -303,6 +374,7 @@ const RequestManagementTable = ({
               label="복구"
               showInMenu={true}
               onClick={() => onRecover(params.row.id)}
+              dense={maxWidth495}
             />,
             <GridActionsCellItem
               key="delete"
@@ -318,6 +390,7 @@ const RequestManagementTable = ({
                 setSelectedWordId(params.row.id);
                 setOpenConfirmDialog(true);
               }}
+              dense={maxWidth495}
             />,
             <GridActionsCellItem
               key="reason"
@@ -334,6 +407,17 @@ const RequestManagementTable = ({
                 setSelectedDeniedReason(params.row.deniedReason || '');
                 setOpenDeniedReasonPopUp(true);
               }}
+              dense={maxWidth495}
+            />
+          ];
+        }
+        if (maxWidth360 && (getApprovalLoader[params.row.id] || getDenyLoader[params.row.id])) {
+          return [
+            <GridActionsCellItem
+              key="more"
+              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+              label="더보기"
+              showInMenu={false}
             />
           ];
         }
@@ -349,7 +433,8 @@ const RequestManagementTable = ({
               </Tooltip>
             }
             label="승인"
-            showInMenu={false}
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
             onClick={() => onApproval(params.row.id)}
           />,
           <GridActionsCellItem
@@ -363,7 +448,8 @@ const RequestManagementTable = ({
               </Tooltip>
             }
             label="거절"
-            showInMenu={false}
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
             onClick={() => {
               setSelectedWordId(params.row.id);
               setOpenDeniedReasonPopUp(true);
@@ -374,7 +460,7 @@ const RequestManagementTable = ({
     }
   ];
 
-  if (wordRequestStatus === 'DENIED') {
+  if (wordRequestStatus === 'DENIED' && !maxWidth545) {
     columns.splice(columns.length - 1, 0, {
       field: 'deniedReason',
       headerName: '거절 사유',
@@ -464,7 +550,16 @@ const RequestManagementTable = ({
   }
   
   return (
-    <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+    <Box 
+      display={'flex'} 
+      flexDirection={'column'} 
+      width={'90%'}
+      sx={{
+        '@media (max-width:545px)': {
+          width: '95% !important',
+        }
+      }}
+    >
       <RequestManagementBulkAction
         ids={selectedRequests}
         setSelectedRequests={setSelectedRequests}
@@ -480,16 +575,22 @@ const RequestManagementTable = ({
           setSelectedRequests(newRowSelectionModel as string[]);
         }}
         rowSelectionModel={selectedRequests || []}
+        disableRowSelectionOnClick
         loading={loading}
         columns={columns}
         rows={words}
         pageSizeOptions={[10, 20, 50, 100]}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
         initialState={{
           pagination: {
             paginationModel: {
               pageSize: 10,
             },
           },
+          columns: {
+            columnVisibilityModel: columnVisibilityModel,
+          }
         }}
         paginationModel={paginationModel}
         onPaginationModelChange={(values, details) => {
@@ -499,6 +600,7 @@ const RequestManagementTable = ({
         getRowHeight={() => 'auto'}
         slots={{
           noRowsOverlay: CustomNoRowsOverlay,
+          ...(maxWidth1000 ? { toolbar:() =>  <CustomExportToolbar/> } : {}),
           pagination: () => (
             <GridPagination
               ActionsComponent={({ className }) => (
@@ -530,6 +632,21 @@ const RequestManagementTable = ({
           footerTotalRows: '총 행 수:',
           MuiTablePagination: {
             labelRowsPerPage: '페이지 당 행 수:',
+          },
+          toolbarColumns: '열 선택',
+          columnsManagementShowHideAllText: '모든 열 보기/숨기기',
+          columnsManagementReset: '초기화',
+        }}
+        sx={{
+          '@media (max-width:750px)': {
+            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-topContainer .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderDraggableContainer .MuiDataGrid-columnHeaderTitleContainer': {
+              display: 'flex',
+              justifyContent: 'center',
+            },
+            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-virtualScrollerContent .MuiDataGrid-virtualScrollerRenderZone .MuiDataGrid-row .MuiDataGrid-cell': {
+              display: 'flex',
+              justifyContent: 'center',
+            }
           }
         }}
       />
@@ -550,6 +667,14 @@ const RequestManagementTable = ({
         handleClose={handleCloseDeniedReasonPopUp}
         getDeniedReason={selectedDeniedReason}
         setDeniedReason={setSelectedDeniedReason}
+      />
+      <DetailPopUP
+        openDetailPopUp={openDetailPopUp}
+        setOpenDetailPopUp={setOpenDetailPopUp}
+        getWordRequest={getWordRequest}
+        setWordRequest={setWordRequest}
+        setRequestor={setRequestor}
+        setOpenUserInfoPopUp={setOpenUserInfoPopUp}
       />
     </Box>
   );

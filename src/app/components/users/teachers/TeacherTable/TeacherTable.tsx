@@ -332,6 +332,7 @@ const TeacherTable = ({
         pagination
         disableColumnMenu
         checkboxSelection
+        disableRowSelectionOnClick
         keepNonExistentRowsSelected
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setSelectedTeachers(newRowSelectionModel as string[]);

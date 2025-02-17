@@ -19,30 +19,30 @@ const VocabularyList = () => {
   const [getClass, setClass] = useState<string>('');
   
   const { data, loading } =
-      useQuery(getVocabulariesQuery, {
-        fetchPolicy: 'network-only',
-        variables: {
-          paginationOptions: {
-            limit: paginationModel.pageSize,
-            pageNum: paginationModel.page,
-          },
-          filterOptions: {
-            status: WordStatus.Approved,
-            word: wordKeyword,
-            year: parseInt(getYear),
-            class: getClass.toString(),
-          },
+    useQuery(getVocabulariesQuery, {
+      fetchPolicy: 'network-only',
+      variables: {
+        paginationOptions: {
+          limit: paginationModel.pageSize,
+          pageNum: paginationModel.page,
         },
-        onError: (error) => {
-          dispatchCurrentSnackBar({
-            payload: {
-              open: true,
-              type: 'error',
-              message: error.message,
-            },
-          });
+        filterOptions: {
+          status: WordStatus.Approved,
+          word: wordKeyword,
+          year: parseInt(getYear),
+          class: getClass.toString(),
         },
-      });
+      },
+      onError: (error) => {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+    });
       
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>

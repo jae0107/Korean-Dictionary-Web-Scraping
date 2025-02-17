@@ -211,6 +211,7 @@ const MyRequestTable = ({
         pagination
         disableColumnMenu
         checkboxSelection={wordRequestStatus === WordStatus.Pending}
+        disableRowSelectionOnClick
         keepNonExistentRowsSelected={wordRequestStatus === WordStatus.Pending}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setSelectedRequests(newRowSelectionModel as string[]);

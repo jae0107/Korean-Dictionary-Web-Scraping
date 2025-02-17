@@ -66,7 +66,6 @@ const RequestManagement = () => {
           setWordRequestStatus={setWordRequestStatus}
           wordKeyword={wordKeyword}
           setWordKeyword={setWordKeyword}
-          getRequestorId={getRequestorId}
           setRequestorId={setRequestorId}
           getYear={getYear}
           setYear={setYear}

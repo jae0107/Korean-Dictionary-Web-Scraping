@@ -1,10 +1,14 @@
 import { GridToolbarColumnsButton, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
 
-const CustomExportToolbar = () => {
+const CustomExportToolbar = ({
+  displayExport,
+} : {
+  displayExport?: boolean;
+}) => {
   return (
     <GridToolbarContainer>
       <GridToolbarColumnsButton/>
-      <GridToolbarExport printOptions={{ disableToolbarButton: true }}/>
+      {displayExport && <GridToolbarExport printOptions={{ disableToolbarButton: true }}/>}
     </GridToolbarContainer>
   );
 }

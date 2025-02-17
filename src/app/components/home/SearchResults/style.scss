@@ -1,0 +1,22 @@
+.korDicLogo {
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  border: 1px solid #807c7c87;
+
+  @media (max-width: 500px) {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.naverLogo {
+  width: 50px;
+  height: 50px;
+  
+  @media (max-width: 500px) {
+    width: 3rem;
+    height: 3rem;
+  }
+}

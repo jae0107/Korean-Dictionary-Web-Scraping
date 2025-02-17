@@ -1,13 +1,13 @@
 import { VocabularyItemsFragment } from "@/app/generated/gql/graphql";
-import { DataGrid, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import csvLogo from "../../../../assets/images/csvLogo.png";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, use, useEffect, useMemo, useState } from "react";
 
 const VocabTable = ({
   loading,
@@ -30,9 +30,33 @@ const VocabTable = ({
     pageSize: number;
   }>>;
 }) => {
+  const maxWidth750 = useMediaQuery('(max-width:750px)');
+  const maxWidth470 = useMediaQuery('(max-width:470px)');
+  const maxWidth435 = useMediaQuery('(max-width:435px)');
+
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
+    page: !maxWidth470,
+    naverDicResults: !maxWidth750,
+    example: !maxWidth435,
+    title: true,
+    korDicResults: true,
+  });
+
+  useEffect(() => {
+    setColumnVisibilityModel({
+      page: !maxWidth470,
+      naverDicResults: !maxWidth750,
+      example: !maxWidth435,
+      title: columnVisibilityModel.title,
+      korDicResults: columnVisibilityModel.korDicResults,
+    });
+  }, [maxWidth435, maxWidth470, maxWidth750]);
+
   const columns: GridColDef[] = [
     { 
       field: 'page', 
+      headerClassName: 'page-header',
+      cellClassName: 'page-cell',
       headerName: '페이지', 
       width: 60, 
       filterable: false, 
@@ -46,6 +70,8 @@ const VocabTable = ({
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
     { 
       field: 'korDicResults', 
+      headerClassName: 'korDic-header',
+      cellClassName: 'korDic-cell',
       headerName: '국립국어원', 
       flex: 1, 
       filterable: false, 
@@ -75,6 +101,8 @@ const VocabTable = ({
     },
     { 
       field: 'naverDicResults', 
+      headerClassName: 'naver-header',
+      cellClassName: 'naver-cell',
       headerName: '네이버', 
       flex: 1, 
       filterable: false, 
@@ -104,6 +132,8 @@ const VocabTable = ({
     },
     { 
       field: 'example',
+      headerClassName: 'example-header',
+      cellClassName: 'example-cell',
       headerName: '예문', 
       flex: 1, 
       filterable: false, 
@@ -117,7 +147,7 @@ const VocabTable = ({
   ];
   
   return (
-    <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+    <Box display={'flex'} flexDirection={'column'} width={maxWidth470 ? '95%' : '90%'}>
       <DataGrid
         pagination
         disableColumnMenu
@@ -126,12 +156,17 @@ const VocabTable = ({
         columns={columns}
         rows={words}
         pageSizeOptions={[10, 20, 50, 100]}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
         initialState={{
           pagination: {
             paginationModel: {
               pageSize: 10,
             },
           },
+          columns: {
+            columnVisibilityModel: columnVisibilityModel,
+          }
         }}
         paginationModel={paginationModel}
         onPaginationModelChange={(values, details) => {
@@ -140,7 +175,7 @@ const VocabTable = ({
         }}
         getRowHeight={() => 'auto'}
         slots={{
-          toolbar: CustomExportToolbar,
+          toolbar: () => <CustomExportToolbar displayExport={true}/>,
           noRowsOverlay: CustomNoRowsOverlay,
           pagination: () => (
             <GridPagination

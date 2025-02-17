@@ -1,25 +1,28 @@
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { NetworkStatus } from '@apollo/client';
-import { AccountCircle, AdminPanelSettings, Checklist, Logout, Portrait, School, VpnKey } from '@mui/icons-material';
+import { AccountCircle, AdminPanelSettings, Checklist, Logout, Portrait, VpnKey } from '@mui/icons-material';
 import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import ColourModeSwitch from '../shared/ColourModeSwitch';
 import { StudentIcon } from '../shared/icons/StudentIcon';
 import { TeacherIcon } from '../shared/icons/TeacherIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import MobileNavDrawer from './MobileNavDrawer/MobileNavDrawer';
+import { SearchResult } from '@/app/types/types';
 
 const NavigationBar = ({
   theme,
   colorMode,
+  setSearchResults,
 } : {
   theme: Theme;
   colorMode: {
     toggleColorMode: () => void;
-  }
+  };
+  setSearchResults: Dispatch<SetStateAction<SearchResult | null>>
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -91,7 +94,10 @@ const NavigationBar = ({
               noWrap
               component={Link}
               href={'/home'}
-              onClick={() => setOpenDrawer(false)}
+              onClick={() => {
+                setSearchResults(null);
+                setOpenDrawer(false);
+              }}
               sx={{
                 mr: 2,
                 display: 'flex',

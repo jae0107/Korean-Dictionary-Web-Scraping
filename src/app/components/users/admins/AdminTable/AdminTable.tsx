@@ -342,6 +342,7 @@ const AdminTable = ({
         pagination
         disableColumnMenu
         checkboxSelection
+        disableRowSelectionOnClick
         keepNonExistentRowsSelected
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setSelectedAdmins(newRowSelectionModel as string[]);
