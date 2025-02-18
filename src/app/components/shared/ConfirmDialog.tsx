@@ -16,6 +16,15 @@ const ConfirmDialog = ({
     <Dialog
       open={open}
       onClose={() => handleClose(false)}
+      sx={{
+        '@media (max-width: 501px)': {
+          "& .MuiDialog-container": {
+            "& .MuiPaper-root": {
+              margin: 1,
+            },
+          },
+        }
+      }}
     >
       <DialogTitle display={'flex'} alignItems={'center'}>
         <ErrorOutline color='warning' sx={{ mr: 1 }}/>{title}

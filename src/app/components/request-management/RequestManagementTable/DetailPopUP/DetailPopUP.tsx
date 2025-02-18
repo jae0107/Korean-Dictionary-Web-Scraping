@@ -1,24 +1,44 @@
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Close, MenuBook, Remove } from "@mui/icons-material";
-import { Box, Chip, Dialog, DialogContent, DialogContentText, DialogTitle, IconButton, Stack } from "@mui/material";
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack } from "@mui/material";
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { Dispatch, SetStateAction } from "react";
 
 const DetailPopUP = ({
   openDetailPopUp,
-  setOpenDetailPopUp,
   getWordRequest,
-  setWordRequest,
   setRequestor,
   setOpenUserInfoPopUp,
+  handleClose,
+  selectedWordId,
+  onApproval,
+  onRecover,
+  setOpenDeniedReasonPopUp,
+  setOpenConfirmDialog,
+  setSelectedDeniedReason,
+  getApprovalLoader,
+  getRecoverLoader,
+  getDenyLoader,
+  getDeniedReasonLoader,
+  getDeleteLoader,
 } : {
   openDetailPopUp: boolean;
-  setOpenDetailPopUp: (value: boolean) => void;
   getWordRequest: WordRequestItemsFragment | null;
-  setWordRequest: (value: WordRequestItemsFragment | null) => void;
   setRequestor: Dispatch<SetStateAction<RequestorItemsFragment | null>>;
   setOpenUserInfoPopUp: (value: boolean) => void;
+  handleClose: () => void;
+  selectedWordId: string;
+  onApproval: (id: string) => void;
+  onRecover: (id: string) => void;
+  setOpenDeniedReasonPopUp: (value: boolean) => void;
+  setOpenConfirmDialog: (value: boolean) => void;
+  setSelectedDeniedReason: (value: SetStateAction<string>) => void;
+  getApprovalLoader: boolean;
+  getRecoverLoader: boolean;
+  getDenyLoader: boolean;
+  getDeniedReasonLoader: boolean;
+  getDeleteLoader: boolean;
 }) => {
   const getRequestor = () => {
     if (getWordRequest?.requestor) {
@@ -35,11 +55,6 @@ const DetailPopUP = ({
       );
     }
     return <></>;
-  }
-
-  const handleClose = () => {
-    setOpenDetailPopUp(false);
-    setWordRequest(null);
   }
 
   return (
@@ -68,14 +83,11 @@ const DetailPopUP = ({
         </Box>
         <DialogContent>
           <Stack spacing={2} direction={'column'}>
-            {
-              getWordRequest?.page && 
-              <Stack spacing={0.5} direction={'row'}>
-                <DialogContentText>
-                  <b>페이지: </b>{' '}{getWordRequest.page}
-                </DialogContentText>
-              </Stack>
-            }
+            <Stack spacing={0.5} direction={'row'}>
+              <DialogContentText>
+                <b>페이지: </b>{' '}{getWordRequest ? getWordRequest.page || '-' : '-'}
+              </DialogContentText>
+            </Stack>
             {
               getWordRequest?.korDicResults && getWordRequest.korDicResults.length > 0 &&
               <Stack spacing={1} direction={'column'}>
@@ -131,14 +143,11 @@ const DetailPopUP = ({
                 </Stack>
               </Stack>
             }
-            {
-              getWordRequest?.example &&
-              <Stack spacing={0.5} direction={'row'}>
-                <DialogContentText>
-                  <b>예문: </b>{' '}{getWordRequest.example}
-                </DialogContentText>
-              </Stack>
-            }
+            <Stack spacing={0.5} direction={'row'}>
+              <DialogContentText>
+                <b>예문: </b>{' '}{getWordRequest ? getWordRequest.example || '-' : '-'}
+              </DialogContentText>
+            </Stack>
             {
               getWordRequest?.deniedReason && getWordRequest.status === WordStatus.Denied &&
               <Stack spacing={0.5} direction={'row'}>
@@ -149,6 +158,46 @@ const DetailPopUP = ({
             }
           </Stack>
         </DialogContent>
+        <DialogActions>
+          {
+            getWordRequest?.status === WordStatus.Pending &&
+            <Button variant="contained" loading={getApprovalLoader} onClick={() => onApproval(selectedWordId)}>
+              승인
+            </Button>
+          }
+          {
+            getWordRequest?.status === WordStatus.Denied &&
+            <Button variant="contained" color='primary' loading={getRecoverLoader} onClick={() => onRecover(selectedWordId)}>
+              복구
+            </Button>
+          }
+          {
+            (getWordRequest?.status === WordStatus.Pending || getWordRequest?.status === WordStatus.Approved) &&
+            <Button variant="contained" color='error' loading={getDenyLoader} onClick={() => setOpenDeniedReasonPopUp(true)}>
+              거절
+            </Button>
+          }
+          {
+            getWordRequest?.status === WordStatus.Denied &&
+            <Button variant="contained" color='error' loading={getDeleteLoader} onClick={() => setOpenConfirmDialog(true)}>
+              삭제
+            </Button>
+          }
+          {
+            getWordRequest?.status === WordStatus.Denied &&
+            <Button 
+              variant="contained" 
+              color='inherit' 
+              loading={getDeniedReasonLoader}
+              onClick={() => {
+                setSelectedDeniedReason(getWordRequest.deniedReason || '');
+                setOpenDeniedReasonPopUp(true);
+              }}
+            >
+              거절 사유
+            </Button>
+          }
+        </DialogActions>
       </Dialog>
     </>
   );

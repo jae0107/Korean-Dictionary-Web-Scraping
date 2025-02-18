@@ -117,6 +117,7 @@ const RequestManagementTable = ({
         refetch();
         setSelectedRequests([]);
         setApprovalLoader({[id]: false});
+        handleCloseDetailPopUp();
         dispatchCurrentSnackBar({
           payload: {
             open: true,
@@ -147,6 +148,7 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseDetailPopUp();
         setSelectedRequests([]);
         setDenyLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -178,6 +180,7 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseDetailPopUp();
         setSelectedRequests([]);
         setRecoverLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -227,6 +230,7 @@ const RequestManagementTable = ({
             variant='text' 
             color='info'
             onClick={() => {
+              setSelectedWordId(params.row.id);
               setWordRequest(params.row);
               setOpenDetailPopUp(true);
             }}
@@ -492,6 +496,7 @@ const RequestManagementTable = ({
         },
         onCompleted: () => {
           refetch();
+          handleCloseDetailPopUp();
           setSelectedRequests([]);
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
@@ -504,7 +509,7 @@ const RequestManagementTable = ({
         },
       });
     }
-    setSelectedWordId('');
+    !openDetailPopUp && setSelectedWordId('');
   }
 
   const handleCloseDeniedReasonPopUp = (isConfirm: boolean, deniedReason: string) => {
@@ -529,6 +534,7 @@ const RequestManagementTable = ({
           },
           onCompleted: () => {
             refetch();
+            handleCloseDetailPopUp();
             setSelectedRequests([]);
             setDeniedReasonLoader({[selectedWordId]: false});
             dispatchCurrentSnackBar({
@@ -544,9 +550,17 @@ const RequestManagementTable = ({
         onDeny(selectedWordId, deniedReason);
       }
     }
-      
+    
+    if (!openDetailPopUp) {
+      setSelectedWordId('');
+      setSelectedDeniedReason('');
+    }
+  }
+
+  const handleCloseDetailPopUp = () => {
+    setOpenDetailPopUp(false);
     setSelectedWordId('');
-    setSelectedDeniedReason('');
+    setWordRequest(null);
   }
   
   return (
@@ -647,6 +661,9 @@ const RequestManagementTable = ({
               display: 'flex',
               justifyContent: 'center',
             }
+          },
+          '[aria-label="more"]': {
+            boxShadow: '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);'
           }
         }}
       />
@@ -670,11 +687,21 @@ const RequestManagementTable = ({
       />
       <DetailPopUP
         openDetailPopUp={openDetailPopUp}
-        setOpenDetailPopUp={setOpenDetailPopUp}
         getWordRequest={getWordRequest}
-        setWordRequest={setWordRequest}
         setRequestor={setRequestor}
         setOpenUserInfoPopUp={setOpenUserInfoPopUp}
+        handleClose={handleCloseDetailPopUp}
+        selectedWordId={selectedWordId}
+        onApproval={onApproval}
+        onRecover={onRecover}
+        setOpenDeniedReasonPopUp={setOpenDeniedReasonPopUp}
+        setOpenConfirmDialog={setOpenConfirmDialog}
+        setSelectedDeniedReason={setSelectedDeniedReason}
+        getApprovalLoader={getApprovalLoader[selectedWordId]}
+        getRecoverLoader={getRecoverLoader[selectedWordId]}
+        getDenyLoader={getDenyLoader[selectedWordId]}
+        getDeniedReasonLoader={getDeniedReasonLoader[selectedWordId]}
+        getDeleteLoader={getDeleteLoader[selectedWordId]}
       />
     </Box>
   );

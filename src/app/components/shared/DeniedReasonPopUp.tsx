@@ -17,14 +17,32 @@ const DeniedReasonPopUp = ({
     <Dialog
       open={open}
       onClose={() => handleClose(false, getDeniedReason)}
+      sx={{
+        '@media (max-width: 470px)': {
+          "& .MuiDialog-container": {
+            "& .MuiPaper-root": {
+              width: '100%',
+              margin: 1,
+            },
+          },
+        }
+      }}
     >
       <DialogTitle display={'flex'} alignItems={'center'}>
         <DoDisturb color='warning' sx={{ mr: 1 }}/>거절 사유
       </DialogTitle>
-      <DialogContent sx={{ pt: '6px !important', width: '400px' }}>
+      <DialogContent 
+        sx={{ 
+          pt: '6px !important', 
+          width: '400px',
+          '@media (max-width: 470px)': {
+            width: '100%',
+          },
+        }}
+      >
         <TextField
-          label={'거절 사유'}
           type='text'
+          placeholder="거절 사유를 입력하세요."
           multiline
           rows={4}
           fullWidth
