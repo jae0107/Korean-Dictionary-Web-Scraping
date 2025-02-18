@@ -197,6 +197,8 @@ const RequestManagementTable = ({
   const actions: GridColDef = {
     field: 'actions',
     type: 'actions',
+    headerName: '작업',
+    renderHeader: () => null,
     width: wordRequestStatus !== WordStatus.Pending || maxWidth360 ? 40 : 80,
     getActions: (params: GridRowParams<WordRequestItemsFragment>) => {
       if (params.row.status === 'APPROVED') {
@@ -661,6 +663,7 @@ const RequestManagementTable = ({
           toolbarColumns: '열 선택',
           columnsManagementShowHideAllText: '모든 열 보기/숨기기',
           columnsManagementReset: '초기화',
+          checkboxSelectionHeaderName: '선택',
         }}
         sx={{
           '@media (max-width:750px)': {
