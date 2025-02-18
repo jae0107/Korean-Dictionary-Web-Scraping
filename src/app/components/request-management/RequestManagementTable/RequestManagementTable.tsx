@@ -194,21 +194,140 @@ const RequestManagementTable = ({
     });
   }
 
-  const columns: GridColDef[] = [
-    { 
-      field: 'page', 
-      headerName: '페이지', 
-      headerClassName: 'page-header',
-      cellClassName: 'page-cell',
-      width: 60, 
-      filterable: false, 
-      sortable: false,
-      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
-        return (
-          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
-        );
+  const actions: GridColDef = {
+    field: 'actions',
+    type: 'actions',
+    width: wordRequestStatus !== WordStatus.Pending || maxWidth360 ? 40 : 80,
+    getActions: (params: GridRowParams<WordRequestItemsFragment>) => {
+      if (params.row.status === 'APPROVED') {
+        return [
+          <GridActionsCellItem
+            key="deny"
+            icon={
+              getDenyLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'거절'}>
+                <HighlightOff color="error" />
+              </Tooltip>
+            }
+            label="거절"
+            showInMenu={false}
+            onClick={() => {
+              setSelectedWordId(params.row.id);
+              setOpenDeniedReasonPopUp(true);
+            }}
+          />
+        ];
+      } else if (params.row.status === 'DENIED') {
+        if (getRecoverLoader[params.row.id] || getDeleteLoader[params.row.id] || getDeniedReasonLoader[params.row.id]) {
+          return [
+            <GridActionsCellItem
+              key="more"
+              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+              label="더보기"
+              showInMenu={false}
+            />
+          ];
+        }
+        return [
+          <GridActionsCellItem
+            key="recover"
+            icon={
+              getRecoverLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Restore color='primary' />
+            }
+            label="복구"
+            showInMenu={true}
+            onClick={() => onRecover(params.row.id)}
+            dense={maxWidth495}
+          />,
+          <GridActionsCellItem
+            key="delete"
+            icon={
+              getDeleteLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <DeleteForever color="error" />
+            }
+            label="삭제"
+            showInMenu={true}
+            onClick={() => {
+              setSelectedWordId(params.row.id);
+              setOpenConfirmDialog(true);
+            }}
+            dense={maxWidth495}
+          />,
+          <GridActionsCellItem
+            key="reason"
+            icon={
+              getDeniedReasonLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Create color='action'/>
+            }
+            label="거절 사유"
+            showInMenu={true}
+            onClick={() => {
+              setSelectedWordId(params.row.id);
+              setSelectedDeniedReason(params.row.deniedReason || '');
+              setOpenDeniedReasonPopUp(true);
+            }}
+            dense={maxWidth495}
+          />
+        ];
       }
-    },
+      if (maxWidth360 && (getApprovalLoader[params.row.id] || getDenyLoader[params.row.id])) {
+        return [
+          <GridActionsCellItem
+            key="more"
+            icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+            label="더보기"
+            showInMenu={false}
+          />
+        ];
+      }
+      return [
+        <GridActionsCellItem
+          key="approve"
+          icon={
+            getApprovalLoader[params.row.id] ?
+            <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+            : 
+            <Tooltip title={'승인'}>
+              <CheckCircleOutline color="success" />
+            </Tooltip>
+          }
+          label="승인"
+          showInMenu={maxWidth360}
+          dense={maxWidth360}
+          onClick={() => onApproval(params.row.id)}
+        />,
+        <GridActionsCellItem
+          key="deny"
+          icon={
+            getDenyLoader[params.row.id] ?
+            <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+            : 
+            <Tooltip title={'거절'}>
+              <HighlightOff color="error" />
+            </Tooltip>
+          }
+          label="거절"
+          showInMenu={maxWidth360}
+          dense={maxWidth360}
+          onClick={() => {
+            setSelectedWordId(params.row.id);
+            setOpenDeniedReasonPopUp(true);
+          }}
+        />
+      ]
+    }
+  };
+
+  const columns: GridColDef[] = maxWidth750? [
     { 
       field: 'title', 
       headerName: '단어', 
@@ -239,6 +358,29 @@ const RequestManagementTable = ({
           </Button>
         );
       }
+    },
+    actions
+  ] : [
+    { 
+      field: 'page', 
+      headerName: '페이지', 
+      headerClassName: 'page-header',
+      cellClassName: 'page-cell',
+      width: 60, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+        return (
+          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+        );
+      }
+    },
+    { 
+      field: 'title', 
+      headerName: '단어', 
+      width: 120, 
+      filterable: false, 
+      sortable: false,
     },
     { 
       field: 'korDicResults', 
@@ -330,138 +472,7 @@ const RequestManagementTable = ({
         );
       },
     },
-    {
-      field: 'actions',
-      type: 'actions',
-      width: wordRequestStatus !== WordStatus.Pending || maxWidth360 ? 40 : 80,
-      getActions: (params: GridRowParams<WordRequestItemsFragment>) => {
-        if (params.row.status === 'APPROVED') {
-          return [
-            <GridActionsCellItem
-              key="deny"
-              icon={
-                getDenyLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'거절'}>
-                  <HighlightOff color="error" />
-                </Tooltip>
-              }
-              label="거절"
-              showInMenu={false}
-              onClick={() => {
-                setSelectedWordId(params.row.id);
-                setOpenDeniedReasonPopUp(true);
-              }}
-            />
-          ];
-        } else if (params.row.status === 'DENIED') {
-          if (getRecoverLoader[params.row.id] || getDeleteLoader[params.row.id] || getDeniedReasonLoader[params.row.id]) {
-            return [
-              <GridActionsCellItem
-                key="more"
-                icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
-                label="더보기"
-                showInMenu={false}
-              />
-            ];
-          }
-          return [
-            <GridActionsCellItem
-              key="recover"
-              icon={
-                getRecoverLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Restore color='primary' />
-              }
-              label="복구"
-              showInMenu={true}
-              onClick={() => onRecover(params.row.id)}
-              dense={maxWidth495}
-            />,
-            <GridActionsCellItem
-              key="delete"
-              icon={
-                getDeleteLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <DeleteForever color="error" />
-              }
-              label="삭제"
-              showInMenu={true}
-              onClick={() => {
-                setSelectedWordId(params.row.id);
-                setOpenConfirmDialog(true);
-              }}
-              dense={maxWidth495}
-            />,
-            <GridActionsCellItem
-              key="reason"
-              icon={
-                getDeniedReasonLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Create color='action'/>
-              }
-              label="거절 사유"
-              showInMenu={true}
-              onClick={() => {
-                setSelectedWordId(params.row.id);
-                setSelectedDeniedReason(params.row.deniedReason || '');
-                setOpenDeniedReasonPopUp(true);
-              }}
-              dense={maxWidth495}
-            />
-          ];
-        }
-        if (maxWidth360 && (getApprovalLoader[params.row.id] || getDenyLoader[params.row.id])) {
-          return [
-            <GridActionsCellItem
-              key="more"
-              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
-              label="더보기"
-              showInMenu={false}
-            />
-          ];
-        }
-        return [
-          <GridActionsCellItem
-            key="approve"
-            icon={
-              getApprovalLoader[params.row.id] ?
-              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-              : 
-              <Tooltip title={'승인'}>
-                <CheckCircleOutline color="success" />
-              </Tooltip>
-            }
-            label="승인"
-            showInMenu={maxWidth360}
-            dense={maxWidth360}
-            onClick={() => onApproval(params.row.id)}
-          />,
-          <GridActionsCellItem
-            key="deny"
-            icon={
-              getDenyLoader[params.row.id] ?
-              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-              : 
-              <Tooltip title={'거절'}>
-                <HighlightOff color="error" />
-              </Tooltip>
-            }
-            label="거절"
-            showInMenu={maxWidth360}
-            dense={maxWidth360}
-            onClick={() => {
-              setSelectedWordId(params.row.id);
-              setOpenDeniedReasonPopUp(true);
-            }}
-          />
-        ]
-      }
-    }
+    actions
   ];
 
   if (wordRequestStatus === 'DENIED' && !maxWidth545) {
