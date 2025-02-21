@@ -11,6 +11,6 @@ export const config = {
     "/vocabulary-list",
     "/my-requests",
     "/password-change",
-    "/((?!signin|signup|api|public).*)", // Protect all pages except these
+    "/((?!signin|signup|password-reset|api|public).*)", // Protect all pages except these
   ],
 };

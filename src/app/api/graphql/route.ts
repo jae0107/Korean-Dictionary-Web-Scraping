@@ -37,11 +37,6 @@ const handler = startServerAndCreateNextHandler(apolloServer, {
 
     const dataloaders = createDataLoaders();
 
-    if (!session || !session.user || !session.user.id) {
-      // If no session, throw error to deny access
-      throw new Error('Unauthorized');
-    }
-
     if (session && session.user && session.user.id) {
       const currentUser = await User.findByPk(session.user.id);
       if (currentUser) {

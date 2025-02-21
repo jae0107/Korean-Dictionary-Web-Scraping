@@ -1,4 +1,4 @@
-import { useColorModeContext, useThemeContext } from "@/app/components/Providers/Providers";
+import { useThemeContext } from "@/app/components/Providers/Providers";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { z } from "zod";
 import { useRouter } from 'next/navigation';
@@ -175,7 +175,7 @@ const LoginForm = () => {
             />
           </Box>
           <Box width={'100%'}>
-          <InputLabel 
+            <InputLabel 
               required 
               sx={{ 
                 marginBottom: 1, 
@@ -271,7 +271,7 @@ const LoginForm = () => {
               }
             }}
           >
-            비밀번호를 잊으셨나요? <a href={'/forgot-password'}>비밀번호 찾기</a>
+            비밀번호를 잊으셨나요? <Link href={'/password-reset'}>비밀번호 찾기</Link>
           </Typography>
         </Stack>
       </Stack>

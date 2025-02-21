@@ -1,7 +1,7 @@
 import { User, Word } from "../models";
 import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
-import { FindPasswordInput, OffsetPaginationOptions, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
+import { FindPasswordInput, OffsetPaginationOptions, PasswordResetInput, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
@@ -22,6 +22,7 @@ export const userResolvers = {
     createUser,
     updateUser,
     changeCurrentPassword,
+    passwordReset,
     approveUser,
     bulkApproveUsers,
     denyUser,
@@ -176,6 +177,26 @@ async function changeCurrentPassword(
       } else {
         throw new Error('입력한 현재 비밀번호가 일치하지 않습니다.');
       }
+    } else {
+      throw new Error('No User Found');
+    }
+
+    return user;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function passwordReset(
+  root: any,
+  { input }: { input: PasswordResetInput; },
+  { currentUser }: Context,
+): Promise<User> {
+  return await transaction(async (t) => {
+    let user = await User.findOne({ where: { email: input.email } });
+
+    if (user) {
+      user = await user.update({ password: input.password }, { validate: false });
     } else {
       throw new Error('No User Found');
     }

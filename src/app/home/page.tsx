@@ -49,7 +49,7 @@ const Home = () => {
         mt={4} 
         width={'100%'}
         sx={{
-          '@media (max-width:500px)': {
+          '@media (max-width:730px)': {
             marginTop: 0,
             width: '95% !important',
           }
@@ -83,10 +83,6 @@ const Home = () => {
                           mr: 1,
                           padding: '12px',
                           fontSize: '1.75rem',
-                          '@media (max-width:500px)': {
-                            padding: '5px',
-                            fontSize: '1.125rem',
-                          }
                         }}
                       >
                         <Cancel sx={{ width: '15px', height: '15px' }}/>
@@ -103,10 +99,6 @@ const Home = () => {
                           sx={{ 
                             padding: '12px',
                             fontSize: '1.75rem',
-                            '@media (max-width:500px)': {
-                              padding: '5px',
-                              fontSize: '1.125rem',
-                            }
                           }}
                           type="submit"
                         >

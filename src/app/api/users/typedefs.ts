@@ -65,6 +65,11 @@ export const userTypeDefs = gql`
     newPassword: String!
   }
 
+  input PasswordResetInput {
+    email: String!
+    password: String!
+  }
+
   type UserOffsetPaginationResponse {
     records: [User!]!
     pageInfo: OffsetPaginationPageInfo!
@@ -87,6 +92,7 @@ export const userTypeDefs = gql`
   type Mutation {
     createUser(input: UserInput!): User!
     changeCurrentPassword(id: ID!, input: FindPasswordInput!): User!
+    passwordReset(input: PasswordResetInput!): User!
     updateUser(id: ID!, input: UserInput!): User!
     approveUser(id: ID!): Boolean!
     bulkApproveUsers(ids: [ID!]!): Boolean!
