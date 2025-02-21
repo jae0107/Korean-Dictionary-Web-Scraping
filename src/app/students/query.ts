@@ -9,6 +9,8 @@ export const studentFragment = gql(`
     number
     email
     status
+    role
+    status
   }
 `);
 

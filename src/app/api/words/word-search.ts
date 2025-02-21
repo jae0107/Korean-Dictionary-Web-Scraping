@@ -18,7 +18,7 @@ export class WordSearch {
 
   async process(): Promise<OffsetPaginationResponse<Word>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { status, word, requestorId, year, class: className } = this.filterOptions;
+    const { status, word, requestorId, year, class: className, page } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('words');
 
@@ -46,6 +46,10 @@ export class WordSearch {
       query = query
         .select('words.*')
         .where('words.title', 'ilike', `%${word}%`);
+    }
+
+    if (isPresent(page) && page) {
+      query = query.where('words.page', '=', page);
     }
 
     if (!isPresent(pageNum) || pageNum < 0) {

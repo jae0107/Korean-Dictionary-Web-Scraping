@@ -116,11 +116,14 @@ const NavigationBar = ({
                 sx={{ 
                   my: 2, 
                   color: 'white', 
-                  display: maxWidth424 ? 'none' : 'flex',
+                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname === '/vocabulary-list' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                  '@media (max-width: 424px)': {
+                    display: 'none',
+                  }
                 }}
                 component={Link}
                 href={'/vocabulary-list'}
@@ -133,9 +136,12 @@ const NavigationBar = ({
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: maxWidth424 ? 'none' : getDisplay(!!userRole && userRole !== 'STUDENT'),
+                    display: getDisplay(!!userRole && userRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                    '@media (max-width: 424px)': {
+                      display: 'none',
+                    }
                   }}
                   loading={loading}
                   component={Link}
@@ -150,9 +156,12 @@ const NavigationBar = ({
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: maxWidth424 ? 'none' : getDisplay(!!userRole && userRole !== 'STUDENT'),
+                    display: getDisplay(!!userRole && userRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                    '@media (max-width: 424px)': {
+                      display: 'none',
+                    }
                   }}
                   loading={loading}
                   onClick={(e) => setAnchorElUserManagement(e.currentTarget)}
@@ -179,6 +188,8 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                   onClick={() => navigationUser('/students')}
+                  component={Link}
+                  href={'/students'}
                 >
                   <Typography 
                     sx={{ 
@@ -197,6 +208,8 @@ const NavigationBar = ({
                   <MenuItem 
                     sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                     onClick={() => navigationUser('/teachers')}
+                    component={Link}
+                    href={'/teachers'}
                   >
                     <Typography 
                       sx={{ 
@@ -216,6 +229,8 @@ const NavigationBar = ({
                   <MenuItem 
                     sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                     onClick={() => navigationUser('/admins')}
+                    component={Link}
+                    href={'/admins'}
                   >
                     <Typography 
                       sx={{ 
@@ -259,9 +274,18 @@ const NavigationBar = ({
                 onClose={() => setAnchorElUser(null)}
               >
                 <MenuItem 
-                  sx={{ backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  sx={{ 
+                    backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
+                    '@media (max-width:424px)': {
+                      fontSize: '0.875rem',
+                      pt: '4px',
+                      pb: '4px',
+                      minHeight: '32px'
+                    }
+                  }}
                   onClick={() => navigationMyInfo('/profile')}
-                
+                  component={Link}
+                  href={'/profile'}
                 >
                   <Typography 
                     sx={{ 
@@ -276,9 +300,18 @@ const NavigationBar = ({
                   </Typography>
                 </MenuItem>
                 <MenuItem 
-                  sx={{ backgroundColor: pathname === '/password-change' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  sx={{ 
+                    backgroundColor: pathname === '/password-change' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
+                    '@media (max-width:424px)': {
+                      fontSize: '0.875rem',
+                      pt: '4px',
+                      pb: '4px',
+                      minHeight: '32px'
+                    }
+                  }}
                   onClick={() => navigationMyInfo('/password-change')}
-                
+                  component={Link}
+                  href={'/password-change'}
                 >
                   <Typography 
                     sx={{ 
@@ -293,9 +326,18 @@ const NavigationBar = ({
                   </Typography>
                 </MenuItem>
                 <MenuItem 
-                  sx={{ backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  sx={{ 
+                    backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
+                    '@media (max-width:424px)': {
+                      fontSize: '0.875rem',
+                      pt: '4px',
+                      pb: '4px',
+                      minHeight: '32px'
+                    }
+                  }}
                   onClick={() => navigationMyInfo('/my-requests')}
-                
+                  component={Link}
+                  href={'/my-requests'}
                 >
                   <Typography 
                     sx={{ 
@@ -311,7 +353,17 @@ const NavigationBar = ({
                 </MenuItem>
                 {
                   session &&
-                  <MenuItem onClick={logOut}>
+                  <MenuItem 
+                    onClick={logOut}
+                    sx={{
+                      '@media (max-width:424px)': {
+                      fontSize: '0.875rem',
+                      pt: '4px',
+                      pb: '4px',
+                      minHeight: '32px'
+                    }
+                    }}
+                  >
                     {
                       logoutLoading ?
                       <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px !important' }}/> :

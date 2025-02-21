@@ -84,7 +84,12 @@ function SnackbarProvider({ children }: { children: React.ReactNode }) {
       >
         <Alert
           severity={currentSnackBar.type}
-          sx={{ width: maxWidth600 ? '95%' : '100%' }}
+          sx={{ 
+            width: maxWidth600 ? '95%' : '100%',
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'row',
+          }}
           action={
             <IconButton
               sx={{

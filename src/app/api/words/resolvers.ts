@@ -27,7 +27,7 @@ export const wordResolvers = {
   },
   Word: {
     async requestor(word: Word, _args: unknown, { dataloaders }: Context) {
-      return await dataloaders.user.load(word.requestorId);
+      return word.requestorId ? await dataloaders.user.load(word.requestorId) : null;
     },
   },
 };

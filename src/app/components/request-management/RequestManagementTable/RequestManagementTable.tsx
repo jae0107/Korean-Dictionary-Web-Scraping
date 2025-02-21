@@ -15,7 +15,7 @@ import ConfirmDialog from "../../shared/ConfirmDialog";
 import RequestManagementBulkAction from "./RequestManagementBulkAction/RequestManagementBulkAction";
 import DeniedReasonPopUp from "../../shared/DeniedReasonPopUp";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
-import DetailPopUP from "./DetailPopUP/DetailPopUP";
+import RequestDetailPopUP from "./RequestDetailPopUP/RequestDetailPopUP";
 
 const RequestManagementTable = ({
   loading,
@@ -65,7 +65,7 @@ const RequestManagementTable = ({
   const [openDeniedReasonPopUp, setOpenDeniedReasonPopUp] = useState<boolean>(false);
   const [selectedWordId, setSelectedWordId] = useState<string>('');
   const [selectedDeniedReason, setSelectedDeniedReason] = useState<string>('');
-  const [openDetailPopUp, setOpenDetailPopUp] = useState<boolean>(false);
+  const [openRequestDetailPopUp, setOpenRequestDetailPopUp] = useState<boolean>(false);
   const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
       page: !maxWidth850,
@@ -117,7 +117,7 @@ const RequestManagementTable = ({
         refetch();
         setSelectedRequests([]);
         setApprovalLoader({[id]: false});
-        handleCloseDetailPopUp();
+        handleCloseRequestDetailPopUp();
         dispatchCurrentSnackBar({
           payload: {
             open: true,
@@ -148,7 +148,7 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
-        handleCloseDetailPopUp();
+        handleCloseRequestDetailPopUp();
         setSelectedRequests([]);
         setDenyLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -180,7 +180,7 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
-        handleCloseDetailPopUp();
+        handleCloseRequestDetailPopUp();
         setSelectedRequests([]);
         setRecoverLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -329,7 +329,7 @@ const RequestManagementTable = ({
     }
   };
 
-  const columns: GridColDef[] = maxWidth750? [
+  const columns: GridColDef[] = maxWidth750 ? [
     { 
       field: 'title', 
       headerName: '단어', 
@@ -353,7 +353,7 @@ const RequestManagementTable = ({
             onClick={() => {
               setSelectedWordId(params.row.id);
               setWordRequest(params.row);
-              setOpenDetailPopUp(true);
+              setOpenRequestDetailPopUp(true);
             }}
           >
             더보기 클릭
@@ -463,7 +463,7 @@ const RequestManagementTable = ({
               color="primary" 
               variant="outlined" 
               onClick={() => {
-                setRequestor(params.row.requestor);
+                params.row.requestor && setRequestor(params.row.requestor);
                 setOpenUserInfoPopUp(true);
               }} 
             /> 
@@ -509,7 +509,7 @@ const RequestManagementTable = ({
         },
         onCompleted: () => {
           refetch();
-          handleCloseDetailPopUp();
+          handleCloseRequestDetailPopUp();
           setSelectedRequests([]);
           setDeleteLoader({[selectedWordId]: false});
           dispatchCurrentSnackBar({
@@ -522,7 +522,7 @@ const RequestManagementTable = ({
         },
       });
     }
-    !openDetailPopUp && setSelectedWordId('');
+    !openRequestDetailPopUp && setSelectedWordId('');
   }
 
   const handleCloseDeniedReasonPopUp = (isConfirm: boolean, deniedReason: string) => {
@@ -547,7 +547,7 @@ const RequestManagementTable = ({
           },
           onCompleted: () => {
             refetch();
-            handleCloseDetailPopUp();
+            handleCloseRequestDetailPopUp();
             setSelectedRequests([]);
             setDeniedReasonLoader({[selectedWordId]: false});
             dispatchCurrentSnackBar({
@@ -564,14 +564,14 @@ const RequestManagementTable = ({
       }
     }
     
-    if (!openDetailPopUp) {
+    if (!openRequestDetailPopUp) {
       setSelectedWordId('');
       setSelectedDeniedReason('');
     }
   }
 
-  const handleCloseDetailPopUp = () => {
-    setOpenDetailPopUp(false);
+  const handleCloseRequestDetailPopUp = () => {
+    setOpenRequestDetailPopUp(false);
     setSelectedWordId('');
     setWordRequest(null);
   }
@@ -676,9 +676,6 @@ const RequestManagementTable = ({
               justifyContent: 'center',
             }
           },
-          '[aria-label="more"]': {
-            boxShadow: '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);'
-          }
         }}
       />
       <UserInfoPopUp
@@ -699,12 +696,12 @@ const RequestManagementTable = ({
         getDeniedReason={selectedDeniedReason}
         setDeniedReason={setSelectedDeniedReason}
       />
-      <DetailPopUP
-        openDetailPopUp={openDetailPopUp}
+      <RequestDetailPopUP
+        openRequestDetailPopUp={openRequestDetailPopUp}
         getWordRequest={getWordRequest}
         setRequestor={setRequestor}
         setOpenUserInfoPopUp={setOpenUserInfoPopUp}
-        handleClose={handleCloseDetailPopUp}
+        handleClose={handleCloseRequestDetailPopUp}
         selectedWordId={selectedWordId}
         onApproval={onApproval}
         onRecover={onRecover}

@@ -31,11 +31,11 @@ const VocabTable = ({
   }>>;
 }) => {
   const maxWidth750 = useMediaQuery('(max-width:750px)');
-  const maxWidth470 = useMediaQuery('(max-width:470px)');
+  const maxWidth475 = useMediaQuery('(max-width:475px)');
   const maxWidth435 = useMediaQuery('(max-width:435px)');
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
-    page: !maxWidth470,
+    page: !maxWidth475,
     naverDicResults: !maxWidth750,
     example: !maxWidth435,
     title: true,
@@ -44,13 +44,13 @@ const VocabTable = ({
 
   useEffect(() => {
     setColumnVisibilityModel({
-      page: !maxWidth470,
+      page: !maxWidth475,
       naverDicResults: !maxWidth750,
       example: !maxWidth435,
       title: columnVisibilityModel.title,
       korDicResults: columnVisibilityModel.korDicResults,
     });
-  }, [maxWidth435, maxWidth470, maxWidth750]);
+  }, [maxWidth435, maxWidth475, maxWidth750]);
 
   const columns: GridColDef[] = [
     { 
@@ -147,7 +147,16 @@ const VocabTable = ({
   ];
   
   return (
-    <Box display={'flex'} flexDirection={'column'} width={maxWidth470 ? '95%' : '90%'}>
+    <Box 
+      display={'flex'} 
+      flexDirection={'column'} 
+      width={'90%'}
+      sx={{
+        '@media (max-width:545px)': {
+          width: '95% !important',
+        }
+      }}
+    >
       <DataGrid
         pagination
         disableColumnMenu

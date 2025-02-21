@@ -8,6 +8,8 @@ export const teacherFragment = gql(`
     class
     email
     status
+    role
+    status
   }
 `);
 

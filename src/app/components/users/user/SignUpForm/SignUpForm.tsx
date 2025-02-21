@@ -4,7 +4,7 @@ import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Cancel, Close, Done, Login, PersonAdd, RadioButtonUnchecked, Visibility, VisibilityOff } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,12 +12,12 @@ import { createUserMutation } from "./query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ColourModeSwitch from "@/app/components/shared/ColourModeSwitch";
+import './style.scss';
 
 const SignUpForm = () => {
   const theme = useThemeContext();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const router = useRouter();
-  const maxWidth600 = useMediaQuery('(max-width:600px)');
 
   const [loading, setLoading] = useState<boolean>(false);
   const [getRole, setRole] = useState<UserRole | null>(UserRole.Student);
@@ -160,19 +160,47 @@ const SignUpForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-      <Stack spacing={4} width={maxWidth600 ? '95%' : '500px'} padding={5} borderRadius={2} boxShadow={2} bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}>
+      <Stack 
+        spacing={4} 
+        width={'500px'} 
+        padding={5} 
+        borderRadius={2} 
+        boxShadow={2} 
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}
+        sx={{
+          '@media (max-width:530px)': {
+            width: '95% !important',
+          }
+        }}
+      >
         <Stack spacing={2}>
           <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
             <Stack spacing={2} direction={'row'} alignItems={'center'}>
-              <PersonAdd color='primary' sx={maxWidth600 ? { width: '30px', height: '30px' } : { width: '40px', height: '40px' }}/>
-              <Typography variant={maxWidth600 ? 'h5' : 'h4'}>회원가입</Typography>
+              <PersonAdd color='primary' sx={{ width: '40px', height: '40px' }}/>
+              <Typography 
+                variant={'h4'}
+                sx={{
+                  '@media (max-width:530px)': {
+                    fontSize: '1.5rem',
+                    fontWeight: 400,
+                  }
+                }}
+              >
+                회원가입
+              </Typography>
             </Stack>
             <ColourModeSwitch/>
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
-              required
+              required 
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
             >
               이메일
             </InputLabel>
@@ -187,19 +215,31 @@ const SignUpForm = () => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('email', '')}>
-                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
-                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
+                htmlInput: {
+                  sx: {
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem',
+                    }
+                  },
+                },
               }}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
-              required
+              required 
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
             >
               비밀번호
             </InputLabel>
@@ -214,15 +254,21 @@ const SignUpForm = () => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('password', '')} sx={{ mr: '2px' }}>
-                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
                       </IconButton>
                       <IconButton onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <VisibilityOff sx={maxWidth600 ? { width: '1rem', height: '1rem' } : { width: '20px', height: '20px' }}/> : <Visibility sx={maxWidth600 ? { width: '1rem', height: '1rem' } : { width: '20px', height: '20px' }}/>}
+                        {showPassword ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
-                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
+                htmlInput: {
+                  sx: {
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem',
+                    }
+                  },
+                },
               }}
               variant="outlined" 
             />
@@ -248,7 +294,13 @@ const SignUpForm = () => {
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
               required
             >
               이름
@@ -264,18 +316,30 @@ const SignUpForm = () => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setValue('name', '')}>
-                        <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
                       </IconButton>
                     </InputAdornment>
                   ),
                 },
-                htmlInput: { style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' } },
+                htmlInput: {
+                  sx: {
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem',
+                    }
+                  },
+                },
               }}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
               required
             >
               역할
@@ -293,19 +357,77 @@ const SignUpForm = () => {
                   }}
                   fullWidth
                   error={!!errors.role}
-                  sx={{ fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+                  sx={{
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem'
+                    },
+                  }}
                 >
-                  <MenuItem value={''} dense={maxWidth600}><em>-</em></MenuItem>
-                  <MenuItem value={UserRole.Student} dense={maxWidth600}>학생</MenuItem>
-                  <MenuItem value={UserRole.Teacher} dense={maxWidth600}>교사</MenuItem>
-                  <MenuItem value={UserRole.Admin} dense={maxWidth600}>관리자</MenuItem>
+                  <MenuItem 
+                    value={''} 
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    <em>-</em>
+                  </MenuItem>
+                  <MenuItem 
+                    value={UserRole.Student}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    학생
+                  </MenuItem>
+                  <MenuItem 
+                    value={UserRole.Teacher}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    교사
+                  </MenuItem>
+                  <MenuItem 
+                    value={UserRole.Admin}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    관리자
+                  </MenuItem>
                 </Select>
               )}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
               required={getRole === UserRole.Student}
             >
               학년
@@ -320,19 +442,77 @@ const SignUpForm = () => {
                   onChange={field.onChange}
                   fullWidth
                   error={!!errors.year}
-                  sx={{ fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+                  sx={{
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem'
+                    },
+                  }}
                 >
-                  <MenuItem value={0} dense={maxWidth600}><em>-</em></MenuItem>
-                  <MenuItem value={1} dense={maxWidth600}>1학년</MenuItem>
-                  <MenuItem value={2} dense={maxWidth600}>2학년</MenuItem>
-                  <MenuItem value={3} dense={maxWidth600}>3학년</MenuItem>
+                  <MenuItem 
+                    value={''}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    <em>-</em>
+                  </MenuItem>
+                  <MenuItem 
+                    value={1}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    1학년
+                  </MenuItem>
+                  <MenuItem 
+                    value={2}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    2학년
+                  </MenuItem>
+                  <MenuItem 
+                    value={3}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    3학년
+                  </MenuItem>
                 </Select>
               )}
             />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
               required={getRole === UserRole.Student}
             >
               반
@@ -347,19 +527,155 @@ const SignUpForm = () => {
                   onChange={field.onChange}
                   fullWidth
                   error={!!errors.class}
-                  sx={{ fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+                  sx={{
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem'
+                    },
+                  }}
                 >
-                  <MenuItem value={'0'} dense={maxWidth600}><em>-</em></MenuItem>
-                  <MenuItem value={'1'} dense={maxWidth600}>1반</MenuItem>
-                  <MenuItem value={'2'} dense={maxWidth600}>2반</MenuItem>
-                  <MenuItem value={'3'} dense={maxWidth600}>3반</MenuItem>
-                  <MenuItem value={'4'} dense={maxWidth600}>4반</MenuItem>
-                  <MenuItem value={'5'} dense={maxWidth600}>5반</MenuItem>
-                  <MenuItem value={'6'} dense={maxWidth600}>6반</MenuItem>
-                  <MenuItem value={'7'} dense={maxWidth600}>7반</MenuItem>
-                  <MenuItem value={'8'} dense={maxWidth600}>8반</MenuItem>
-                  <MenuItem value={'9'} dense={maxWidth600}>9반</MenuItem>
-                  <MenuItem value={'10'} dense={maxWidth600}>10반</MenuItem>
+                  <MenuItem 
+                    value={''}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    <em>-</em>
+                  </MenuItem>
+                  <MenuItem 
+                    value={1}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    1반
+                  </MenuItem>
+                  <MenuItem 
+                    value={2}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    2반
+                  </MenuItem>
+                  <MenuItem 
+                    value={3}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    3반
+                  </MenuItem>
+                  <MenuItem 
+                    value={4}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    4반
+                  </MenuItem>
+                  <MenuItem 
+                    value={5}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    5반
+                  </MenuItem>
+                  <MenuItem 
+                    value={6}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    6반
+                  </MenuItem>
+                  <MenuItem 
+                    value={7}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    7반
+                  </MenuItem>
+                  <MenuItem 
+                    value={8}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    8반
+                  </MenuItem>
+                  <MenuItem 
+                    value={9}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    9반
+                  </MenuItem>
+                  <MenuItem 
+                    value={10}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    10반
+                  </MenuItem>
                 </Select>
               )}
             />
@@ -368,7 +684,13 @@ const SignUpForm = () => {
             getRole === UserRole.Student && 
             <Box width={'100%'}>
               <InputLabel 
-                sx={{ marginBottom: 1, fontSize: maxWidth600 ? '0.8rem' : '1rem' }}
+                sx={{ 
+                  marginBottom: 1, 
+                  fontSize: '1rem',
+                  '@media (max-width:530px)': {
+                    fontSize: '0.8rem',
+                  }
+                }}
                 required={getRole === UserRole.Student}
               >
                 번호
@@ -379,13 +701,17 @@ const SignUpForm = () => {
                 slotProps={{
                   htmlInput: {
                     min: 0,
-                    style: { fontSize: maxWidth600 ? '0.8rem' : '1rem' }
+                    sx: {
+                      '@media (max-width:530px)': {
+                        fontSize: '0.8rem',
+                      }
+                    },
                   },
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton onClick={() => setValue('number', 0)}>
-                          <Cancel sx={maxWidth600 ? { width: '0.8rem', height: '0.8rem' } : { width: '15px', height: '15px' }}/>
+                          <Cancel sx={{ width: '15px', height: '15px' }}/>
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -398,15 +724,50 @@ const SignUpForm = () => {
             </Box>
           }
           <Box width={'100%'}>
-            <Button fullWidth type='submit' variant="contained" loading={loading} sx={{ mt: 3, fontSize: maxWidth600 ? '0.8rem' : '0.875rem' }}>
+            <Button 
+              fullWidth 
+              type='submit' 
+              variant="contained" 
+              loading={loading} 
+              sx={{ 
+                mt: 3, 
+                fontSize: '0.875rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
+            >
               가입하기
             </Button>
           </Box>
           <Box>
-            <Typography variant={'body2'} mt={1} display={'flex'} alignItems={'center'} flexDirection={'row'} fontSize={maxWidth600 ? '0.75rem' : '0.875rem'}>
+            <Typography 
+              variant={'body2'} 
+              mt={1} 
+              display={'flex'} 
+              alignItems={'center'} 
+              flexDirection={'row'} 
+              fontSize={'0.875rem'}
+              sx={{
+                '@media (max-width:530px)': {
+                  fontSize: '0.75rem',
+                }
+              }}
+            >
               계정이 이미 있으신가요? 
-              <Link href={'/signin'} style={{ marginLeft: maxWidth600 ? 6 : 10, display: 'flex', alignItems: 'center' }}>
-                <Login sx={maxWidth600 ? { mr: 0.5, width: '15px', height: '15px' } : { mr: 1, width: '20px', height: '20px' }}/>
+              <Link href={'/signin'} className='link'>
+                <Login 
+                  sx={{
+                    mr: 1,
+                    width: '20px',
+                    height: '20px',
+                    '@media (max-width:530px)': {
+                      mr: 0.5,
+                      width: '15px',
+                      height: '15px',
+                    }
+                  }}
+                />
                 로그인
               </Link>
             </Typography>

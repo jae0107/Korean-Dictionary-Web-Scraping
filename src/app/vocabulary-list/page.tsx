@@ -17,6 +17,7 @@ const VocabularyList = () => {
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
+  const [getPage, setPage] = useState<number | null>(null);
   
   const { data, loading } =
     useQuery(getVocabulariesQuery, {
@@ -31,6 +32,7 @@ const VocabularyList = () => {
           word: wordKeyword,
           year: parseInt(getYear),
           class: getClass.toString(),
+          page: getPage,
         },
       },
       onError: (error) => {
@@ -55,6 +57,8 @@ const VocabularyList = () => {
             setYear={setYear}
             getClass={getClass}
             setClass={setClass}
+            getPage={getPage}
+            setPage={setPage}
           />
         </Box>
         <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>

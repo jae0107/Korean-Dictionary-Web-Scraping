@@ -6,11 +6,27 @@ const DummyPasswordChangeForm = () => {
     <Stack spacing={2}>
       <Box width={'100%'}>
         <InputLabel sx={{ marginBottom: 1 }} required>현재 비밀번호</InputLabel>
-        <Skeleton variant="rounded" height={56} />
+        <Skeleton 
+          variant="rounded" 
+          height={56}
+          sx={{
+            '@media (max-width:420px)': {
+              height: '51.4px !important'
+            }
+          }}
+        />
       </Box>
       <Box width={'100%'}>
         <InputLabel sx={{ marginBottom: 1 }} required>새 비밀번호</InputLabel>
-        <Skeleton variant="rounded" height={56} />
+        <Skeleton 
+          variant="rounded" 
+          height={56}
+          sx={{
+            '@media (max-width:420px)': {
+              height: '51.4px !important'
+            }
+          }}
+        />
       </Box>
       <Stack spacing={0.5}>
         <Typography

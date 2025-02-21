@@ -93,6 +93,9 @@ const Providers = ({ children } : { children: ReactNode }) => {
                   alignItems: 'center',
                   whiteSpace: 'pre-line !important',
                 },
+                '[aria-label="more"]': {
+                  boxShadow: '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);'
+                }
               }
             }
           },
@@ -103,6 +106,9 @@ const Providers = ({ children } : { children: ReactNode }) => {
                   fontWeight: 'bold',
                 },
                 textTransform: 'none',
+                '@media (max-width:545px)': {
+                  flex: 1,
+                }
               },
             },
           },
@@ -115,18 +121,6 @@ const Providers = ({ children } : { children: ReactNode }) => {
               },
             },
           },
-          // MuiStack: {
-          //   defaultProps: {
-          //     spacing: 2,
-          //   },
-          //   styleOverrides: {
-          //     root: {
-          //       '& > :not(style) + :not(style)': {
-          //         ml: '4px !important',
-          //       }
-          //     },
-          //   }
-          // }
         }
       }),
     [mode],

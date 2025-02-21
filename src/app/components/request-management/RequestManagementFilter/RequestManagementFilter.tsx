@@ -62,31 +62,16 @@ const RequestManagementFilter = ({
               label="승인"
               value={WordStatus.Approved}
               {...a11yProps(WordStatus.Approved)}
-              sx={{
-                '@media (max-width:545px)': {
-                  flex: 1,
-                }
-              }}
             />
             <Tab
               label="승인 대기중"
               value={WordStatus.Pending}
               {...a11yProps(WordStatus.Pending)}
-              sx={{
-                '@media (max-width:545px)': {
-                  flex: 1,
-                }
-              }}
             />
             <Tab
               label="거절"
               value={WordStatus.Denied}
               {...a11yProps(WordStatus.Denied)}
-              sx={{
-                '@media (max-width:545px)': {
-                  flex: 1,
-                }
-              }}
             />
           </TabList>
         </Box>

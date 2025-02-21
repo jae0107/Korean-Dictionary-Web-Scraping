@@ -25,7 +25,8 @@ export class RequestorSearch {
     query = query
       .select('users.*')
       .distinct()
-      .leftJoin('users', 'words.requestorId', 'users.id');
+      .leftJoin('users', 'words.requestorId', 'users.id')
+      .where('users.name', 'is not', null);
 
     if (isPresent(userName)) {
       query = query

@@ -135,7 +135,17 @@ const PasswordChangeForm = ({
     <form onSubmit={handleSubmit(onSubmit, onError)}>
       <Stack spacing={2}>
         <Box width={'100%'}>
-          <InputLabel sx={{ marginBottom: 1 }} required>현재 비밀번호</InputLabel>
+          <InputLabel 
+            sx={{ 
+              marginBottom: 1,
+              '@media (max-width:420px)': {
+                fontSize: '0.8rem',
+              }
+            }} 
+            required
+          >
+            현재 비밀번호
+          </InputLabel>
           <TextField
             {...register('currentPassword')}
             placeholder="현재 비밀번호를 입력하세요."
@@ -155,12 +165,29 @@ const PasswordChangeForm = ({
                   </InputAdornment>
                 ),
               },
+              htmlInput: {
+                sx: {
+                  '@media (max-width:420px)': {
+                    fontSize: '0.8rem',
+                  }
+                },
+              },
             }}
             variant="outlined" 
           />
         </Box>
         <Box width={'100%'}>
-          <InputLabel sx={{ marginBottom: 1 }} required>새 비밀번호</InputLabel>
+          <InputLabel 
+            sx={{ 
+              marginBottom: 1,
+              '@media (max-width:420px)': {
+                fontSize: '0.8rem',
+              }
+            }} 
+            required
+          >
+            새 비밀번호
+          </InputLabel>
           <TextField
             {...register('newPassword')}
             placeholder="새 비밀번호를 입력하세요."
@@ -180,6 +207,13 @@ const PasswordChangeForm = ({
                   </InputAdornment>
                 ),
               },
+              htmlInput: {
+                sx: {
+                  '@media (max-width:420px)': {
+                    fontSize: '0.8rem',
+                  }
+                },
+              },
             }}
             variant="outlined" 
           />
@@ -190,7 +224,7 @@ const PasswordChangeForm = ({
               <Typography
                 key={index}
                 variant='body2'
-                fontSize={'0.80rem'}
+                fontSize={'0.8rem'}
                 display={'flex'}
                 alignItems={'center'}
                 color={watch('newPassword') === '' ? 'textSecondary' : condition.regex.test(watch('newPassword')) ? 'success' : 'error'}

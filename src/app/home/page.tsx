@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, IconButton, InputAdornment, Skeleton, Stack, TextField, useMediaQuery } from '@mui/material';
+import { Box, IconButton, InputAdornment, Skeleton, Stack, TextField } from '@mui/material';
 import { Cancel, Search } from '@mui/icons-material';
 import { useState } from 'react';
 import { SearchResult } from '@/app/types/types';
@@ -11,8 +11,6 @@ import { useSearch } from '../hooks/useSearch';
 import './style.scss';
 
 const Home = () => {
-  const maxWidth745 = useMediaQuery('(max-width:745px)');
-  
   const { searchResults, setSearchResults } = useSearch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -49,10 +47,11 @@ const Home = () => {
         spacing={4}
         mb={4} 
         mt={4} 
-        width={maxWidth745 ? '95%' : '100%'}
+        width={'100%'}
         sx={{
           '@media (max-width:500px)': {
             marginTop: 0,
+            width: '95% !important',
           }
         }}
       >

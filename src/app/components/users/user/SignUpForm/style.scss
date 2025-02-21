@@ -1,0 +1,9 @@
+.link {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 530px) {
+    margin-left: 6px;
+  }
+}

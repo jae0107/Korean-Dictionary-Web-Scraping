@@ -1,7 +1,7 @@
 import { StudentItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Restore, Visibility } from "@mui/icons-material";
-import { Box, CircularProgress, Tooltip } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridPagination } from "@mui/x-data-grid";
+import { Box, Button, CircularProgress, Tooltip, useMediaQuery } from "@mui/material";
+import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useState } from "react";
 import CustomNoRowsOverlay from "../../../shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
@@ -11,6 +11,8 @@ import ConfirmDialog from "@/app/components/shared/ConfirmDialog";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { approveUserMutation, deleteUserMutation, denyUserMutation, recoverUserMutation } from "../../query";
+import StudentDetailPopUp from "../StudentDetailPopUp/StudentDetailPopUp";
+import { UserInfoProps } from "../../UserInfo/type";
 
 const StudentTable = ({
   loading,
@@ -43,6 +45,9 @@ const StudentTable = ({
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const maxWidth360 = useMediaQuery('(max-width:360px)');
+  const maxWidth400 = useMediaQuery('(max-width:400px)');
+  const maxWidth750 = useMediaQuery('(max-width:750px)');
 
   const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
@@ -50,6 +55,8 @@ const StudentTable = ({
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [openStudentDetailPopUp, setOpenStudentDetailPopUp] = useState<boolean>(false);
+  const [getUser, setUser] = useState<UserInfoProps | null>(null);
 
   const [approveUser] = useMutation(approveUserMutation);
   const [denyUser] = useMutation(denyUserMutation);
@@ -74,6 +81,7 @@ const StudentTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseStudentDetailPopUp();
         setSelectedStudents([]);
         setApprovalLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -105,6 +113,7 @@ const StudentTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseStudentDetailPopUp();
         setSelectedStudents([]);
         setDenyLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -136,6 +145,7 @@ const StudentTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseStudentDetailPopUp();
         setSelectedStudents([]);
         setRecoverLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -148,79 +158,29 @@ const StudentTable = ({
       },
     });
   }
-  
-  const columns: GridColDef[] = [
-    { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
-    { field: 'email', headerName: '이메일', flex: 3, filterable: false, sortable: false },
-    { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
-    { field: 'class', headerName: '반', flex: 1, filterable: false, sortable: false },
-    { field: 'number', headerName: '번호', flex: 1, filterable: false, sortable: false },
-    {
-      field: 'actions',
-      type: 'actions',
-      width: studentStatus === UserStatus.Pending ? 120 : 80,
-      getActions: (params) => {
-        if (params.row.status === 'APPROVED') {
+
+  const getActionWidth = () => {
+    if (maxWidth360) return 40;
+    if (studentStatus === UserStatus.Pending) {
+      return maxWidth400 ? 40 : 120;
+    };
+    return 80;
+  }
+
+  const actions: GridColDef = {
+    field: 'actions',
+    type: 'actions',
+    width: getActionWidth(),
+    getActions: (params) => {
+      if (params.row.status === 'APPROVED') {
+        if (maxWidth360 && getDenyLoader[params.row.id]) {
           return [
             <GridActionsCellItem
-              key="view"
-              icon={
-                <Tooltip title={'프로필 보기'}>
-                  <Visibility color='action' />
-                </Tooltip>
-              }
-              label="프로필 보기"
+              key="more"
+              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+              label="더보기"
               showInMenu={false}
-              onClick={() => router.push(`/students/${params.row.id}`)}
-            />,
-            <GridActionsCellItem
-              key="deny"
-              icon={
-                getDenyLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'거절'}>
-                  <HighlightOff color="error" />
-                </Tooltip>
-              }
-              label="거절"
-              showInMenu={false}
-              onClick={() => onDeny(params.row.id)}
             />
-          ];
-        } else if (params.row.status === 'DENIED') {
-          return [
-            <GridActionsCellItem
-              key="recover"
-              icon={
-                getRecoverLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'복구'}>
-                  <Restore color='primary' />
-                </Tooltip>
-              }
-              label="복구"
-              showInMenu={false}
-              onClick={() => onRecover(params.row.id)}
-            />,
-            <GridActionsCellItem
-              key="delete"
-              icon={
-                getDeleteLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'삭제'}>
-                  <DeleteForever color="error" />
-                </Tooltip>
-              }
-              label="삭제"
-              showInMenu={false}
-              onClick={() => {
-                setSelectedUserId(params.row.id);
-                setOpenConfirmDialog(true);
-              }}
-            />,
           ];
         }
         return [
@@ -232,22 +192,9 @@ const StudentTable = ({
               </Tooltip>
             }
             label="프로필 보기"
-            showInMenu={false}
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
             onClick={() => router.push(`/students/${params.row.id}`)}
-          />,
-          <GridActionsCellItem
-            key="approve"
-            icon={
-              getApprovalLoader[params.row.id] ?
-              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-              : 
-              <Tooltip title={'승인'}>
-                <CheckCircleOutline color="success" />
-              </Tooltip>
-            }
-            label="승인"
-            showInMenu={false}
-            onClick={() => onApproval(params.row.id)}
           />,
           <GridActionsCellItem
             key="deny"
@@ -260,12 +207,156 @@ const StudentTable = ({
               </Tooltip>
             }
             label="거절"
-            showInMenu={false}
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
             onClick={() => onDeny(params.row.id)}
           />
-        ]
+        ];
+      } else if (params.row.status === 'DENIED') {
+        if (maxWidth360 && (getRecoverLoader[params.row.id] || getDeleteLoader[params.row.id])) {
+          return [
+            <GridActionsCellItem
+              key="more"
+              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+              label="더보기"
+              showInMenu={false}
+            />
+          ];
+        }
+        return [
+          <GridActionsCellItem
+            key="recover"
+            icon={
+              getRecoverLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'복구'}>
+                <Restore color='primary' />
+              </Tooltip>
+            }
+            label="복구"
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
+            onClick={() => onRecover(params.row.id)}
+          />,
+          <GridActionsCellItem
+            key="delete"
+            icon={
+              getDeleteLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'삭제'}>
+                <DeleteForever color="error" />
+              </Tooltip>
+            }
+            label="삭제"
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
+            onClick={() => {
+              setSelectedUserId(params.row.id);
+              setOpenConfirmDialog(true);
+            }}
+          />,
+        ];
       }
-    }
+      if (maxWidth400 && (getApprovalLoader[params.row.id] || getDenyLoader[params.row.id])) {
+        return [
+          <GridActionsCellItem
+            key="more"
+            icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+            label="더보기"
+            showInMenu={false}
+          />
+        ];
+      }
+      return [
+        <GridActionsCellItem
+          key="view"
+          icon={
+            <Tooltip title={'프로필 보기'}>
+              <Visibility color='action' />
+            </Tooltip>
+          }
+          label="프로필 보기"
+          showInMenu={maxWidth400}
+          dense={maxWidth400}
+          onClick={() => router.push(`/students/${params.row.id}`)}
+        />,
+        <GridActionsCellItem
+          key="approve"
+          icon={
+            getApprovalLoader[params.row.id] ?
+            <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+            : 
+            <Tooltip title={'승인'}>
+              <CheckCircleOutline color="success" />
+            </Tooltip>
+          }
+          label="승인"
+          showInMenu={maxWidth400}
+          dense={maxWidth400}
+          onClick={() => onApproval(params.row.id)}
+        />,
+        <GridActionsCellItem
+          key="deny"
+          icon={
+            getDenyLoader[params.row.id] ?
+            <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+            : 
+            <Tooltip title={'거절'}>
+              <HighlightOff color="error" />
+            </Tooltip>
+          }
+          label="거절"
+          showInMenu={maxWidth400}
+          dense={maxWidth400}
+          onClick={() => onDeny(params.row.id)}
+        />
+      ]
+    },
+  };
+  
+  const columns: GridColDef[] = maxWidth750 ? [
+    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false, sortable: false, },
+    { 
+      field: 'detail', 
+      headerName: '더보기', 
+      width: 120, 
+      filterable: false, 
+      sortable: false,
+      flex: maxWidth750 ? 1 : 0,
+      renderCell: (params: GridRenderCellParams<StudentItemsFragment>) => {
+        return (
+          <Button 
+            variant='text' 
+            color='info'
+            onClick={() => {
+              setSelectedUserId(params.row.id);
+              setUser({
+                name: params.row.name,
+                year: params.row.year || undefined,
+                class: params.row.class || '',
+                number: params.row.number || undefined,
+                email: params.row.email,
+                role: params.row.role,
+                status: params.row.status,
+              });
+              setOpenStudentDetailPopUp(true);
+            }}
+          >
+            더보기 클릭
+          </Button>
+        );
+      }
+    },
+    actions
+  ] : [
+    { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
+    { field: 'email', headerName: '이메일', flex: 3, filterable: false, sortable: false },
+    { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
+    { field: 'class', headerName: '반', flex: 1, filterable: false, sortable: false },
+    { field: 'number', headerName: '번호', flex: 1, filterable: false, sortable: false },
+    actions,
   ];
 
   const handleCloseConfirmDialog = (isConfirm: boolean) => {
@@ -288,6 +379,7 @@ const StudentTable = ({
         },
         onCompleted: () => {
           refetch();
+          handleCloseStudentDetailPopUp();
           setSelectedStudents([]);
           setDeleteLoader({[selectedUserId]: false});
           dispatchCurrentSnackBar({
@@ -300,11 +392,28 @@ const StudentTable = ({
         },
       });
     }
+    if (!openStudentDetailPopUp) {
+      setSelectedUserId('');
+    }
+  }
+
+  const handleCloseStudentDetailPopUp = () => {
+    setOpenStudentDetailPopUp(false);
     setSelectedUserId('');
+    setUser(null);
   }
   
   return (
-    <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+    <Box 
+      display={'flex'} 
+      flexDirection={'column'} 
+      width={'90%'}
+      sx={{
+        '@media (max-width:545px)': {
+          width: '95% !important',
+        }
+      }}
+    >
       <UserManagementBulkAction
         ids={selectedStudents}
         setSelectedUsers={setSelectedStudents}
@@ -371,7 +480,20 @@ const StudentTable = ({
           footerTotalRows: '총 행 수:',
           MuiTablePagination: {
             labelRowsPerPage: '페이지 당 행 수:',
-          }
+          },
+          checkboxSelectionHeaderName: '선택',
+        }}
+        sx={{
+          '@media (max-width:750px)': {
+            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-topContainer .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderDraggableContainer .MuiDataGrid-columnHeaderTitleContainer': {
+              display: 'flex',
+              justifyContent: 'center',
+            },
+            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-virtualScrollerContent .MuiDataGrid-virtualScrollerRenderZone .MuiDataGrid-row .MuiDataGrid-cell': {
+              display: 'flex',
+              justifyContent: 'center',
+            }
+          },
         }}
       />
       <ConfirmDialog
@@ -379,6 +501,20 @@ const StudentTable = ({
         handleClose={handleCloseConfirmDialog}
         title={'주의'}
         content={'정말 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.'}
+      />
+      <StudentDetailPopUp 
+        openStudentDetailPopUp={openStudentDetailPopUp}
+        handleClose={handleCloseStudentDetailPopUp}
+        user={getUser}
+        selectedUserId={selectedUserId}
+        getApprovalLoader={getApprovalLoader[selectedUserId]}
+        getRecoverLoader={getRecoverLoader[selectedUserId]}
+        getDenyLoader={getDenyLoader[selectedUserId]}
+        getDeleteLoader={getDeleteLoader[selectedUserId]}
+        onApproval={onApproval}
+        onRecover={onRecover}
+        onDeny={onDeny}
+        setOpenConfirmDialog={setOpenConfirmDialog}
       />
     </Box>
   );

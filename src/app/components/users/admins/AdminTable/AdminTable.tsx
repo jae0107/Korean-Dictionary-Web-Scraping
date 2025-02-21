@@ -1,6 +1,6 @@
 import { AdminItemsFragment, UserRole, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Restore, Visibility } from "@mui/icons-material";
-import { Box, CircularProgress, Tooltip, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useState } from "react";
 import CustomNoRowsOverlay from "../../../shared/CustomNoRowsOverlay";
@@ -11,6 +11,8 @@ import { useMutation } from "@apollo/client";
 import { approveUserMutation, deleteUserMutation, denyUserMutation, recoverUserMutation } from "../../query";
 import ConfirmDialog from "@/app/components/shared/ConfirmDialog";
 import UserManagementBulkAction from "../../UserManagementBulkAction/UserManagementBulkAction";
+import { UserInfoProps } from "../../UserInfo/type";
+import AdminDetailPopUp from "../AdminDetailPopUp/AdminDetailPopUp";
 
 const AdminTable = ({
   loading,
@@ -45,6 +47,9 @@ const AdminTable = ({
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const maxWidth360 = useMediaQuery('(max-width:360px)');
+  const maxWidth400 = useMediaQuery('(max-width:400px)');
+  const maxWidth750 = useMediaQuery('(max-width:750px)');
 
   const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
@@ -52,6 +57,8 @@ const AdminTable = ({
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [openAdminDetailPopUp, setOpenAdminDetailPopUp] = useState<boolean>(false);
+  const [getUser, setUser] = useState<UserInfoProps | null>(null);
 
   const [approveUser] = useMutation(approveUserMutation);
   const [denyUser] = useMutation(denyUserMutation);
@@ -76,6 +83,7 @@ const AdminTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseAdminDetailPopUp();
         setSelectedAdmins([]);
         setApprovalLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -107,6 +115,7 @@ const AdminTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseAdminDetailPopUp();
         setSelectedAdmins([]);
         setDenyLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -138,6 +147,7 @@ const AdminTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseAdminDetailPopUp();
         setSelectedAdmins([]);
         setRecoverLoader({[id]: false});
         dispatchCurrentSnackBar({
@@ -150,8 +160,206 @@ const AdminTable = ({
       },
     });
   }
+
+  const getActionWidth = () => {
+    if (maxWidth360) return 40;
+    if (adminStatus === UserStatus.Pending) {
+      return maxWidth400 ? 40 : 120;
+    };
+    return 80;
+  }
+
+  const actions: GridColDef = {
+    field: 'actions',
+    type: 'actions',
+    width: getActionWidth(),
+    getActions: (params: GridRowParams<AdminItemsFragment>) => {
+      const disabled = userRole !== 'SUPERADMIN' && params.row.role === UserRole.Superadmin;
+      if (params.row.status === 'APPROVED') {
+        if (maxWidth360 && getDenyLoader[params.row.id]) {
+          return [
+            <GridActionsCellItem
+              key="more"
+              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+              label="더보기"
+              showInMenu={false}
+            />
+          ];
+        }
+        return [
+          <GridActionsCellItem
+            key="view"
+            icon={
+              <Tooltip title={'프로필 보기'}>
+                <Visibility color={disabled ? 'disabled' : 'action'} />
+              </Tooltip>
+            }
+            label="프로필 보기"
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
+            onClick={() => router.push(`/admins/${params.row.id}`)}
+            disabled={disabled}
+          />,
+          <GridActionsCellItem
+            key="deny"
+            icon={
+              getDenyLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'거절'}>
+                <HighlightOff color={disabled ? 'disabled' : 'error'} />
+              </Tooltip>
+            }
+            label="거절"
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
+            onClick={() => onDeny(params.row.id)}
+            disabled={disabled}
+          />,
+        ];
+      } else if (params.row.status === 'DENIED') {
+        if (maxWidth360 && (getRecoverLoader[params.row.id] || getDeleteLoader[params.row.id])) {
+          return [
+            <GridActionsCellItem
+              key="more"
+              icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+              label="더보기"
+              showInMenu={false}
+            />
+          ];
+        }
+        return [
+          <GridActionsCellItem
+            key="recover"
+            icon={
+              getRecoverLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'복구'}>
+                <Restore color={disabled ? 'disabled' : 'primary'} />
+              </Tooltip>
+            }
+            label="복구"
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
+            onClick={() => onRecover(params.row.id)}
+            disabled={disabled}
+          />,
+          <GridActionsCellItem
+            key="delete"
+            icon={
+              getDeleteLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'삭제'}>
+                <DeleteForever color={disabled ? 'disabled' : 'error'} />
+              </Tooltip>
+            }
+            label="삭제"
+            showInMenu={maxWidth360}
+            dense={maxWidth360}
+            onClick={() => {
+              setSelectedUserId(params.row.id);
+              setOpenConfirmDialog(true);
+            }}
+            disabled={disabled}
+          />,
+        ];
+      }
+      if (maxWidth400 && (getApprovalLoader[params.row.id] || getDenyLoader[params.row.id])) {
+        return [
+          <GridActionsCellItem
+            key="more"
+            icon={<CircularProgress style={{ width: '20px', height: '20px' }}/>}
+            label="더보기"
+            showInMenu={false}
+          />
+        ];
+      }
+      return [
+        <GridActionsCellItem
+          key="view"
+          icon={
+            <Tooltip title={'프로필 보기'}>
+              <Visibility color={disabled ? 'disabled' : 'action'} />
+            </Tooltip>
+          }
+          label="프로필 보기"
+          showInMenu={maxWidth400}
+          dense={maxWidth400}
+          onClick={() => router.push(`/admins/${params.row.id}`)}
+          disabled={disabled}
+        />,
+        <GridActionsCellItem
+          key="approve"
+          icon={
+            getApprovalLoader[params.row.id] ?
+            <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+            : 
+            <Tooltip title={'승인'}>
+              <CheckCircleOutline color={disabled ? 'disabled' : 'success'} />
+            </Tooltip>
+          }
+          label="승인"
+          showInMenu={maxWidth400}
+          dense={maxWidth400}
+          onClick={() => onApproval(params.row.id)}
+          disabled={disabled}
+        />,
+        <GridActionsCellItem
+          key="deny"
+          icon={
+            getDenyLoader[params.row.id] ?
+            <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+            : 
+            <Tooltip title={'거절'}>
+              <HighlightOff color={disabled ? 'disabled' : 'error'} />
+            </Tooltip>
+          }
+          label="거절"
+          showInMenu={maxWidth400}
+          dense={maxWidth400}
+          onClick={() => onDeny(params.row.id)}
+          disabled={disabled}
+        />
+      ]
+    }
+  };
   
-  const columns: GridColDef[] = [
+  const columns: GridColDef[] = maxWidth750 ? [
+    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false, sortable: false },
+    { 
+      field: 'detail', 
+      headerName: '더보기', 
+      width: 120, 
+      filterable: false, 
+      sortable: false,
+      flex: maxWidth750 ? 1 : 0,
+      renderCell: (params: GridRenderCellParams<AdminItemsFragment>) => {
+        return (
+          <Button 
+            variant='text' 
+            color='info'
+            onClick={() => {
+              setSelectedUserId(params.row.id);
+              setUser({
+                name: params.row.name,
+                year: params.row.year || undefined,
+                class: params.row.class || '',
+                email: params.row.email,
+                role: params.row.role,
+                status: params.row.status,
+              });
+              setOpenAdminDetailPopUp(true);
+            }}
+          >
+            더보기 클릭
+          </Button>
+        );
+      }
+    },
+    actions,
+  ] : [
     { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
     { field: 'email', headerName: '이메일', flex: 3, filterable: false, sortable: false },
     { 
@@ -174,125 +382,7 @@ const AdminTable = ({
         return params.row.class ? params.row.class : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
       },
     },
-    {
-      field: 'actions',
-      type: 'actions',
-      width: adminStatus === UserStatus.Pending ? 120 : 80,
-      getActions: (params: GridRowParams<AdminItemsFragment>) => {
-        const disabled = userRole !== 'SUPERADMIN' && params.row.role === UserRole.Superadmin;
-        if (params.row.status === 'APPROVED') {
-          return [
-            <GridActionsCellItem
-              key="view"
-              icon={
-                <Tooltip title={'프로필 보기'}>
-                  <Visibility color={disabled ? 'disabled' : 'action'} />
-                </Tooltip>
-              }
-              label="프로필 보기"
-              showInMenu={false}
-              onClick={() => router.push(`/admins/${params.row.id}`)}
-              disabled={disabled}
-            />,
-            <GridActionsCellItem
-              key="deny"
-              icon={
-                getDenyLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'거절'}>
-                  <HighlightOff color={disabled ? 'disabled' : 'error'} />
-                </Tooltip>
-              }
-              label="거절"
-              showInMenu={false}
-              onClick={() => onDeny(params.row.id)}
-              disabled={disabled}
-            />,
-          ];
-        } else if (params.row.status === 'DENIED') {
-          return [
-            <GridActionsCellItem
-              key="recover"
-              icon={
-                getRecoverLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'복구'}>
-                  <Restore color={disabled ? 'disabled' : 'primary'} />
-                </Tooltip>
-              }
-              label="복구"
-              showInMenu={false}
-              onClick={() => onRecover(params.row.id)}
-              disabled={disabled}
-            />,
-            <GridActionsCellItem
-              key="delete"
-              icon={
-                getDeleteLoader[params.row.id] ?
-                <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-                : 
-                <Tooltip title={'삭제'}>
-                  <DeleteForever color={disabled ? 'disabled' : 'error'} />
-                </Tooltip>
-              }
-              label="삭제"
-              showInMenu={false}
-              onClick={() => {
-                setSelectedUserId(params.row.id);
-                setOpenConfirmDialog(true);
-              }}
-              disabled={disabled}
-            />,
-          ];
-        }
-        return [
-          <GridActionsCellItem
-            key="view"
-            icon={
-              <Tooltip title={'프로필 보기'}>
-                <Visibility color={disabled ? 'disabled' : 'action'} />
-              </Tooltip>
-            }
-            label="프로필 보기"
-            showInMenu={false}
-            onClick={() => router.push(`/admins/${params.row.id}`)}
-            disabled={disabled}
-          />,
-          <GridActionsCellItem
-            key="approve"
-            icon={
-              getApprovalLoader[params.row.id] ?
-              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-              : 
-              <Tooltip title={'승인'}>
-                <CheckCircleOutline color={disabled ? 'disabled' : 'success'} />
-              </Tooltip>
-            }
-            label="승인"
-            showInMenu={false}
-            onClick={() => onApproval(params.row.id)}
-            disabled={disabled}
-          />,
-          <GridActionsCellItem
-            key="deny"
-            icon={
-              getDenyLoader[params.row.id] ?
-              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
-              : 
-              <Tooltip title={'거절'}>
-                <HighlightOff color={disabled ? 'disabled' : 'error'} />
-              </Tooltip>
-            }
-            label="거절"
-            showInMenu={false}
-            onClick={() => onDeny(params.row.id)}
-            disabled={disabled}
-          />
-        ]
-      }
-    }
+    actions,
   ];
 
   const handleCloseConfirmDialog = (isConfirm: boolean) => {
@@ -315,6 +405,7 @@ const AdminTable = ({
         },
         onCompleted: () => {
           refetch();
+          handleCloseAdminDetailPopUp();
           setSelectedAdmins([]);
           setDeleteLoader({[selectedUserId]: false});
           dispatchCurrentSnackBar({
@@ -327,11 +418,28 @@ const AdminTable = ({
         },
       });
     }
+    if (!openAdminDetailPopUp) {
+      setSelectedUserId('');
+    }
+  }
+
+  const handleCloseAdminDetailPopUp = () => {
+    setOpenAdminDetailPopUp(false);
     setSelectedUserId('');
+    setUser(null);
   }
   
   return (
-    <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+    <Box 
+    display={'flex'} 
+    flexDirection={'column'} 
+    width={'90%'}
+    sx={{
+      '@media (max-width:545px)': {
+        width: '95% !important',
+      }
+    }}
+  >
       <UserManagementBulkAction
         ids={selectedAdmins}
         setSelectedUsers={setSelectedAdmins}
@@ -394,12 +502,47 @@ const AdminTable = ({
             />
           ),
         }}
+        localeText={{
+          footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
+          footerTotalRows: '총 행 수:',
+          MuiTablePagination: {
+            labelRowsPerPage: '페이지 당 행 수:',
+          },
+          checkboxSelectionHeaderName: '선택',
+        }}
+        sx={{
+          '@media (max-width:750px)': {
+            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-topContainer .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderDraggableContainer .MuiDataGrid-columnHeaderTitleContainer': {
+              display: 'flex',
+              justifyContent: 'center',
+            },
+            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-virtualScrollerContent .MuiDataGrid-virtualScrollerRenderZone .MuiDataGrid-row .MuiDataGrid-cell': {
+              display: 'flex',
+              justifyContent: 'center',
+            }
+          },
+        }}
       />
       <ConfirmDialog
         open={openConfirmDialog}
         handleClose={handleCloseConfirmDialog}
         title={'주의'}
         content={'정말 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.'}
+      />
+      <AdminDetailPopUp 
+        openAdminDetailPopUp={openAdminDetailPopUp}
+        handleClose={handleCloseAdminDetailPopUp}
+        user={getUser}
+        selectedUserId={selectedUserId}
+        getApprovalLoader={getApprovalLoader[selectedUserId]}
+        getRecoverLoader={getRecoverLoader[selectedUserId]}
+        getDenyLoader={getDenyLoader[selectedUserId]}
+        getDeleteLoader={getDeleteLoader[selectedUserId]}
+        onApproval={onApproval}
+        onRecover={onRecover}
+        onDeny={onDeny}
+        setOpenConfirmDialog={setOpenConfirmDialog}
+        userRole={userRole}
       />
     </Box>
   );

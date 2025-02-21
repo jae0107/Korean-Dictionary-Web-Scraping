@@ -1,8 +1,8 @@
 import { MyRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Cancel } from "@mui/icons-material";
-import { Box, Button, CircularProgress, Tooltip, Typography } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
@@ -12,6 +12,7 @@ import { useMutation } from "@apollo/client";
 import { deleteWordRequestMutation } from "../../request-management/RequestManagementTable/query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import MyRequestBulkAction from "./MyRequestBulkAction/MyRequestBulkAction";
+import CustomExportToolbar from "../../shared/CustomExportToolbar";
 
 const MyRequestTable = ({
   loading,
@@ -43,10 +44,30 @@ const MyRequestTable = ({
   setSelectedRequests: (value: string[]) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const maxWidth750 = useMediaQuery('(max-width:750px)');
+  const maxWidth475 = useMediaQuery('(max-width:475px)');
+  const maxWidth435 = useMediaQuery('(max-width:435px)');
   
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [selectedWordId, setSelectedWordId] = useState<string>('');
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
+    page: !maxWidth475,
+    naverDicResults: !maxWidth750,
+    example: !maxWidth435,
+    title: true,
+    korDicResults: true,
+  });
+  
+  useEffect(() => {
+    setColumnVisibilityModel({
+      page: !maxWidth475,
+      naverDicResults: !maxWidth750,
+      example: !maxWidth435,
+      title: columnVisibilityModel.title,
+      korDicResults: columnVisibilityModel.korDicResults,
+    });
+  }, [maxWidth435, maxWidth475, maxWidth750]);
 
   const [deleteWordRequest] = useMutation(deleteWordRequestMutation);
   
@@ -127,6 +148,8 @@ const MyRequestTable = ({
     columns.push({
       field: 'actions',
       type: 'actions',
+      headerName: '작업',
+      renderHeader: () => null,
       width: 40,
       getActions: (params) => [
         <GridActionsCellItem
@@ -197,7 +220,16 @@ const MyRequestTable = ({
   }
 
   return (
-    <Box display={'flex'} flexDirection={'column'} width={'90%'}>
+    <Box 
+      display={'flex'} 
+      flexDirection={'column'} 
+      width={'90%'}
+      sx={{
+        '@media (max-width:545px)': {
+          width: '95% !important',
+        }
+      }}
+    >
       {
         wordRequestStatus === WordStatus.Pending && 
         <MyRequestBulkAction
@@ -221,12 +253,17 @@ const MyRequestTable = ({
         columns={columns}
         rows={words}
         pageSizeOptions={[10, 20, 50, 100]}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
         initialState={{
           pagination: {
             paginationModel: {
               pageSize: 10,
             },
           },
+          columns: {
+            columnVisibilityModel: columnVisibilityModel,
+          }
         }}
         paginationModel={paginationModel}
         onPaginationModelChange={(values, details) => {
@@ -235,6 +272,7 @@ const MyRequestTable = ({
         }}
         getRowHeight={() => 'auto'}
         slots={{
+          toolbar: () => <CustomExportToolbar/>,
           noRowsOverlay: CustomNoRowsOverlay,
           pagination: () => (
             <GridPagination
@@ -267,7 +305,10 @@ const MyRequestTable = ({
           footerTotalRows: '총 행 수:',
           MuiTablePagination: {
             labelRowsPerPage: '페이지 당 행 수:',
-          }
+          },
+          toolbarColumns: '열 선택',
+          columnsManagementShowHideAllText: '모든 열 보기/숨기기',
+          columnsManagementReset: '초기화',
         }}
       />
       <ConfirmDialog

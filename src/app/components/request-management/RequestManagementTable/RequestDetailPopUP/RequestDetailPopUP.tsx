@@ -5,8 +5,8 @@ import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { Dispatch, SetStateAction } from "react";
 
-const DetailPopUP = ({
-  openDetailPopUp,
+const RequestDetailPopUP = ({
+  openRequestDetailPopUp,
   getWordRequest,
   setRequestor,
   setOpenUserInfoPopUp,
@@ -23,7 +23,7 @@ const DetailPopUP = ({
   getDeniedReasonLoader,
   getDeleteLoader,
 } : {
-  openDetailPopUp: boolean;
+  openRequestDetailPopUp: boolean;
   getWordRequest: WordRequestItemsFragment | null;
   setRequestor: Dispatch<SetStateAction<RequestorItemsFragment | null>>;
   setOpenUserInfoPopUp: (value: boolean) => void;
@@ -48,7 +48,7 @@ const DetailPopUP = ({
             color="primary" 
             variant="outlined" 
             onClick={() => {
-              setRequestor(getWordRequest.requestor);
+              getWordRequest.requestor && setRequestor(getWordRequest.requestor);
               setOpenUserInfoPopUp(true);
             }} 
           /> 
@@ -60,7 +60,7 @@ const DetailPopUP = ({
   return (
     <>
       <Dialog
-        open={openDetailPopUp}
+        open={openRequestDetailPopUp}
         onClose={() => handleClose()}
         sx={{
           "& .MuiDialog-container": {
@@ -203,4 +203,4 @@ const DetailPopUP = ({
   );
 }
 
-export default DetailPopUP; 
+export default RequestDetailPopUP; 

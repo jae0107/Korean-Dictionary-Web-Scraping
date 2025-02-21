@@ -1,3 +1,5 @@
+import { UserInfoProps } from "@/app/components/users/UserInfo/type";
+import UserInfo from "@/app/components/users/UserInfo/UserInfo";
 import { RequestorItemsFragment } from "@/app/generated/gql/graphql";
 import { AccountBox, Close } from "@mui/icons-material";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableRow } from "@mui/material";
@@ -41,6 +43,15 @@ const UserInfoPopUp = ({
     setOpenUserInfoPopUp(false);
     setRequestor(null);
   }
+
+  const userInfoProps: UserInfoProps = {
+    name: getRequestor?.name || '',
+    year: getRequestor?.year || undefined,
+    class: getRequestor?.class || '',
+    number: getRequestor?.number || undefined,
+    email: getRequestor?.email || '',
+    role: getRequestor?.role || 'STUDENT',
+  };
   
   return (
     <Dialog
@@ -64,32 +75,7 @@ const UserInfoPopUp = ({
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0 }}>
         <AccountBox color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/> {`${getRole()} 프로필`}
       </DialogTitle>
-      <DialogContent>
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">이름</TableCell>
-              <TableCell>{getRequestor?.name || ''}</TableCell>
-            </TableRow>
-            {!!getRequestor?.year && <TableRow>
-              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">학년</TableCell>
-              <TableCell>{`${getRequestor?.year}학년` || ''}</TableCell>
-            </TableRow>}
-            {!!getRequestor?.class && <TableRow>
-              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">반</TableCell>
-              <TableCell>{`${getRequestor?.class}반` || ''}</TableCell>
-            </TableRow>}
-            {!!getRequestor?.number && <TableRow>
-              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">번호</TableCell>
-              <TableCell>{`${getRequestor?.number}번` || ''}</TableCell>
-            </TableRow>}
-            {!!getRequestor?.email && <TableRow>
-              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">이메일</TableCell>
-              <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{getRequestor?.email || ''}</TableCell>
-            </TableRow>}
-          </TableBody>
-        </Table>
-      </DialogContent>
+      <UserInfo user={userInfoProps}/>
       <DialogActions>
         <Button variant="contained" onClick={() => handleClose(getRequestor?.id)}>
           {`${getRole()} 페이지로 이동`}

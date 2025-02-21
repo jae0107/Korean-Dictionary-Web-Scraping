@@ -26,7 +26,17 @@ const PasswordChange = () => {
 
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'}>
-      <Stack spacing={4} width={'400px'} mt={2} alignSelf={'center'}>  
+      <Stack 
+        spacing={4} 
+        width={'400px'} 
+        mt={2} 
+        alignSelf={'center'}
+        sx={{
+          '@media (max-width:420px)': {
+            width: '95% !important',
+          }
+        }}
+      >  
         <Typography variant='h5' display={'flex'} flexDirection={'row'} alignItems={'center'}>
           <VpnKey color='primary' sx={{ width: '40px', height: '40px', mr: 1 }}/>비밀번호 변경
         </Typography>

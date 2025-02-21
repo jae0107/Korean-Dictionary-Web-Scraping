@@ -13,6 +13,7 @@ export const wordTypeDefs = gql`
     requestorId: ID
     year: Int
     class: String
+    page: Int
   }
 
   type Word {
@@ -25,7 +26,7 @@ export const wordTypeDefs = gql`
     page: Int
     example: String
     deniedReason: String
-    requestor: User!
+    requestor: User
     createdAt: DateTime!
   }
 

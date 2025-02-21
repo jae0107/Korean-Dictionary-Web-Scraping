@@ -34,7 +34,16 @@ const MyRequestFilter = ({
   };
   
   return (
-    <Stack width={'90%'} spacing={2} mb={2}>
+    <Stack 
+      width={'90%'} 
+      spacing={2} 
+      mb={2}
+      sx={{
+        '@media (max-width:545px)': {
+          width: '95% !important',
+        }
+      }}
+    >
       <TabContext value={wordRequestStatus}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleTabChange}>
@@ -61,7 +70,12 @@ const MyRequestFilter = ({
           label="단어 검색"
           value={wordKeyword}
           onChange={(e) => setWordKeyword(e.target.value)}
-          sx={{ width: '250px' }}
+          sx={{ 
+            width: '250px',
+            '@media (max-width:600px)': {
+              width: '100%',
+            }
+          }}
           slotProps={{
             input: {
               endAdornment: (
@@ -71,6 +85,13 @@ const MyRequestFilter = ({
                   </IconButton>
                 </InputAdornment>
               ),
+            },
+            htmlInput: {
+              sx: {
+                '@media (max-width:600px)': {
+                  fontSize: '0.8rem',
+                }
+              },
             },
           }}
         />
