@@ -456,7 +456,7 @@ const AdminTable = ({
           setSelectedAdmins(newRowSelectionModel as string[]);
         }}
         rowSelectionModel={selectedAdmins || []}
-        isRowSelectable={(params: GridRowParams<AdminItemsFragment>) => params.row.role !== UserRole.Superadmin}
+        isRowSelectable={(params: GridRowParams<AdminItemsFragment>) => (userRole === 'SUPERADMIN' || params.row.role !== UserRole.Superadmin)}
         loading={loading}
         columns={columns}
         rows={admins}
