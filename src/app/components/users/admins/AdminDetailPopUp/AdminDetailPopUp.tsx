@@ -57,7 +57,7 @@ const AdminDetailPopUp = ({
       <DialogActions>
         {
           user && user.status !== 'DENIED' && 
-          <Button variant="contained" color='inherit' component={Link} href={`/students/${selectedUserId}`} disabled={disabled}>
+          <Button variant="contained" color='inherit' component={Link} href={`/admins/${selectedUserId}`} disabled={disabled}>
             프로필 페이지로 이동
           </Button>
         }

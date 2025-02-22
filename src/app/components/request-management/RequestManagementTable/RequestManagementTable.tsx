@@ -68,28 +68,28 @@ const RequestManagementTable = ({
   const [openRequestDetailPopUp, setOpenRequestDetailPopUp] = useState<boolean>(false);
   const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
+    page: !maxWidth850,
+    requestor: !maxWidth1000,
+    example: !maxWidth750,
+    title: true,
+    korDicResults: !maxWidth750,
+    naverDicResults: !maxWidth750,
+    detail: maxWidth750,
+    deniedReason: wordRequestStatus === WordStatus.Denied || maxWidth545,
+  });
+  
+  useEffect(() => {
+    setColumnVisibilityModel({
       page: !maxWidth850,
       requestor: !maxWidth1000,
       example: !maxWidth750,
-      title: true,
+      title: columnVisibilityModel.title,
       korDicResults: !maxWidth750,
       naverDicResults: !maxWidth750,
       detail: maxWidth750,
       deniedReason: wordRequestStatus === WordStatus.Denied || maxWidth545,
     });
-  
-    useEffect(() => {
-      setColumnVisibilityModel({
-        page: !maxWidth850,
-        requestor: !maxWidth1000,
-        example: !maxWidth750,
-        title: columnVisibilityModel.title,
-        korDicResults: !maxWidth750,
-        naverDicResults: !maxWidth750,
-        detail: maxWidth750,
-        deniedReason: wordRequestStatus === WordStatus.Denied || maxWidth545,
-      });
-    }, [maxWidth495, maxWidth750, maxWidth850, maxWidth1000]);
+  }, [maxWidth495, maxWidth750, maxWidth850, maxWidth1000]);
 
   const [approveWordRequest] = useMutation(approveWordRequestMutation);
   const [denyWordRequest] = useMutation(denyWordRequestMutation);
@@ -115,9 +115,9 @@ const RequestManagementTable = ({
       },
       onCompleted: () => {
         refetch();
+        handleCloseRequestDetailPopUp();
         setSelectedRequests([]);
         setApprovalLoader({[id]: false});
-        handleCloseRequestDetailPopUp();
         dispatchCurrentSnackBar({
           payload: {
             open: true,

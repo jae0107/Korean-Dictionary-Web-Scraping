@@ -25,8 +25,8 @@ const RequestDetailPopUP = ({
 } : {
   openRequestDetailPopUp: boolean;
   getWordRequest: WordRequestItemsFragment | null;
-  setRequestor: Dispatch<SetStateAction<RequestorItemsFragment | null>>;
-  setOpenUserInfoPopUp: (value: boolean) => void;
+  setRequestor?: Dispatch<SetStateAction<RequestorItemsFragment | null>>;
+  setOpenUserInfoPopUp?: (value: boolean) => void;
   handleClose: () => void;
   selectedWordId: string;
   onApproval: (id: string) => void;
@@ -41,7 +41,7 @@ const RequestDetailPopUP = ({
   getDeleteLoader: boolean;
 }) => {
   const getRequestor = () => {
-    if (getWordRequest?.requestor) {
+    if (getWordRequest?.requestor && setRequestor && setOpenUserInfoPopUp) {
       return (
           <Chip 
             label={getWordRequest.requestor.name} 
@@ -108,11 +108,21 @@ const RequestDetailPopUP = ({
                 </Stack>
                 <Stack spacing={1} direction={'column'}>
                   {
-                    getWordRequest.korDicResults.map((korDicResult, index) => (
-                      <DialogContentText key={index}>
-                        {index+1}. {korDicResult}
-                      </DialogContentText>
-                    ))
+                    getWordRequest.korDicResults.map((korDicResult, index) => {
+                      if (getWordRequest.korDicResults?.length === 1) {
+                        return (
+                          <DialogContentText key={index}>
+                            {korDicResult}
+                          </DialogContentText>
+                        );
+                        
+                      }
+                      return (
+                        <DialogContentText key={index}>
+                          {`${index+1}. ${korDicResult}`}
+                        </DialogContentText>
+                      );
+                    })
                   }
                 </Stack>
               </Stack>
@@ -134,11 +144,21 @@ const RequestDetailPopUP = ({
                 </Stack>
                 <Stack spacing={1} direction={'column'}>
                   {
-                    getWordRequest.naverDicResults.map((naverDicResult, index) => (
-                      <DialogContentText key={index}>
-                        {index+1}. {naverDicResult}
-                      </DialogContentText>
-                    ))
+                    getWordRequest.naverDicResults.map((naverDicResult, index) => {
+                      if (getWordRequest.naverDicResults?.length === 1) {
+                        return (
+                          <DialogContentText key={index}>
+                            {naverDicResult}
+                          </DialogContentText>
+                        );
+                        
+                      }
+                      return (
+                        <DialogContentText key={index}>
+                          {`${index+1}. ${naverDicResult}`}
+                        </DialogContentText>
+                      );
+                    })
                   }
                 </Stack>
               </Stack>

@@ -54,7 +54,7 @@ const TeacherDetailPopUp = ({
       <DialogActions>
         {
           user && user.status !== 'DENIED' && 
-          <Button variant="contained" color='inherit' component={Link} href={`/students/${selectedUserId}`}>
+          <Button variant="contained" color='inherit' component={Link} href={`/teachers/${selectedUserId}`}>
             프로필 페이지로 이동
           </Button>
         }
