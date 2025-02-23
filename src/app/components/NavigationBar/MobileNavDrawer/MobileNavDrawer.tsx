@@ -11,7 +11,7 @@ const MobileNavDrawer = ({
   setOpenDrawer,
   loading,
   session,
-  userRole,
+  myRole,
   networkStatus,
   pathname,
   theme,
@@ -20,7 +20,7 @@ const MobileNavDrawer = ({
   setOpenDrawer: (open: boolean) => void;
   loading: boolean;
   session: Session;
-  userRole: string;
+  myRole: string;
   networkStatus: number;
   pathname: string;
   theme: Theme;
@@ -55,9 +55,9 @@ const MobileNavDrawer = ({
         </List>
         <Divider />
         {
-          (session.user.role !== 'STUDENT' || userRole !== 'STUDENT') &&
+          (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') &&
           <>
-            <List sx={{ display: getDisplay(!!userRole && userRole !== 'STUDENT') }}>
+            <List sx={{ display: getDisplay(!!myRole && myRole !== 'STUDENT') }}>
               <ListItem disablePadding sx={{ backgroundColor: pathname === '/request-management' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                 <ListItemButton LinkComponent={Link} href={'/request-management'}>
                   <ListItemIcon>
@@ -68,7 +68,7 @@ const MobileNavDrawer = ({
               </ListItem>
             </List>
             <Divider />
-            <List sx={{ display: getDisplay(!!userRole && userRole !== 'STUDENT') }}>
+            <List sx={{ display: getDisplay(!!myRole && myRole !== 'STUDENT') }}>
               <ListItem disablePadding>
                 <ListItemButton LinkComponent={Link} href={'/students'}>
                   <ListItemIcon>
@@ -87,7 +87,7 @@ const MobileNavDrawer = ({
                   </ListItemButton>
                 </ListItem>
                 {
-                  userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
+                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                     <ListItemButton LinkComponent={Link} href={'/teachers'} sx={{ pl: '40px !important' }}>
                       <ListItemIcon>
@@ -98,7 +98,7 @@ const MobileNavDrawer = ({
                   </ListItem>
                 }
                { 
-                  userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
+                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                     <ListItemButton LinkComponent={Link} href={'/admins'} sx={{ pl: '40px !important' }}>
                       <ListItemIcon>

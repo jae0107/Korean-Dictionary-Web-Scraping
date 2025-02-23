@@ -10,7 +10,7 @@ export const getMyPasswordQuery = gql(`
 `);
 
 export const findMyPasswordQuery = gql(`
-  query FindMyPassword($email: String!) {
-    findPassword(email: $email)
+  query FindMyPassword($accountId: String!) {
+    findPassword(accountId: $accountId)
   }
 `);

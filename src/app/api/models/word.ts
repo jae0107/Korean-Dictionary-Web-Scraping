@@ -60,10 +60,10 @@ Word.init(
     tableName: 'words',
     validate: {
       async validateRequiredFields() {
-        if (!isPresent(this.title)) throw new Error('Title is required.');
-        if (!isPresent(this.requestorId)) throw new Error('Requestor ID is required.');
-        if (!isPresent(this.status)) throw new Error('Status is required.');
-        if (!isPresent(this.korDicResults) && !isPresent(this.naverDicResults)) throw new Error('At least one of korDicResults or naverDicResults is required.');
+        if (!isPresent(this.title)) throw new Error('단어를 입력해주세요.');
+        if (!isPresent(this.requestorId)) throw new Error('요청자는 필수입니다.');
+        if (!isPresent(this.status)) throw new Error('상태는 필수입니다.');
+        if (!isPresent(this.korDicResults) && !isPresent(this.naverDicResults)) throw new Error('국립국어원 사전 또는 네이버 사전 결과 중 하나는 필수입니다.');
       },
     },
   },

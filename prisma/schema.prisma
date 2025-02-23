@@ -19,10 +19,7 @@ model User {
   year     Int?
   class    String?
   number   Int?
-  email String   @unique
-  // kakaoEmail String?
-  // naverEmail String?
-  // googleEmail String?
+  accountId String   @unique
   password String
   role     String
   status   String  @default("PENDING")

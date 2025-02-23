@@ -17,7 +17,7 @@ const AdminManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
-  const { userRole } = useCurrentUser();
+  const { myRole } = useCurrentUser();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
@@ -37,7 +37,7 @@ const AdminManagement = () => {
           userName: userNameKeyword,
         },
       },
-      skip: userRole === "STUDENT" || userRole === "TEACHER",
+      skip: myRole === "STUDENT" || myRole === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -49,7 +49,7 @@ const AdminManagement = () => {
       },
     });
 
-  if (userRole === 'STUDENT' || userRole === 'TEACHER') {
+  if (myRole === 'STUDENT' || myRole === 'TEACHER') {
     return <AccessDenied/>;
   }
 
@@ -76,7 +76,7 @@ const AdminManagement = () => {
           refetch={refetch}
           selectedAdmins={selectedAdmins}
           setSelectedAdmins={setSelectedAdmins}
-          userRole={userRole}
+          myRole={myRole}
         />
       </Box>
     </Box>

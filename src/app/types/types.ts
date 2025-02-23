@@ -1,6 +1,6 @@
 export interface RequestBody {
   name: string;
-  email: string;
+  accountId: string;
   password: string;
 }
 
@@ -13,7 +13,7 @@ export interface SearchResult {
 export interface User {
   id: string;
   name: string;
-  email: string;
+  accountId: string;
 }
 
 export interface Word {

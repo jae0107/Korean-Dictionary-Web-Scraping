@@ -8,7 +8,7 @@ export const requestorFragment = gql(`
     year
     class
     number
-    email
+    accountId
   }
 `);
 

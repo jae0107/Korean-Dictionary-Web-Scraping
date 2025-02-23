@@ -29,7 +29,12 @@ const UserFormContainer = ({
 
   const schema = z.object({
     name: z.string().nonempty({ message: "이름을 작성하십시오." }),
-    email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
+    accountId: z
+      .string()
+      .nonempty({ message: "아이디를 작성하십시오." })
+      .min(4, { message: "아이디는 최소 4자 이상이어야 합니다." })
+      .max(20, { message: "아이디는 최대 20자 이하여야 합니다." })
+      .regex(/^[a-zA-Z0-9_]+$/, { message: "아이디는 영문, 숫자, 밑줄(_)만 포함할 수 있습니다." }),
     year: z.number({ message: "학년은 숫자여야 합니다." }).optional()
       .refine((year) => {
         if (getRole === UserRole.Student) {

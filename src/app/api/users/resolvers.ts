@@ -17,6 +17,7 @@ export const userResolvers = {
     getUser,
     findPassword,
     getRequestors,
+    accountIdCheck,
   },
   Mutation: {
     createUser,
@@ -98,10 +99,10 @@ async function getCurrentUser(_: any, { id }: { id: string }, { currentUser }: C
   });
 }
 
-async function findPassword(_: any, { email }: { email: string }): Promise<string> {
+async function findPassword(_: any, { accountId }: { accountId: string }): Promise<string> {
   return await transaction(async (t) => {
-    if (!email) throw new Error('ID is required');
-    const user = await User.findOne({ where: { email: email } });
+    if (!accountId) throw new Error('ID is required');
+    const user = await User.findOne({ where: { accountId: accountId } });
     if (!user) throw new Error('No User Found');
     return user.password;
   }).catch((e) => {
@@ -116,7 +117,7 @@ async function createUser(
   return await transaction(async (t) => {
     const user = await User.create({
       name: input.name || '',
-      email: input.email || '',
+      accountId: input.accountId || '',
       year: input.year || undefined,
       class: input.class || '',
       number: input.number || undefined,
@@ -144,7 +145,7 @@ async function updateUser(
     if (user) {
       user = await user.update({
         name: input.name || '',
-        email: input.email || '',
+        accountId: input.accountId || '',
         year: input.year || undefined,
         class: input.class || '',
         number: input.number || undefined,
@@ -193,7 +194,7 @@ async function passwordReset(
   { currentUser }: Context,
 ): Promise<User> {
   return await transaction(async (t) => {
-    let user = await User.findOne({ where: { email: input.email } });
+    let user = await User.findOne({ where: { accountId: input.accountId } });
 
     if (user) {
       user = await user.update({ password: input.password }, { validate: false });
@@ -202,6 +203,24 @@ async function passwordReset(
     }
 
     return user;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function accountIdCheck(
+  root: any,
+  { accountId }: { accountId: string; },
+  { currentUser }: Context,
+): Promise<boolean> {
+  return await transaction(async (t) => {
+    let user = await User.findOne({ where: { accountId: accountId } });
+
+    if (user) {
+      return true;
+    }
+
+    return false;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

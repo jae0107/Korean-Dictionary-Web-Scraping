@@ -28,8 +28,8 @@ const UserInfo = ({
               <TableCell>{user?.number && user.number > 0 ? `${user.number}번` || '-' : '-'}</TableCell>
             </TableRow>}
             <TableRow>
-              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">이메일</TableCell>
-              <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.email || ''}</TableCell>
+              <TableCell sx={{ minWidth: 70 }} component="th" scope="row">아이디</TableCell>
+              <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.accountId || ''}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

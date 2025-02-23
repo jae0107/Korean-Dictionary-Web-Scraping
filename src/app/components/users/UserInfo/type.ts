@@ -3,7 +3,7 @@ export interface UserInfoProps {
   year?: number;
   class?: string;
   number?: number;
-  email: string;
+  accountId: string;
   role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPERADMIN';
   status?: 'APPROVED' | 'PENDING' | 'DENIED';
 }

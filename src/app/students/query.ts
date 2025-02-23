@@ -7,7 +7,7 @@ export const studentFragment = gql(`
     year
     class
     number
-    email
+    accountId
     status
     role
     status

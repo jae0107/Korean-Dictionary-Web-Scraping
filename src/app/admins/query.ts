@@ -6,7 +6,7 @@ export const adminFragment = gql(`
     name
     year
     class
-    email
+    accountId
     status
     role
   }

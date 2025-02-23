@@ -20,7 +20,7 @@ const SingleTeacher = () => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const searchParams = useSearchParams();
-  const { userRole } = useCurrentUser();
+  const { myRole } = useCurrentUser();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -31,7 +31,7 @@ const SingleTeacher = () => {
     variables: {
       getUserId: id,
     },
-    skip: userRole === "STUDENT" || userRole === "TEACHER",
+    skip: myRole === "STUDENT" || myRole === "TEACHER",
     onError: (error) => {
       dispatchCurrentSnackBar({
         payload: {
@@ -45,7 +45,7 @@ const SingleTeacher = () => {
 
   const defaultValues: UserInput = {
     name: data?.getUser.name || '',
-    email: data?.getUser.email || '',
+    accountId: data?.getUser.accountId || '',
     year: data?.getUser.year || 0,
     class: data?.getUser.class || '0',
     role: data?.getUser.role || UserRole.Teacher,
@@ -64,7 +64,7 @@ const SingleTeacher = () => {
           requestorId: id,
         },
       },
-      skip: userRole === "STUDENT" || userRole === "TEACHER",
+      skip: myRole === "STUDENT" || myRole === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -76,7 +76,7 @@ const SingleTeacher = () => {
       },
     });
   
-  if (userRole === 'STUDENT' || userRole === 'TEACHER') {
+  if (myRole === 'STUDENT' || myRole === 'TEACHER') {
     return <AccessDenied/>;
   }
   

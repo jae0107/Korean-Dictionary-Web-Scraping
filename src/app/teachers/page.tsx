@@ -17,7 +17,7 @@ const TeacherManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
-  const { userRole } = useCurrentUser();
+  const { myRole } = useCurrentUser();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [teacherStatus, setTeacherStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
@@ -37,7 +37,7 @@ const TeacherManagement = () => {
           userName: userNameKeyword,
         },
       },
-      skip: userRole === "STUDENT" || userRole === "TEACHER",
+      skip: myRole === "STUDENT" || myRole === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -49,7 +49,7 @@ const TeacherManagement = () => {
       },
     });
   
-  if (userRole === 'STUDENT' || userRole === 'TEACHER') {
+  if (myRole === 'STUDENT' || myRole === 'TEACHER') {
     return <AccessDenied/>;
   }
       

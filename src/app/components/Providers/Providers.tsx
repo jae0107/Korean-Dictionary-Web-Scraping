@@ -20,13 +20,15 @@ export const useColorModeContext = () => useContext(ColorModeContext);
 export interface CurrentUserContextValue {
   refetch: () => void;
   loading: boolean;
-  userRole: string | null;
+  myRole: string | null;
+  myId: string | null;
   networkStatus: number;
 }
 
 export interface CurrentUserContextValueWithUser
   extends Omit<CurrentUserContextValue, 'user'> {
-  userRole: string;
+  myRole: string;
+  myId: string;
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextValue | null>(

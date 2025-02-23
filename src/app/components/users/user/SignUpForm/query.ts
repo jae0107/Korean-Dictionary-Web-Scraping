@@ -7,3 +7,9 @@ export const createUserMutation = gql(`
     }
   }
 `);
+
+export const accountIdCheckQuery = gql(`
+  query AccountIdCheck($accountId: String!) {
+    accountIdCheck(accountId: $accountId)
+  }
+`);

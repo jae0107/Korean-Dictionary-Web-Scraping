@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   
   const user = await prisma.user.findFirst({
     where: {
-      email: body.username,
+      accountId: body.username,
     },
   });
 

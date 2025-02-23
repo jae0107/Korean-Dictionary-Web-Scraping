@@ -49,7 +49,7 @@ const UserInfoPopUp = ({
     year: getRequestor?.year || undefined,
     class: getRequestor?.class || '',
     number: getRequestor?.number || undefined,
-    email: getRequestor?.email || '',
+    accountId: getRequestor?.accountId || '',
     role: getRequestor?.role || 'STUDENT',
   };
   

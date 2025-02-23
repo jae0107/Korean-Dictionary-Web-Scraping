@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<ID>;
   declare name: string;
-  declare email: string;
+  declare accountId: string;
   declare password: string;
   declare role: string;
   declare status: string;
@@ -42,7 +42,7 @@ User.init(
       primaryKey: true,
     },
     name: DataTypes.STRING,
-    email: DataTypes.STRING,
+    accountId: DataTypes.STRING,
     password: DataTypes.STRING,
     role: DataTypes.ENUM('ADMIN', 'STUDENT', 'TEACHER'),
     status: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
@@ -60,29 +60,28 @@ User.init(
     tableName: 'users',
     validate: {
       async validateRequiredFields() {
-        if (!isPresent(this.name)) throw new Error('Name is required.');
-        if (!isPresent(this.email)) throw new Error('Email is required.');
-        if (!isPresent(this.password)) throw new Error('Password is required.');
-        if (!isPresent(this.role)) throw new Error('Role is required.');
-        if (!isPresent(this.status)) throw new Error('Status is required.');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email as string)) {
-          throw new Error('Invalid email format.');
+        if (!isPresent(this.name)) throw new Error('이름을 입력해주세요.');
+        if (!isPresent(this.accountId)) throw new Error('아이디를 입력해주세요.');
+        if (!isPresent(this.password)) throw new Error('비밀번호를 입력해주세요.');
+        if (!isPresent(this.role)) throw new Error('역할은 필수입니다.');
+        if (!isPresent(this.status)) throw new Error('상태는 필수입니다.');
+        if (!/^[a-zA-Z0-9_]+$/.test(this.accountId as string)) {
+          throw new Error('Invalid account ID format.');
         }
-        if (!isPresent(this.password)) throw new Error('Password is required.');
         if ((this.password as string).length < 8) {
-          throw new Error('Password must be at least 8 characters long.');
+          throw new Error('패스워드는 8자 이상이어야 합니다.');
         }
         if (!/[A-Z]/.test(this.password as string)) {
-          throw new Error('Password must contain at least one uppercase letter.');
+          throw new Error('패스워드에 최소 하나의 대문자가 포함되어야 합니다.');
         }
         if (!/[a-z]/.test(this.password as string)) {
-          throw new Error('Password must contain at least one lowercase letter.');
+          throw new Error('패스워드에 최소 하나의 소문자가 포함되어야 합니다.');
         }
         if (!/[0-9]/.test(this.password as string)) {
-          throw new Error('Password must contain at least one number.');
+          throw new Error('패스워드에 최소 하나의 숫자가 포함되어야 합니다.');
         }
         if (!/[\W_]/.test(this.password as string)) {
-          throw new Error('Password must contain at least one special character (!@#$%^&*).');
+          throw new Error('패스워드에 최소 하나의 특수문자 (!@#$%^&*)가 포함되어야 합니다.');
         }
       },
     },

@@ -1,6 +1,6 @@
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { NetworkStatus } from '@apollo/client';
-import { AccountCircle, AdminPanelSettings, Checklist, Logout, Portrait, VpnKey } from '@mui/icons-material';
+import { AccountCircle, AdminPanelSettings, Checklist, Logout, PersonAdd, Portrait, VpnKey } from '@mui/icons-material';
 import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -26,7 +26,7 @@ const NavigationBar = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { userRole, refetch, loading, networkStatus } = useCurrentUser();
+  const { myRole, refetch, loading, networkStatus } = useCurrentUser();
   const { data: session } = useSession();
   const maxWidth424 = useMediaQuery('(max-width:424px)');
   
@@ -131,12 +131,12 @@ const NavigationBar = ({
                 단어장
               </Button>
               {
-                (session.user.role !== 'STUDENT' || userRole !== 'STUDENT') &&
+                (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') &&
                 <Button
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: getDisplay(!!userRole && userRole !== 'STUDENT'),
+                    display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                     '@media (max-width: 424px)': {
@@ -151,12 +151,12 @@ const NavigationBar = ({
                 </Button>
               }
               {
-                (session.user.role !== 'STUDENT' || userRole !== 'STUDENT') && 
+                (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') && 
                 <Button
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: getDisplay(!!userRole && userRole !== 'STUDENT'),
+                    display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                     '@media (max-width: 424px)': {
@@ -186,6 +186,24 @@ const NavigationBar = ({
                 onClose={() => setAnchorElUserManagement(null)}
               >
                 <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/account-creation') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/account-creation')}
+                  component={Link}
+                  href={'/account-creation'}
+                >
+                  <Typography 
+                    sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    display={'flex'}
+                    alignItems={'center'}
+                  >
+                    <PersonAdd sx={{ mr: '4px' }}/>계정 만들기
+                  </Typography>
+                </MenuItem>
+                <MenuItem 
                   sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                   onClick={() => navigationUser('/students')}
                   component={Link}
@@ -204,7 +222,7 @@ const NavigationBar = ({
                   </Typography>
                 </MenuItem>
                 {
-                  userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
+                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
                   <MenuItem 
                     sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                     onClick={() => navigationUser('/teachers')}
@@ -225,7 +243,7 @@ const NavigationBar = ({
                   </MenuItem>
                 }
                 {
-                  userRole && (userRole === 'SUPERADMIN' || userRole === 'ADMIN') &&
+                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
                   <MenuItem 
                     sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                     onClick={() => navigationUser('/admins')}
@@ -389,7 +407,7 @@ const NavigationBar = ({
           setOpenDrawer={setOpenDrawer} 
           loading={loading} 
           session={session} 
-          userRole={userRole} 
+          myRole={myRole} 
           networkStatus={networkStatus}
           pathname={pathname}
           theme={theme}

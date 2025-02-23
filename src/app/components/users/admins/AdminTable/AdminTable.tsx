@@ -25,7 +25,7 @@ const AdminTable = ({
   refetch,
   selectedAdmins,
   setSelectedAdmins,
-  userRole,
+  myRole,
 }: {
   loading: boolean;
   admins: AdminItemsFragment[];
@@ -43,7 +43,7 @@ const AdminTable = ({
   refetch: () => void;
   selectedAdmins: string[];
   setSelectedAdmins: (value: string[]) => void;
-  userRole: string;
+  myRole: string;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -174,7 +174,7 @@ const AdminTable = ({
     type: 'actions',
     width: getActionWidth(),
     getActions: (params: GridRowParams<AdminItemsFragment>) => {
-      const disabled = userRole !== 'SUPERADMIN' && params.row.role === UserRole.Superadmin;
+      const disabled = myRole !== 'SUPERADMIN' && params.row.role === UserRole.Superadmin;
       if (params.row.status === 'APPROVED') {
         if (maxWidth360 && getDenyLoader[params.row.id]) {
           return [
@@ -196,7 +196,7 @@ const AdminTable = ({
             }
             label="프로필 보기"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => router.push(`/admins/${params.row.id}`)}
             disabled={disabled}
           />,
@@ -212,7 +212,7 @@ const AdminTable = ({
             }
             label="거절"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => onDeny(params.row.id)}
             disabled={disabled}
           />,
@@ -241,7 +241,7 @@ const AdminTable = ({
             }
             label="복구"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => onRecover(params.row.id)}
             disabled={disabled}
           />,
@@ -257,7 +257,7 @@ const AdminTable = ({
             }
             label="삭제"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => {
               setSelectedUserId(params.row.id);
               setOpenConfirmDialog(true);
@@ -286,7 +286,7 @@ const AdminTable = ({
           }
           label="프로필 보기"
           showInMenu={maxWidth400}
-          dense={maxWidth400}
+          dense={!!maxWidth400}
           onClick={() => router.push(`/admins/${params.row.id}`)}
           disabled={disabled}
         />,
@@ -302,7 +302,7 @@ const AdminTable = ({
           }
           label="승인"
           showInMenu={maxWidth400}
-          dense={maxWidth400}
+          dense={!!maxWidth400}
           onClick={() => onApproval(params.row.id)}
           disabled={disabled}
         />,
@@ -318,7 +318,7 @@ const AdminTable = ({
           }
           label="거절"
           showInMenu={maxWidth400}
-          dense={maxWidth400}
+          dense={!!maxWidth400}
           onClick={() => onDeny(params.row.id)}
           disabled={disabled}
         />
@@ -346,7 +346,7 @@ const AdminTable = ({
                 name: params.row.name,
                 year: params.row.year || undefined,
                 class: params.row.class || '',
-                email: params.row.email,
+                accountId: params.row.accountId,
                 role: params.row.role,
                 status: params.row.status,
               });
@@ -361,7 +361,7 @@ const AdminTable = ({
     actions,
   ] : [
     { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
-    { field: 'email', headerName: '이메일', flex: 3, filterable: false, sortable: false },
+    { field: 'accountId', headerName: '아이디', flex: 3, filterable: false, sortable: false },
     { 
       field: 'year', 
       headerName: '학년', 
@@ -456,7 +456,7 @@ const AdminTable = ({
           setSelectedAdmins(newRowSelectionModel as string[]);
         }}
         rowSelectionModel={selectedAdmins || []}
-        isRowSelectable={(params: GridRowParams<AdminItemsFragment>) => (userRole === 'SUPERADMIN' || params.row.role !== UserRole.Superadmin)}
+        isRowSelectable={(params: GridRowParams<AdminItemsFragment>) => (myRole === 'SUPERADMIN' || params.row.role !== UserRole.Superadmin)}
         loading={loading}
         columns={columns}
         rows={admins}
@@ -542,7 +542,7 @@ const AdminTable = ({
         onRecover={onRecover}
         onDeny={onDeny}
         setOpenConfirmDialog={setOpenConfirmDialog}
-        userRole={userRole}
+        myRole={myRole}
       />
     </Box>
   );

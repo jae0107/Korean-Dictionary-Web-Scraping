@@ -1,14 +1,14 @@
 import { useThemeContext } from "@/app/components/Providers/Providers";
 import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
-import { useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Cancel, Close, Done, Login, PersonAdd, RadioButtonUnchecked, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import { createUserMutation } from "./query";
+import { accountIdCheckQuery, createUserMutation } from "./query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ColourModeSwitch from "@/app/components/shared/ColourModeSwitch";
@@ -22,12 +22,21 @@ const SignUpForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [getRole, setRole] = useState<UserRole | null>(UserRole.Student);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [passwordCheck, setPasswordCheck] = useState<string>('');
 
   const [createUser] = useMutation(createUserMutation);
+  const [accountIdCheck, {data, loading: accountIdCheckLoading}] = useLazyQuery(accountIdCheckQuery);
 
   const schema = z.object({
     name: z.string().nonempty({ message: "이름을 작성하십시오." }),
-    email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
+    accountId: z
+      .string()
+      .nonempty({ message: "아이디를 작성하십시오." })
+      .min(4, { message: "아이디는 최소 4자 이상이어야 합니다." })
+      .max(20, { message: "아이디는 최대 20자 이하여야 합니다." })
+      .regex(/^[a-zA-Z0-9_]+$/, { message: "아이디는 영문, 숫자, 밑줄(_)만 포함할 수 있습니다." }),
     password: z
       .string()
       .nonempty({ message: "비밀번호를 작성하십시오." })
@@ -68,7 +77,7 @@ const SignUpForm = () => {
   
   const form = useForm({
     defaultValues: {
-      email: '',
+      accountId: '',
       password: '',
       name: '',
       role: UserRole.Student,
@@ -79,7 +88,7 @@ const SignUpForm = () => {
     resolver: zodResolver(schema),
   });
   
-  const { control, register, handleSubmit, watch, setValue, formState: { errors } } = form;
+  const { control, register, handleSubmit, watch, setValue, formState: { errors }, setError, clearErrors } = form;
 
   const passwordConditions = [
     { regex: /.{8,}/, message: "비밀번호는 최소 8자 이상이어야 합니다." },
@@ -87,6 +96,12 @@ const SignUpForm = () => {
     { regex: /[a-z]/, message: "비밀번호에 최소 하나의 소문자가 포함되어야 합니다." },
     { regex: /[0-9]/, message: "비밀번호에 최소 하나의 숫자가 포함되어야 합니다." },
     { regex: /[\W_]/, message: "비밀번호에 최소 하나의 특수문자 (!@#$%^&*)가 포함되어야 합니다." },
+  ];
+
+  const accountIdConditions = [
+    { regex: /.{4,}/, message: "아이디는 최소 4자 이상이어야 합니다." },
+    { regex: /^.{1,20}$/, message: "아이디는 최대 20자 이하여야 합니다." },
+    { regex: /^[a-zA-Z0-9_]+$/, message: "아이디는 영문, 숫자, 밑줄(_)만 포함할 수 있습니다." },
   ];
 
   const getErrorMsg = (errors: FieldErrors<UserInput>) => {
@@ -123,7 +138,11 @@ const SignUpForm = () => {
     setLoading(true);
     createUser({
       variables: {
-        input: userInput,
+        input: {
+          ...userInput,
+          year: userInput.year === 0 ? null : userInput.year,
+          number: userInput.number === 0 ? null : userInput.number,
+        },
       },
       onError: (error) => {
         setLoading(false);
@@ -149,17 +168,96 @@ const SignUpForm = () => {
     });
   };
 
-  const getIcon = (condition: { regex: RegExp, message: string }) => {
-    if (watch('password') === '') {
+  const onAccountIdCheck = async () => {
+    if (watch('accountId')) {
+      const res = await accountIdCheck({ 
+        variables: { accountId: watch('accountId') },
+        onError: (error) => {
+          setIsChecked(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+      });
+      setIsChecked(!res.data?.accountIdCheck);
+      if (res.data?.accountIdCheck) {
+        setError('accountId', { message: '이미 사용중인 아이디입니다.' });
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: '이미 사용중인 아이디입니다.',
+          },
+        });
+      } else if (!res.data?.accountIdCheck) {
+        clearErrors('accountId');
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '사용 가능한 아이디입니다.',
+          },
+        });
+      }
+    } else {
+      setIsChecked(false);
+      setError('accountId', { message: '아이디를 입력해주십시오.' });
+      dispatchCurrentSnackBar({
+        payload: {
+          open: true,
+          type: 'error',
+          message: '아이디를 입력해주십시오.',
+        },
+      });
+    }
+  }
+
+  const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isChecked) {
+      dispatchCurrentSnackBar({
+        payload: {
+          open: true,
+          type: 'error',
+          message: '아이디 중복 확인을 해주십시오.',
+        },
+      });
+    } else if (passwordCheck !== watch('password')) {
+      setError('password', { message: '비밀번호가 일치하지 않습니다.' });
+      dispatchCurrentSnackBar({
+        payload: {
+          open: true,
+          type: 'error',
+          message: '비밀번호가 일치하지 않습니다.',
+        },
+      });
+    }
+    isChecked && passwordCheck === watch('password') && handleSubmit(onSubmit, onError)();
+  }
+
+  const getIcon = (condition: { regex: RegExp, message: string }, type: 'accountId' | 'password') => {
+    if (watch(type) === '') {
       return <RadioButtonUnchecked color='action' sx={{ width: '10px', height: '10px', mr: 1 }}/>
-    } else if (condition.regex.test(watch('password'))) {
+    } else if (condition.regex.test(watch(type))) {
       return <Done color='success' sx={{ width: '10px', height: '10px', mr: 1 }}/>;
     }
     return <Close color='error' sx={{ width: '10px', height: '10px', mr: 1 }}/>;
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+    <form 
+      onSubmit={onFormSubmit} 
+      style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        width: '100%'
+      }}
+    >
       <Stack 
         spacing={4} 
         width={'500px'} 
@@ -202,33 +300,61 @@ const SignUpForm = () => {
                 }
               }}
             >
-              이메일
+              아이디
             </InputLabel>
-            <TextField
-              placeholder="이메일을 입력하세요."
-              {...register('email')}
-              type='email'
-              fullWidth
-              error={!!errors.email}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setValue('email', '')}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-                htmlInput: {
-                  sx: {
-                    '@media (max-width:530px)': {
-                      fontSize: '0.8rem',
-                    }
+            <Stack spacing={1} direction={'row'} alignItems={'center'}>
+              <TextField
+                placeholder="아이디를 입력하세요."
+                type='text'
+                error={!!errors.accountId}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setValue('accountId', '')}>
+                          <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        </IconButton>
+                      </InputAdornment>
+                    ),
                   },
-                },
-              }}
-            />
+                  htmlInput: {
+                    sx: {
+                      '@media (max-width:530px)': {
+                        fontSize: '0.8rem',
+                      }
+                    },
+                  },
+                }}
+                sx={{ flex: 1 }}
+                value={watch('accountId')}
+                onChange={(e) => {
+                  setValue('accountId', e.target.value);
+                  setIsChecked(false);
+                }}
+              />
+              <Button variant='outlined' loading={accountIdCheckLoading} onClick={onAccountIdCheck} sx={{ height: '56px' }}>
+                중복 확인
+              </Button>
+            </Stack>
+            {
+              watch('accountId') !== '' &&
+              <Stack spacing={0.5} mt={1}>
+                {accountIdConditions.map((condition, index) => {
+                  return (
+                    <Typography
+                      key={index}
+                      variant='body2'
+                      fontSize={'0.80rem'}
+                      display={'flex'}
+                      alignItems={'center'}
+                      color={watch('accountId') === '' ? 'textSecondary' : condition.regex.test(watch('accountId')) ? 'success' : 'error'}
+                    >
+                      {getIcon(condition, 'accountId')}{condition.message}
+                    </Typography>
+                  );
+                })}
+              </Stack>
+            }
           </Box>
           <Box width={'100%'}>
             <InputLabel 
@@ -285,12 +411,55 @@ const SignUpForm = () => {
                       alignItems={'center'}
                       color={watch('password') === '' ? 'textSecondary' : condition.regex.test(watch('password')) ? 'success' : 'error'}
                     >
-                      {getIcon(condition)}{condition.message}
+                      {getIcon(condition, 'password')}{condition.message}
                     </Typography>
                   );
                 })}
               </Stack>
             }
+          </Box>
+          <Box width={'100%'}>
+            <InputLabel 
+              required 
+              sx={{ 
+                marginBottom: 1, 
+                fontSize: '1rem',
+                '@media (max-width:530px)': {
+                  fontSize: '0.8rem',
+                }
+              }}
+            >
+              비밀번호 확인
+            </InputLabel>
+            <TextField
+              placeholder="비밀번호를 다시 입력하세요."
+              type={showPasswordCheck ? 'text' : 'password'}
+              fullWidth
+              value={passwordCheck}
+              onChange={(e) => setPasswordCheck(e.target.value)}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setValue('password', '')} sx={{ mr: '2px' }}>
+                        <Cancel sx={{ width: '15px', height: '15px' }}/>
+                      </IconButton>
+                      <IconButton onClick={() => setShowPasswordCheck(!showPasswordCheck)}>
+                        {showPasswordCheck ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+                htmlInput: {
+                  sx: {
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem',
+                    }
+                  },
+                },
+              }}
+              variant="outlined" 
+            />
           </Box>
           <Box width={'100%'}>
             <InputLabel 
@@ -449,7 +618,7 @@ const SignUpForm = () => {
                   }}
                 >
                   <MenuItem 
-                    value={''}
+                    value={0}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',

@@ -24,7 +24,7 @@ const UserForm = ({
   refetch: () => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const { userRole } = useCurrentUser();
+  const { myRole, myId } = useCurrentUser();
 
   const [getUpdateLoader, setUpdateLoader] = useState<boolean>(false);
 
@@ -117,15 +117,15 @@ const UserForm = ({
       </FormControl>
       <FormControl component='fieldset'>
         <TextField
-          {...register('email')}
-          type='email'
-          label='이메일'
-          disabled={!editMode}
+          {...register('accountId')}
+          type='text'
+          label='아이디'
+          disabled={myRole === 'SUPERADMIN' ? !editMode : !editMode || myRole === 'STUDENT' || myId !== id}
           slotProps={{
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setValue('email', '')} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                  <IconButton onClick={() => setValue('accountId', '')} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
                     <Cancel sx={{ width: '15px', height: '15px' }}/>
                   </IconButton>
                 </InputAdornment>
@@ -147,13 +147,13 @@ const UserForm = ({
                 field.onChange(e);
                 setRole && setRole(e.target.value as UserRole);
               }}
-              disabled={!editMode || userRole === 'STUDENT' || userRole === 'TEACHER'}
+              disabled={!editMode || myRole === 'STUDENT' || myRole === 'TEACHER'}
             >
               <MenuItem value={''}><em>-</em></MenuItem>
               <MenuItem value={'STUDENT'}>학생</MenuItem>
-              {(userRole === 'SUPERADMIN' || userRole === 'ADMIN' || userRole === 'TEACHER') && <MenuItem value={'TEACHER'}>교사</MenuItem>}
-              {(userRole === 'SUPERADMIN' || userRole === 'ADMIN') && <MenuItem value={'ADMIN'}>관리자</MenuItem>}
-              {userRole === 'SUPERADMIN' && <MenuItem value={'SUPERADMIN'}>최고 관리자</MenuItem>}
+              {(myRole === 'SUPERADMIN' || myRole === 'ADMIN' || myRole === 'TEACHER') && <MenuItem value={'TEACHER'}>교사</MenuItem>}
+              {(myRole === 'SUPERADMIN' || myRole === 'ADMIN') && <MenuItem value={'ADMIN'}>관리자</MenuItem>}
+              {myRole === 'SUPERADMIN' && <MenuItem value={'SUPERADMIN'}>최고 관리자</MenuItem>}
             </Select>
           )}
         />

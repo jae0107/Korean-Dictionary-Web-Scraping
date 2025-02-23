@@ -2,7 +2,7 @@ import { gql } from "../generated/gql";
 
 export const myProfileFragment = gql(`
   fragment MyProfileItems on User {
-    email
+    accountId
     name
     year
     class

@@ -6,7 +6,7 @@ export const teacherFragment = gql(`
     name
     year
     class
-    email
+    accountId
     status
     role
     status

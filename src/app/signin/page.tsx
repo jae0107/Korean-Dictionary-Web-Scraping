@@ -30,7 +30,7 @@ const Login = () => {
         payload: {
           open: true,
           type: 'error',
-          message: '이메일 혹은 비밀번호가 일치하지 않습니다.',
+          message: '아이디 혹은 비밀번호가 일치하지 않습니다.',
         },
       });
     }

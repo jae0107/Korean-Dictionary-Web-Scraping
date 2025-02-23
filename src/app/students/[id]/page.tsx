@@ -20,7 +20,7 @@ const SingleStudent = () => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const searchParams = useSearchParams();
-  const { userRole } = useCurrentUser();
+  const { myRole } = useCurrentUser();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -31,7 +31,7 @@ const SingleStudent = () => {
     variables: {
       getUserId: id,
     },
-    skip: userRole === "STUDENT",
+    skip: myRole === "STUDENT",
     onError: (error) => {
       dispatchCurrentSnackBar({
         payload: {
@@ -45,7 +45,7 @@ const SingleStudent = () => {
 
   const defaultValues: UserInput = {
     name: data?.getUser.name || '',
-    email: data?.getUser.email || '',
+    accountId: data?.getUser.accountId || '',
     year: data?.getUser.year || 0,
     class: data?.getUser.class || '0',
     number: data?.getUser.number || 0,
@@ -65,7 +65,7 @@ const SingleStudent = () => {
           requestorId: id,
         },
       },
-      skip: userRole === "STUDENT",
+      skip: myRole === "STUDENT",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -77,7 +77,7 @@ const SingleStudent = () => {
       },
     });
   
-  if (userRole === 'STUDENT') {
+  if (myRole === 'STUDENT') {
     return <AccessDenied/>;
   }
   

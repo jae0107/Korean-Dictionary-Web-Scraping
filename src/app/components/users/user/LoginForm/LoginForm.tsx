@@ -12,12 +12,17 @@ import Link from "next/link";
 import ColourModeSwitch from "@/app/components/shared/ColourModeSwitch";
 
 const schema = z.object({
-  email: z.string().nonempty({ message: "이메일을 작성하십시오." }).email({ message: "잘못된 이메일 형식입니다." }),
+  accountId: z
+    .string()
+    .nonempty({ message: "아이디를 작성하십시오." })
+    .min(4, { message: "아이디는 최소 4자 이상이어야 합니다." })
+    .max(20, { message: "아이디는 최대 20자 이하여야 합니다." })
+    .regex(/^[a-zA-Z0-9_]+$/, { message: "아이디는 영문, 숫자, 밑줄(_)만 포함할 수 있습니다." }),
   password: z.string().nonempty({ message: "비밀번호를 작성하십시오." }),
 });
 
 interface LoginInput {
-  email: string;
+  accountId: string;
   password: string;
 }
 
@@ -31,7 +36,7 @@ const LoginForm = () => {
   
   const form = useForm({
     defaultValues: {
-      email: '',
+      accountId: '',
       password: '',
     },
     resolver: zodResolver(schema),
@@ -72,7 +77,7 @@ const LoginForm = () => {
   const onSubmit = async () => {
     setLoading(true);
     const res = await signIn('credentials', {
-      username: watch('email'),
+      username: watch('accountId'),
       password: watch('password'),
       redirect: false,
       callbackUrl: '/',
@@ -146,19 +151,19 @@ const LoginForm = () => {
                 }
               }}
             >
-              이메일
+              아이디
             </InputLabel>
             <TextField
-              placeholder="이메일을 입력하세요."
-              {...register('email')}
-              type='email'
+              placeholder="아이디를 입력하세요."
+              {...register('accountId')}
+              type='text'
               fullWidth
-              error={!!errors.email}
+              error={!!errors.accountId}
               slotProps={{
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setValue('email', '')}>
+                      <IconButton onClick={() => setValue('accountId', '')}>
                         <Cancel sx={{ width: '15px', height: '15px' }}/>
                       </IconButton>
                     </InputAdornment>

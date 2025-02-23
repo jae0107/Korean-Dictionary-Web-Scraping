@@ -39,7 +39,7 @@ export const userTypeDefs = gql`
   type User {
     id: ID!
     name: String!
-    email: String!
+    accountId: String!
     password: String
     year: Int
     class: String
@@ -52,7 +52,7 @@ export const userTypeDefs = gql`
 
   input UserInput {
     name: String
-    email: String
+    accountId: String
     year: Int
     class: String
     number: Int
@@ -66,7 +66,7 @@ export const userTypeDefs = gql`
   }
 
   input PasswordResetInput {
-    email: String!
+    accountId: String!
     password: String!
   }
 
@@ -82,11 +82,12 @@ export const userTypeDefs = gql`
       filterOptions: UserFilterOptions!
     ): UserOffsetPaginationResponse!
     getUser(id: ID!): User!
-    findPassword(email: String!): String!
+    findPassword(accountId: String!): String!
     getRequestors(
       paginationOptions: OffsetPaginationOptions!
       filterOptions: RequestorFilterOptions!
     ): UserOffsetPaginationResponse!
+    accountIdCheck(accountId: String!): Boolean!
   }
 
   type Mutation {

@@ -13,9 +13,9 @@ export const authOptions: AuthOptions = {
       // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
         username: {
-          label: "이메일",
+          label: "아이디",
           type: "text",
-          placeholder: "이메일 주소 입력 요망",
+          placeholder: "아이디 입력 요망",
         },
         password: { label: "비밀번호", type: "password" },
       },

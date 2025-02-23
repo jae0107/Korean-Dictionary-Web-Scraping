@@ -7,6 +7,7 @@ import { gql } from "@/app/generated/gql";
 const getMyRoleQuery = gql(`
   query GetMyRole {
     getCurrentUser {
+      id
       role
     }
   }
@@ -31,8 +32,8 @@ export function CurrentUserProvider({
   });
   
   const value = {
-    // user: data?.getCurrentUser ?? null,
-    userRole: data?.getCurrentUser?.role ?? null,
+    myId: data?.getCurrentUser?.id ?? null,
+    myRole: data?.getCurrentUser?.role ?? null,
     loading: loading,
     refetch: refetch,
     networkStatus: networkStatus

@@ -28,7 +28,7 @@ const Profile = () => {
 
   const defaultValues: UserInput = {
     name: data?.getCurrentUser.name || '',
-    email: data?.getCurrentUser.email || '',
+    accountId: data?.getCurrentUser.accountId || '',
     year: data?.getCurrentUser.year || 0,
     class: data?.getCurrentUser.class || '0',
     number: data?.getCurrentUser.number || 0,

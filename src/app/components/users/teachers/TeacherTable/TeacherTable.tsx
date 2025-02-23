@@ -193,7 +193,7 @@ const TeacherTable = ({
             }
             label="프로필 보기"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => router.push(`/teachers/${params.row.id}`)}
           />,
           <GridActionsCellItem
@@ -208,7 +208,7 @@ const TeacherTable = ({
             }
             label="거절"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => onDeny(params.row.id)}
           />
         ];
@@ -236,7 +236,7 @@ const TeacherTable = ({
             }
             label="복구"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => onRecover(params.row.id)}
           />,
           <GridActionsCellItem
@@ -251,7 +251,7 @@ const TeacherTable = ({
             }
             label="삭제"
             showInMenu={maxWidth360}
-            dense={maxWidth360}
+            dense={!!maxWidth360}
             onClick={() => {
               setSelectedUserId(params.row.id);
               setOpenConfirmDialog(true);
@@ -279,7 +279,7 @@ const TeacherTable = ({
           }
           label="프로필 보기"
           showInMenu={maxWidth400}
-          dense={maxWidth400}
+          dense={!!maxWidth400}
           onClick={() => router.push(`/teachers/${params.row.id}`)}
         />,
         <GridActionsCellItem
@@ -294,7 +294,7 @@ const TeacherTable = ({
           }
           label="승인"
           showInMenu={maxWidth400}
-          dense={maxWidth400}
+          dense={!!maxWidth400}
           onClick={() => onApproval(params.row.id)}
         />,
         <GridActionsCellItem
@@ -309,7 +309,7 @@ const TeacherTable = ({
           }
           label="거절"
           showInMenu={maxWidth400}
-          dense={maxWidth400}
+          dense={!!maxWidth400}
           onClick={() => onDeny(params.row.id)}
         />
       ]
@@ -336,7 +336,7 @@ const TeacherTable = ({
                 name: params.row.name,
                 year: params.row.year || undefined,
                 class: params.row.class || '',
-                email: params.row.email,
+                accountId: params.row.accountId,
                 role: params.row.role,
                 status: params.row.status,
               });
@@ -351,7 +351,7 @@ const TeacherTable = ({
     actions
   ] : [
     { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
-    { field: 'email', headerName: '이메일', flex: 3, filterable: false, sortable: false },
+    { field: 'accountId', headerName: '아이디', flex: 3, filterable: false, sortable: false },
     { 
       field: 'year', 
       headerName: '학년', 
