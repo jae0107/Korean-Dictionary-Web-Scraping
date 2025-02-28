@@ -55,6 +55,7 @@ async function createPasswordResetRequest(
       } : {
         name: input.name,
         accountId: input.accountId,
+        email: input.email ?? '',
         role: input.role,
       }
     });

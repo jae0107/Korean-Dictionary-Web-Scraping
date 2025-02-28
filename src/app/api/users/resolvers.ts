@@ -1,7 +1,7 @@
 import { PasswordResetRequest, User, Word } from "../models";
 import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
-import { FindPasswordInput, OffsetPaginationOptions, PasswordResetInput, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
+import { FindMyIdInput, FindPasswordInput, OffsetPaginationOptions, PasswordResetInput, RequestorFilterOptions, UserFilterOptions, UserInput, UserRole, UserStatus } from "../../generated/gql/graphql";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
@@ -35,6 +35,7 @@ export const userResolvers = {
     bulkRecoverUsers,
     deleteUser,
     bulkDeleteUsers,
+    findMyId,
   },
   User: {
     async words(user: User, _args: unknown, { dataloaders }: Context): Promise<Word[]> {
@@ -521,6 +522,39 @@ async function bulkDeleteUsers(
     });
 
     return true;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function findMyId(
+  root: any,
+  { input }: { input: FindMyIdInput },
+): Promise<string> {
+  return await transaction(async (t) => {
+    const user = await User.findOne({
+      where: input.role === UserRole.Student ? {
+        name: input.name,
+        year: input.year ?? 0,
+        class: input.class  ?? '',
+        number: input.number ?? 0,
+        role: input.role,
+      } : {
+        name: input.name,
+        email: input.email ?? '',
+        role: input.role,
+      }
+    });
+
+    if (!user) throw new Error('입력한 정보와 일치하는 사용자를 찾을 수 없습니다.');
+
+    if (input.role !== user.role) throw new Error('입력한 정보와 일치하는 사용자를 찾을 수 없습니다.');
+
+    if (user.accountId.length <= 3) {
+      return user.accountId;
+    }
+
+    return user.accountId.slice(0, 3) + '*'.repeat(user.accountId.length - 3);
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

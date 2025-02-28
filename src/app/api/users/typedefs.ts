@@ -71,6 +71,15 @@ export const userTypeDefs = gql`
     password: String!
   }
 
+  input FindMyIdInput {
+    name: String!
+    email: String
+    year: Int
+    class: String
+    number: Int
+    role: UserRole!
+  }
+
   type UserOffsetPaginationResponse {
     records: [User!]!
     pageInfo: OffsetPaginationPageInfo!
@@ -107,5 +116,6 @@ export const userTypeDefs = gql`
     bulkRecoverUsers(ids: [ID!]!): Boolean!
     deleteUser(id: ID!): Boolean!
     bulkDeleteUsers(ids: [ID!]!): Boolean!
+    findMyId(input: FindMyIdInput!): String!
   }
 `;

@@ -281,6 +281,17 @@ const LoginForm = () => {
               }
             }}
           >
+            아이디를 잊으셨나요? <Link href={'/find-my-id'}>아이디 찾기</Link>
+          </Typography>
+          <Typography 
+            variant={'body2'} 
+            fontSize={'0.875rem'}
+            sx={{
+              '@media (max-width:530px)': {
+                fontSize: '0.75rem',
+              }
+            }}
+          >
             비밀번호를 잊으셨나요? <Link href={'/password-reset-request'}>비밀번호 재설정 요청</Link>
           </Typography>
         </Stack>

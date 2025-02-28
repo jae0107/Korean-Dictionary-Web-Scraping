@@ -22,6 +22,7 @@ const documents = {
     "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    accountId\n    status\n    role\n  }\n": types.AdminItemsFragmentDoc,
     "\n  query GetAdmins($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...AdminItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetAdminsDocument,
     "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n": types.GetMyRoleDocument,
+    "\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n": types.FindMyIdDocument,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  mutation ChangeCurrentPassword($changeCurrentPasswordId: ID!, $input: FindPasswordInput!) {\n    changeCurrentPassword(id: $changeCurrentPasswordId, input: $input) {\n      id\n    }\n  }\n": types.ChangeCurrentPasswordDocument,
     "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n": types.BulkPasswordResetDocument,
@@ -122,6 +123,10 @@ export function gql(source: "\n  query GetAdmins($paginationOptions: OffsetPagin
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n"): (typeof documents)["\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n"): (typeof documents)["\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
