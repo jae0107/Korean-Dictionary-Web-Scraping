@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Box, Stack } from "@mui/material";
 import VocabFilter from "../components/vocabulary-list/VocabFilter/VocabFilter";
 import VocabTable from "../components/vocabulary-list/VocabTable/VocabTable";
+import { useDebounce } from "../hooks/useDebounce";
 
 const VocabularyList = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -18,6 +19,8 @@ const VocabularyList = () => {
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
   const [getPage, setPage] = useState<number | null>(null);
+
+  const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   
   const { data, loading } =
     useQuery(getVocabulariesQuery, {
@@ -29,7 +32,7 @@ const VocabularyList = () => {
         },
         filterOptions: {
           status: WordStatus.Approved,
-          word: wordKeyword,
+          word: debouncedWordKeyWord,
           year: parseInt(getYear),
           class: getClass.toString(),
           page: getPage,

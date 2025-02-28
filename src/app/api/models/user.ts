@@ -93,7 +93,7 @@ User.init(
       },
       async validateUniqueAccountId() {
         const existingUserCount = await User.count({ where: { accountId: this.accountId as string } });
-        if (existingUserCount !== 0) {
+        if (existingUserCount !== 1) {
           throw new Error('아이디는 고유해야 합니다.');
         }
       }

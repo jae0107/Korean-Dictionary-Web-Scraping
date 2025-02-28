@@ -10,6 +10,7 @@ import { WordStatus } from "../generated/gql/graphql";
 import { Box } from "@mui/material";
 import MyRequestFilter from "../components/my-requests/MyRequestFilter/MyRequestFilter";
 import MyRequestTable from "../components/my-requests/MyRequestTable/MyRequestTable";
+import { useDebounce } from "../hooks/useDebounce";
 
 const MyRequests = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -19,6 +20,8 @@ const MyRequests = () => {
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
+
+  const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
 
   const { data, loading, refetch } =
       useQuery(getMyRequestsQuery, {
@@ -30,7 +33,7 @@ const MyRequests = () => {
           },
           filterOptions: {
             status: wordRequestStatus,
-            word: wordKeyword,
+            word: debouncedWordKeyWord,
           },
         },
         onError: (error) => {

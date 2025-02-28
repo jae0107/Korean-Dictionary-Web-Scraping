@@ -12,6 +12,7 @@ import RequestManagementFilter from "../components/request-management/RequestMan
 import { useSearchParams } from "next/navigation";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import AccessDenied from "../components/shared/AccessDenied";
+import { useDebounce } from "../hooks/useDebounce";
 
 const RequestManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -25,6 +26,8 @@ const RequestManagement = () => {
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
+
+  const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   
   const { data, loading, refetch } =
     useQuery(getWordRequestsQuery, {
@@ -36,7 +39,7 @@ const RequestManagement = () => {
         },
         filterOptions: {
           status: wordRequestStatus,
-          word: wordKeyword,
+          word: debouncedWordKeyWord,
           requestorId: getRequestorId,
           year: parseInt(getYear),
           class: getClass.toString(),

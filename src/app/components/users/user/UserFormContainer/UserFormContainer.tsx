@@ -35,6 +35,23 @@ const UserFormContainer = ({
       .min(4, { message: "아이디는 최소 4자 이상이어야 합니다." })
       .max(20, { message: "아이디는 최대 20자 이하여야 합니다." })
       .regex(/^[a-zA-Z0-9_]+$/, { message: "아이디는 영문, 숫자, 밑줄(_)만 포함할 수 있습니다." }),
+    email: z.string().optional()
+      .refine((email) => {
+        if (getRole !== UserRole.Student) {
+          if (email === null || email === undefined || email.trim() === "") {
+            return false;
+          }
+        }
+        return true;
+      },{ message: "이메일을 작성하십시오."})
+      .refine((email) => {
+        if (getRole !== UserRole.Student && email) {
+          if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            return false;
+          }
+        }
+        return true;
+      },{ message: "이메일 형식이 올바르지 않습니다." }),
     year: z.number({ message: "학년은 숫자여야 합니다." }).optional()
       .refine((year) => {
         if (getRole === UserRole.Student) {
@@ -115,12 +132,12 @@ const UserFormContainer = ({
   }
   
   return (
-    <Stack spacing={4} width={'300px'} mt={2} alignSelf={'center'}>  
+    <Stack spacing={4} width={'300px'} mt={2} mb={2} alignSelf={'center'}>  
       <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
         {getIcon()}
         <Typography variant="h5">{`${userType} 프로필`}</Typography>
       </Box>
-      <UserForm id={id} editMode={editMode} setEditMode={setEditMode} form={form} setRole={setRole} refetch={refetch}/>
+      <UserForm id={id} editMode={editMode} setEditMode={setEditMode} form={form} setRole={setRole} refetch={refetch} defaultValues={defaultValues}/>
     </Stack>
   );
 }

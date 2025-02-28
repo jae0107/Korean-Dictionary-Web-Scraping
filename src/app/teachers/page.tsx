@@ -12,6 +12,7 @@ import TeacherFilter from "../components/users/teachers/TeacherFilter/TeacherFil
 import TeacherTable from "../components/users/teachers/TeacherTable/TeacherTable";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import AccessDenied from "../components/shared/AccessDenied";
+import { useDebounce } from "../hooks/useDebounce";
 
 const TeacherManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -22,6 +23,8 @@ const TeacherManagement = () => {
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [teacherStatus, setTeacherStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+
+  const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
   const { data, loading, refetch } =
     useQuery(getTeachersQuery, {
@@ -34,7 +37,7 @@ const TeacherManagement = () => {
         filterOptions: {
           roles: [UserRole.Teacher],
           statuses: [teacherStatus],
-          userName: userNameKeyword,
+          userName: debouncedUserNameKeyWord,
         },
       },
       skip: myRole === "STUDENT" || myRole === "TEACHER",

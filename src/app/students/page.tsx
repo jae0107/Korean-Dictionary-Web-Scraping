@@ -12,6 +12,7 @@ import StudentFilter from "../components/users/students/StudentFilter/StudentFil
 import StudentTable from "../components/users/students/StudentTable/StudentTable";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import AccessDenied from "../components/shared/AccessDenied";
+import { useDebounce } from "../hooks/useDebounce";
 
 const StudentManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -22,6 +23,8 @@ const StudentManagement = () => {
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+
+  const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
   const { data, loading, refetch } =
     useQuery(getStudentsQuery, {
@@ -34,7 +37,7 @@ const StudentManagement = () => {
         filterOptions: {
           roles: [UserRole.Student],
           statuses: [studentStatus],
-          userName: userNameKeyword,
+          userName: debouncedUserNameKeyWord,
         },
       },
       skip: myRole === "STUDENT",

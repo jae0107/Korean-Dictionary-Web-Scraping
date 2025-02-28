@@ -1,6 +1,6 @@
 import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { Controller, FieldErrors, SubmitErrorHandler, UseFormReturn } from "react-hook-form";
-import { Button, FormControl, Grid2, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { Box, Button, FormControl, Grid2, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useCurrentUser } from "@/app/hooks/useCurrentUser";
 import { Cancel, Edit, HighlightOff, SaveAlt } from "@mui/icons-material";
 import { useState } from "react";
@@ -15,6 +15,7 @@ const UserForm = ({
   form,
   setRole,
   refetch,
+  defaultValues,
 } : {
   id: string;
   editMode: boolean;
@@ -22,6 +23,7 @@ const UserForm = ({
   form: UseFormReturn<UserInput>;
   setRole?: (role: UserRole) => void;
   refetch: () => void;
+  defaultValues: UserInput;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { myRole, myId } = useCurrentUser();
@@ -30,7 +32,7 @@ const UserForm = ({
 
   const [updateUser] = useMutation(updateUserMutation);
   
-  const { register, control, watch, setValue, handleSubmit } = form;
+  const { register, control, watch, setValue, handleSubmit, formState: { errors } } = form;
 
   const getErrorMsg = (errors: FieldErrors<UserInput>) => {
     if (errors) {
@@ -95,13 +97,27 @@ const UserForm = ({
     }
   
   return (
-    <Stack spacing={2}>
-      <FormControl component='fieldset'>
+    <Stack spacing={2} >
+      <Box width={'100%'}>
+        <InputLabel 
+          sx={{ 
+            marginBottom: 1, 
+            fontSize: '1rem',
+            '@media (max-width:530px)': {
+              fontSize: '0.8rem',
+            }
+          }}
+          required
+        >
+          이름
+        </InputLabel>
         <TextField
           {...register('name')}
           type='text'
-          label='이름'
+          placeholder="이름을 입력하세요."
+          fullWidth
           disabled={!editMode}
+          error={!!errors.name}
           slotProps={{
             input: {
               endAdornment: (
@@ -114,18 +130,32 @@ const UserForm = ({
             },
           }}
         />
-      </FormControl>
-      <FormControl component='fieldset'>
+      </Box>
+      <Box width={'100%'}>
+        <InputLabel 
+          sx={{ 
+            marginBottom: 1, 
+            fontSize: '1rem',
+            '@media (max-width:530px)': {
+              fontSize: '0.8rem',
+            }
+          }}
+          required
+        >
+          아이디
+        </InputLabel>
         <TextField
           {...register('accountId')}
           type='text'
-          label='아이디'
+          placeholder="아이디를 입력하세요."
+          fullWidth
           disabled={myRole === 'SUPERADMIN' ? !editMode : !editMode || myRole === 'STUDENT' || myId !== id}
+          error={!!errors.accountId}
           slotProps={{
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setValue('accountId', '')} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                  <IconButton onClick={() => setValue('accountId', '')} disabled={myRole === 'SUPERADMIN' ? !editMode : !editMode || myRole === 'STUDENT' || myId !== id} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
                     <Cancel sx={{ width: '15px', height: '15px' }}/>
                   </IconButton>
                 </InputAdornment>
@@ -133,21 +163,69 @@ const UserForm = ({
             },
           }}
         />
-      </FormControl>
-      <FormControl component='fieldset'>
-        <InputLabel>역할</InputLabel>
+      </Box>
+      {
+        watch('role') !== UserRole.Student &&
+        <Box width={'100%'}>
+          <InputLabel 
+            sx={{ 
+              marginBottom: 1, 
+              fontSize: '1rem',
+              '@media (max-width:530px)': {
+                fontSize: '0.8rem',
+              }
+            }}
+            required={watch('role') !== UserRole.Student}
+          >
+            이메일
+          </InputLabel>
+          <TextField
+            {...register('email')}
+            placeholder="이메일을 입력하세요."
+            type='text'
+            fullWidth
+            disabled={!editMode}
+            error={!!errors.email}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setValue('name', '')} disabled={!editMode} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                      <Cancel sx={{ width: '15px', height: '15px' }}/>
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </Box>
+      }
+      <Box width={'100%'}>
+        <InputLabel 
+          sx={{ 
+            marginBottom: 1, 
+            fontSize: '1rem',
+            '@media (max-width:530px)': {
+              fontSize: '0.8rem',
+            }
+          }}
+          required
+        >
+          역할
+        </InputLabel>
         <Controller
           control={control}
           name='role'
           render={({ field }) => (
             <Select
               value={field.value}
-              label="역할"
+              fullWidth
               onChange={(e) => {
                 field.onChange(e);
                 setRole && setRole(e.target.value as UserRole);
               }}
               disabled={!editMode || myRole === 'STUDENT' || myRole === 'TEACHER'}
+              error={!!errors.role}
             >
               <MenuItem value={''}><em>-</em></MenuItem>
               <MenuItem value={'STUDENT'}>학생</MenuItem>
@@ -157,18 +235,30 @@ const UserForm = ({
             </Select>
           )}
         />
-      </FormControl>
-      <FormControl component='fieldset'>
-        <InputLabel>학년</InputLabel>
+      </Box>
+      <Box width={'100%'}>
+        <InputLabel 
+          sx={{ 
+            marginBottom: 1, 
+            fontSize: '1rem',
+            '@media (max-width:530px)': {
+              fontSize: '0.8rem',
+            }
+          }}
+          required={watch('role') === 'STUDENT'}
+        >
+          학년
+        </InputLabel>
         <Controller
           control={control}
           name='year'
           render={({ field }) => (
             <Select
               value={field.value}
-              label="학년"
               onChange={field.onChange}
               disabled={!editMode}
+              fullWidth
+              error={!!errors.year}
             >
               <MenuItem value={0}><em>-</em></MenuItem>
               <MenuItem value={1}>1학년</MenuItem>
@@ -177,18 +267,30 @@ const UserForm = ({
             </Select>
           )}
         />
-      </FormControl>
-      <FormControl component='fieldset'>
-        <InputLabel>반</InputLabel>
+      </Box>
+      <Box width={'100%'}>
+        <InputLabel 
+          sx={{ 
+            marginBottom: 1, 
+            fontSize: '1rem',
+            '@media (max-width:530px)': {
+              fontSize: '0.8rem',
+            }
+          }}
+          required={watch('role') === 'STUDENT'}
+        >
+          반
+        </InputLabel>
         <Controller
           control={control}
           name='class'
           render={({ field }) => (
             <Select
               value={field.value}
-              label="반"
               onChange={field.onChange}
               disabled={!editMode}
+              fullWidth
+              error={!!errors.class}
             >
               <MenuItem value={'0'}><em>-</em></MenuItem>
               <MenuItem value={'1'}>1반</MenuItem>
@@ -204,14 +306,27 @@ const UserForm = ({
             </Select>
           )}
         />
-      </FormControl>
+      </Box>
       {
         watch('role') === 'STUDENT' && 
-        <FormControl component='fieldset'>
+        <Box width={'100%'}>
+          <InputLabel 
+            sx={{ 
+              marginBottom: 1, 
+              fontSize: '1rem',
+              '@media (max-width:530px)': {
+                fontSize: '0.8rem',
+              }
+            }}
+            required={watch('role') === 'STUDENT'}
+          >
+            번호
+          </InputLabel>
           <TextField
             type='number'
-            label='번호'
             disabled={!editMode}
+            error={!!errors.number}
+            fullWidth
             slotProps={{
               htmlInput: {
                 min: 0
@@ -229,7 +344,7 @@ const UserForm = ({
             value={watch('number')}
             onChange={(e) => setValue('number', parseInt(e.target.value))}
           />
-        </FormControl>
+        </Box>
       }
       {
         !editMode ? (
@@ -239,7 +354,23 @@ const UserForm = ({
         ) : (
           <Grid2 container spacing={1}>
             <Grid2 size={6}>
-              <Button variant='outlined' fullWidth onClick={() => setEditMode(false)} color="error" startIcon={<HighlightOff/>} disabled={getUpdateLoader}>
+              <Button 
+                variant='outlined' 
+                fullWidth 
+                onClick={() => {
+                  setValue('name', defaultValues.name);
+                  setValue('accountId', defaultValues.accountId);
+                  setValue('email', defaultValues.email);
+                  setValue('year', defaultValues.year);
+                  setValue('class', defaultValues.class);
+                  setValue('number', defaultValues.number);
+                  setValue('role', defaultValues.role);
+                  setEditMode(false);
+                }} 
+                color="error" 
+                startIcon={<HighlightOff/>} 
+                disabled={getUpdateLoader}
+              >
                 취소
               </Button>
             </Grid2>

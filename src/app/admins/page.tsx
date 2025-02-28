@@ -12,6 +12,7 @@ import AdminFilter from "../components/users/admins/AdminFilter/AdminFilter";
 import AdminTable from "../components/users/admins/AdminTable/AdminTable";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import AccessDenied from "../components/shared/AccessDenied";
+import { useDebounce } from "../hooks/useDebounce";
 
 const AdminManagement = () => {
   const { paginationModel, setPaginationModel } = usePaginationModel();
@@ -22,6 +23,8 @@ const AdminManagement = () => {
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
+
+  const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
   const { data, loading, refetch } =
     useQuery(getAdminsQuery, {
@@ -34,7 +37,7 @@ const AdminManagement = () => {
         filterOptions: {
           roles: [UserRole.Admin, UserRole.Superadmin],
           statuses: [adminStatus],
-          userName: userNameKeyword,
+          userName: debouncedUserNameKeyWord,
         },
       },
       skip: myRole === "STUDENT" || myRole === "TEACHER",
