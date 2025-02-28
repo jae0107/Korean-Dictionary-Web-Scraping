@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Cancel, Close, Done, RadioButtonUnchecked, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
@@ -33,7 +33,9 @@ const PasswordChangeForm = ({
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [passwordCheck, setPasswordCheck] = useState<string>('');
 
   const [changeCurrentPassword] = useMutation(changeCurrentPasswordMutation);
 
@@ -131,8 +133,23 @@ const PasswordChangeForm = ({
     return <Close color='error' sx={{ width: '10px', height: '10px', mr: 1 }}/>;
   }
 
+  const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (passwordCheck !== watch('newPassword')) {
+      setError('newPassword', { message: '비밀번호가 일치하지 않습니다.' });
+      dispatchCurrentSnackBar({
+        payload: {
+          open: true,
+          type: 'error',
+          message: '비밀번호가 일치하지 않습니다.',
+        },
+      });
+    }
+    passwordCheck === watch('newPassword') && handleSubmit(onSubmit, onError)();
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)}>
+    <form onSubmit={onFormSubmit}>
       <Stack spacing={2}>
         <Box width={'100%'}>
           <InputLabel 
@@ -234,6 +251,49 @@ const PasswordChangeForm = ({
             );
           })}
         </Stack>
+        <Box width={'100%'}>
+          <InputLabel 
+            required 
+            sx={{ 
+              marginBottom: 1, 
+              fontSize: '1rem',
+              '@media (max-width:530px)': {
+                fontSize: '0.8rem',
+              }
+            }}
+          >
+            비밀번호 확인
+          </InputLabel>
+          <TextField
+            placeholder="비밀번호를 다시 입력하세요."
+            type={showPasswordCheck ? 'text' : 'password'}
+            fullWidth
+            value={passwordCheck}
+            onChange={(e) => setPasswordCheck(e.target.value)}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setValue('newPassword', '')} sx={{ mr: '2px' }}>
+                      <Cancel sx={{ width: '15px', height: '15px' }}/>
+                    </IconButton>
+                    <IconButton onClick={() => setShowPasswordCheck(!showPasswordCheck)}>
+                      {showPasswordCheck ? <VisibilityOff sx={{ width: '20px', height: '20px' }}/> : <Visibility sx={{ width: '20px', height: '20px' }}/>}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+              htmlInput: {
+                sx: {
+                  '@media (max-width:530px)': {
+                    fontSize: '0.8rem',
+                  }
+                },
+              },
+            }}
+            variant="outlined" 
+          />
+        </Box>
         <Button fullWidth type='submit' variant="contained" loading={loading}>
           비밀번호 변경하기
         </Button>

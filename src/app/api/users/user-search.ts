@@ -1,7 +1,7 @@
 import { OffsetPaginationOptions, UserFilterOptions } from "../../generated/gql/graphql";
 import { User } from "../models";
 import { OffsetPaginationResponse } from "../utils/shared-types";
-import { knex, QueryBuilder, queryBuilder, sequelize } from "../initialisers";
+import { QueryBuilder, queryBuilder, sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 
 export class UserSearch {
@@ -18,15 +18,15 @@ export class UserSearch {
 
   async process(): Promise<OffsetPaginationResponse<User>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { status, roles, userName } = this.filterOptions;
+    const { statuses, roles, userName } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('users');
 
     query = query
       .select('users.*');
 
-    if (isPresent(status)) {
-      query = query.andWhere('users.status', '=', status);
+    if (isPresent(statuses) && Array.isArray(statuses) && statuses.length > 0) {
+      query = query.andWhere('users.status', 'in', statuses);
     }
 
     if (isPresent(roles)) {

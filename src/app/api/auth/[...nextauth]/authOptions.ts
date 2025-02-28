@@ -54,7 +54,7 @@ export const authOptions: AuthOptions = {
     },
     async signIn({ user }) {
       const tmpUser = user as User;
-      if (tmpUser.status === UserStatus.Pending) {
+      if (tmpUser.status === UserStatus.Pending && tmpUser.role !== 'STUDENT') {
         throw new Error('승인 대기중인 계정입니다.');
       } else if (tmpUser.status === UserStatus.Denied) {
         throw new Error('승인이 거부된 계정입니다.');

@@ -1,4 +1,4 @@
-import { User, Word } from "../models";
+import { PasswordResetRequest, User, Word } from "../models";
 import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
 import { FindPasswordInput, OffsetPaginationOptions, PasswordResetInput, RequestorFilterOptions, UserFilterOptions, UserInput, UserStatus } from "../../generated/gql/graphql";
@@ -6,8 +6,8 @@ import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
 import { RequestorSearch } from "./requestor-search";
-import { sequelize } from "../initialisers";
-import { Op } from "sequelize";
+import { queryBuilder, QueryBuilder, sequelize } from "../initialisers";
+import { Op, QueryTypes } from "sequelize";
 import * as bcrypt from 'bcrypt';
 
 export const userResolvers = {
@@ -21,9 +21,12 @@ export const userResolvers = {
   },
   Mutation: {
     createUser,
+    bulkCreateUsers,
     updateUser,
     changeCurrentPassword,
+    passwordSetUp,
     passwordReset,
+    bulkPasswordReset,
     approveUser,
     bulkApproveUsers,
     denyUser,
@@ -124,10 +127,40 @@ async function createUser(
       role: input.role || '',
       password: input.password || '',
       status: UserStatus.Pending,
+      email: input.email || '',
     });
 
     return user;
   }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function bulkCreateUsers(
+  root: any,
+  { inputs }: { inputs: UserInput[]; },
+): Promise<User[]> {
+  return await transaction(async (t) => {
+    const users = await User.bulkCreate(
+      inputs.map((user) => ({
+        name: user.name || '',
+        accountId: user.accountId || '',
+        year: user.year || undefined,
+        class: user.class || '',
+        number: user.number || undefined,
+        role: user.role || '',
+        password: user.password || '',
+        status: UserStatus.Pending,
+        email: user.email || '',
+      })),
+      { individualHooks: true }
+    );
+
+    return users;
+  }).catch((e) => {
+    if (e.errors[0].message === 'accountId must be unique') {
+      e.message = '아이디가 중복되었습니다.';
+    }
     throw new ApolloResponseError(e);
   });
 }
@@ -174,7 +207,7 @@ async function changeCurrentPassword(
     if (user) {
       const isPasswordValid = await bcrypt.compare(input.currentPassword, user.password);
       if (isPasswordValid) {
-        user = await user.update({ password: input.newPassword });
+        user = await user.update({ password: input.newPassword }, { validate: false });
       } else {
         throw new Error('입력한 현재 비밀번호가 일치하지 않습니다.');
       }
@@ -188,21 +221,95 @@ async function changeCurrentPassword(
   });
 }
 
-async function passwordReset(
+async function passwordSetUp(
   root: any,
-  { input }: { input: PasswordResetInput; },
+  { id, password }: { id: string; password: string; },
   { currentUser }: Context,
 ): Promise<User> {
   return await transaction(async (t) => {
-    let user = await User.findOne({ where: { accountId: input.accountId } });
+    let user = await User.findByPk(id);
 
     if (user) {
-      user = await user.update({ password: input.password }, { validate: false });
+      user = await user.update({ password: password, status: UserStatus.Approved, previousStatus: user.status }, { validate: false });
     } else {
       throw new Error('No User Found');
     }
 
     return user;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function passwordReset(
+  root: any,
+  { id, password }: { id: string; password?: string; },
+  { currentUser }: Context,
+): Promise<User> {
+  return await transaction(async (t) => {
+    let user = await User.findByPk(id);
+
+    if (user) {
+      const newPassword = password ? password : `${user.year}${String(user.class).padStart(2, '0')}${String(user.number).padStart(2, '0')}`;
+      user = await user.update({ password: newPassword }, { validate: false });
+      await PasswordResetRequest.destroy({ where: { requestorId: user.id } });
+    } else {
+      throw new Error('No User Found');
+    }
+
+    return user;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function bulkPasswordReset(
+  root: any,
+  { ids }: { ids: string[]; },
+  { currentUser }: Context,
+): Promise<boolean> {
+  return await transaction(async (t) => {
+    let query: QueryBuilder = queryBuilder('passwordResetRequests');
+
+    query = query
+      .select('passwordResetRequests.requestorId')
+      .andWhere('passwordResetRequests.id', 'in', ids);
+    
+    const results = (await sequelize.query(query.toString(), { type: QueryTypes.SELECT })) as { requestorId: string }[];
+    const requestorIds = results.map((result) => result.requestorId)
+    
+    const users = await User.findAll({ 
+      where: {
+        id: { [Op.in]: requestorIds },
+      },
+    });
+
+    if (users.length === 0 || !users) {
+      throw new Error('No Users Found');
+    }
+
+    const updatedUsers = users.map((user) => {
+      const newPassword = `${user.dataValues.year}${String(user.dataValues.class).padStart(2, '0')}${String(user.dataValues.number).padStart(2, '0')}`;
+      
+      return {
+        ...user.dataValues,
+        password: newPassword,
+      };
+    });
+    
+    await User.bulkCreate(updatedUsers, {
+      updateOnDuplicate: ['password'],
+      fields: ['id', 'name', 'year', 'class', 'number', 'password', 'status', 'previousStatus', 'role', 'accountId', 'email', 'createdAt', 'updatedAt'],
+    });
+    
+
+    await PasswordResetRequest.destroy({
+      where: { 
+        requestorId: { [Op.in]: requestorIds }
+      },
+    });
+
+    return true;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

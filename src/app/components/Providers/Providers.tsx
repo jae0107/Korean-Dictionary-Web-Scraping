@@ -13,6 +13,7 @@ import { CurrentUserProvider } from "./CurrentUserProvider";
 import { SnackbarProvider } from "@/app/hooks/useSnackbar";
 import { SearchResult } from "@/app/types/types";
 import SearchProvider from "./SearchProvider";
+import { UserStatus } from "@/app/generated/gql/graphql";
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 export const useColorModeContext = () => useContext(ColorModeContext);
@@ -21,6 +22,7 @@ export interface CurrentUserContextValue {
   refetch: () => void;
   loading: boolean;
   myRole: string | null;
+  myStatus: UserStatus | null;
   myId: string | null;
   networkStatus: number;
 }

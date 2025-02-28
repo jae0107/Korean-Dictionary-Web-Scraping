@@ -14,14 +14,20 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
+    "\n  fragment UserItems on User {\n    id\n    accountId\n  }\n": types.UserItemsFragmentDoc,
+    "\n  query GetUsers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetUsersDocument,
+    "\n  mutation BulkCreateStudents($inputs: [UserInput!]!) {\n    bulkCreateUsers(inputs: $inputs) {\n      id\n    }\n  }\n": types.BulkCreateStudentsDocument,
     "\n  fragment SingleAdminItems on User {\n    accountId\n    name\n    year\n    class\n    role\n  }\n": types.SingleAdminItemsFragmentDoc,
     "\n  query GetAdmin($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleAdminItems\n    }\n  }\n": types.GetAdminDocument,
     "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    accountId\n    status\n    role\n  }\n": types.AdminItemsFragmentDoc,
     "\n  query GetAdmins($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...AdminItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetAdminsDocument,
-    "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n    }\n  }\n": types.GetMyRoleDocument,
+    "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n": types.GetMyRoleDocument,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  mutation ChangeCurrentPassword($changeCurrentPasswordId: ID!, $input: FindPasswordInput!) {\n    changeCurrentPassword(id: $changeCurrentPasswordId, input: $input) {\n      id\n    }\n  }\n": types.ChangeCurrentPasswordDocument,
-    "\n  mutation PasswordReset($input: PasswordResetInput!) {\n    passwordReset(input: $input) {\n      id\n    }\n  }\n": types.PasswordResetDocument,
+    "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n": types.BulkPasswordResetDocument,
+    "\n  mutation PasswordReset($passwordResetId: ID!, $password: String) {\n    passwordReset(id: $passwordResetId, password: $password) {\n      id\n    }\n  }\n": types.PasswordResetDocument,
+    "\n  mutation CreatePasswordResetRequest($input: PasswordResetRequestInput!) {\n    createPasswordResetRequest(input: $input) {\n      id\n    }\n  }\n": types.CreatePasswordResetRequestDocument,
+    "\n  mutation PasswordSetUp($passwordSetUpId: ID!, $password: String!) {\n    passwordSetUp(id: $passwordSetUpId, password: $password) {\n      id\n    }\n  }\n": types.PasswordSetUpDocument,
     "\n  fragment RequestorDropDownItems on User {\n    id\n    name\n  }\n": types.RequestorDropDownItemsFragmentDoc,
     "\n  query GetRequestorsDropDown($paginationOptions: OffsetPaginationOptions!, $filterOptions: RequestorFilterOptions!) {\n    getRequestors(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...RequestorDropDownItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetRequestorsDropDownDocument,
     "\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n": types.BulkApproveWordRequestsDocument,
@@ -50,6 +56,9 @@ const documents = {
     "\n  query GetMyRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getMyRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...MyRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetMyRequestsDocument,
     "\n  query GetMyPassword {\n    getCurrentUser {\n      id\n      password\n    }\n  }\n": types.GetMyPasswordDocument,
     "\n  query FindMyPassword($accountId: String!) {\n    findPassword(accountId: $accountId)\n  }\n": types.FindMyPasswordDocument,
+    "\n  fragment PasswordResetRequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n": types.PasswordResetRequestorItemsFragmentDoc,
+    "\n  fragment PasswordResetRequestItems on PasswordResetRequest {\n    id\n    requestor {\n      ...PasswordResetRequestorItems\n    }\n  }\n": types.PasswordResetRequestItemsFragmentDoc,
+    "\n  query GetPasswordResetRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: PasswordResetRequestFilterOptions!) {\n    getPasswordResetRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...PasswordResetRequestItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetPasswordResetRequestsDocument,
     "\n  fragment MyProfileItems on User {\n    accountId\n    name\n    year\n    class\n    number\n    role\n  }\n": types.MyProfileItemsFragmentDoc,
     "\n  query GetMyProfile {\n    getCurrentUser {\n      id\n      ...MyProfileItems\n    }\n  }\n": types.GetMyProfileDocument,
     "\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n": types.RequestorItemsFragmentDoc,
@@ -84,6 +93,18 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  fragment UserItems on User {\n    id\n    accountId\n  }\n"): (typeof documents)["\n  fragment UserItems on User {\n    id\n    accountId\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetUsers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetUsers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkCreateStudents($inputs: [UserInput!]!) {\n    bulkCreateUsers(inputs: $inputs) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation BulkCreateStudents($inputs: [UserInput!]!) {\n    bulkCreateUsers(inputs: $inputs) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment SingleAdminItems on User {\n    accountId\n    name\n    year\n    class\n    role\n  }\n"): (typeof documents)["\n  fragment SingleAdminItems on User {\n    accountId\n    name\n    year\n    class\n    role\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -100,7 +121,7 @@ export function gql(source: "\n  query GetAdmins($paginationOptions: OffsetPagin
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n    }\n  }\n"): (typeof documents)["\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n    }\n  }\n"];
+export function gql(source: "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n"): (typeof documents)["\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -112,7 +133,19 @@ export function gql(source: "\n  mutation ChangeCurrentPassword($changeCurrentPa
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation PasswordReset($input: PasswordResetInput!) {\n    passwordReset(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation PasswordReset($input: PasswordResetInput!) {\n    passwordReset(input: $input) {\n      id\n    }\n  }\n"];
+export function gql(source: "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation PasswordReset($passwordResetId: ID!, $password: String) {\n    passwordReset(id: $passwordResetId, password: $password) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation PasswordReset($passwordResetId: ID!, $password: String) {\n    passwordReset(id: $passwordResetId, password: $password) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation CreatePasswordResetRequest($input: PasswordResetRequestInput!) {\n    createPasswordResetRequest(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreatePasswordResetRequest($input: PasswordResetRequestInput!) {\n    createPasswordResetRequest(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation PasswordSetUp($passwordSetUpId: ID!, $password: String!) {\n    passwordSetUp(id: $passwordSetUpId, password: $password) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation PasswordSetUp($passwordSetUpId: ID!, $password: String!) {\n    passwordSetUp(id: $passwordSetUpId, password: $password) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -225,6 +258,18 @@ export function gql(source: "\n  query GetMyPassword {\n    getCurrentUser {\n  
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query FindMyPassword($accountId: String!) {\n    findPassword(accountId: $accountId)\n  }\n"): (typeof documents)["\n  query FindMyPassword($accountId: String!) {\n    findPassword(accountId: $accountId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment PasswordResetRequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n"): (typeof documents)["\n  fragment PasswordResetRequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment PasswordResetRequestItems on PasswordResetRequest {\n    id\n    requestor {\n      ...PasswordResetRequestorItems\n    }\n  }\n"): (typeof documents)["\n  fragment PasswordResetRequestItems on PasswordResetRequest {\n    id\n    requestor {\n      ...PasswordResetRequestorItems\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetPasswordResetRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: PasswordResetRequestFilterOptions!) {\n    getPasswordResetRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...PasswordResetRequestItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetPasswordResetRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: PasswordResetRequestFilterOptions!) {\n    getPasswordResetRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...PasswordResetRequestItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

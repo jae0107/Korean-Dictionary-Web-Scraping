@@ -16,6 +16,7 @@ datasource db {
 model User {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name     String
+  email    String?   @unique
   year     Int?
   class    String?
   number   Int?
@@ -25,6 +26,7 @@ model User {
   status   String  @default("PENDING")
   previousStatus String?
   words    Word[]
+  passwordResetRequests PasswordResetRequest[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -47,4 +49,14 @@ model Word {
   updatedAt DateTime @updatedAt
 
   @@map("words")
+}
+
+model PasswordResetRequest {
+  id           String  @id @default(uuid())
+  requestor    User?   @relation(fields: [requestorId], references: [id])
+  requestorId  String? @unique @db.Uuid
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("passwordResetRequests")
 }

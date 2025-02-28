@@ -1,11 +1,9 @@
-'use client';
+'use client'
 
 import { Box } from "@mui/material";
-import dynamic from "next/dynamic";
+import PasswordResetRequestForm from "../components/password-reset-request/PasswordResetRequestForm/PasswordResetRequestForm";
 
-const PasswordResetForm = dynamic(() => import('../components/password-reset/PasswordResetForm/PasswordResetForm'), { ssr: false });
-
-const PasswordReset = () => {
+const PasswordResetRequest = () => {
   return (
     <Box 
       display={'flex'} 
@@ -16,15 +14,15 @@ const PasswordReset = () => {
       mt={0} 
       mb={0}
       sx={{
-        '@media (max-height:600px)': {
+        '@media (max-height:820px)': {
           marginTop: '16px !important',
           marginBottom: '16px !important',
         }
       }}
     >
-      <PasswordResetForm/>
+      <PasswordResetRequestForm/>
     </Box>
   );
 }
 
-export default PasswordReset;
+export default PasswordResetRequest;

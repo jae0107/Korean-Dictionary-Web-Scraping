@@ -17,7 +17,7 @@ const UserInfo = ({
             </TableRow>
             {(!!user?.year || user.role === 'STUDENT') && <TableRow>
               <TableCell sx={{ minWidth: 70 }} component="th" scope="row">학년</TableCell>
-              <TableCell>{`${user?.year}학년` || '-'}</TableCell>
+              <TableCell>{user?.year ? `${user?.year}학년` || '-' : '-'}</TableCell>
             </TableRow>}
             {((!!user?.class && !!parseInt(user.class)) || user.role === 'STUDENT') && <TableRow>
               <TableCell sx={{ minWidth: 70 }} component="th" scope="row">반</TableCell>
@@ -31,6 +31,13 @@ const UserInfo = ({
               <TableCell sx={{ minWidth: 70 }} component="th" scope="row">아이디</TableCell>
               <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.accountId || ''}</TableCell>
             </TableRow>
+            {
+              user.password && 
+              <TableRow>
+                <TableCell sx={{ minWidth: 70 }} component="th" scope="row">비밀번호</TableCell>
+                <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.password || ''}</TableCell>
+              </TableRow>
+            }
           </TableBody>
         </Table>
       </DialogContent>

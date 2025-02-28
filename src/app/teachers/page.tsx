@@ -33,7 +33,7 @@ const TeacherManagement = () => {
         },
         filterOptions: {
           roles: [UserRole.Teacher],
-          status: teacherStatus,
+          statuses: [teacherStatus],
           userName: userNameKeyword,
         },
       },

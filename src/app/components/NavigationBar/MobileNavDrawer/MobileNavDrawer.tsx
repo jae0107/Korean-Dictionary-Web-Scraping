@@ -1,5 +1,5 @@
 import { NetworkStatus } from "@apollo/client";
-import { AdminPanelSettings, Chat, Groups, MenuBook } from "@mui/icons-material";
+import { AdminPanelSettings, Chat, Groups, MenuBook, RestartAlt } from "@mui/icons-material";
 import { Box, CircularProgress, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Theme } from "@mui/material";
 import { Session } from "next-auth";
 import Link from "next/link";
@@ -111,6 +111,16 @@ const MobileNavDrawer = ({
               </List>
             </List>
             <Divider />
+            <List>
+              <ListItem disablePadding sx={{ backgroundColor: pathname === '/password-reset-request-management' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                <ListItemButton LinkComponent={Link} href={'/password-reset-request-management'}>
+                  <ListItemIcon>
+                    <RestartAlt/>
+                  </ListItemIcon>
+                  <ListItemText primary={'비밀번호 재설정 요청 관리'} />
+                </ListItemButton>
+              </ListItem>
+            </List>
           </>
         }
       </Box>

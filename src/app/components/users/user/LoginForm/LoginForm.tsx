@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { Box, Button, Divider, IconButton, InputAdornment, InputLabel, Stack, TextField, Typography } from "@mui/material";
 import { Cancel, Login, Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
@@ -80,7 +80,7 @@ const LoginForm = () => {
       username: watch('accountId'),
       password: watch('password'),
       redirect: false,
-      callbackUrl: '/',
+      // callbackUrl: '/',
     });
 
     if (res && res.error) {
@@ -92,7 +92,12 @@ const LoginForm = () => {
         },
       });
     } else {
-      router.push('/');
+      const session = await getSession();
+      if (session?.user.status === 'PENDING' && session?.user.role === 'STUDENT') {
+        router.push('/password-setup');
+      } else if (session?.user.status === 'APPROVED') {
+        router.push('/');
+      }
     }
     setLoading(false);
   };
@@ -276,7 +281,7 @@ const LoginForm = () => {
               }
             }}
           >
-            비밀번호를 잊으셨나요? <Link href={'/password-reset'}>비밀번호 찾기</Link>
+            비밀번호를 잊으셨나요? <Link href={'/password-reset-request'}>비밀번호 재설정 요청</Link>
           </Typography>
         </Stack>
       </Stack>

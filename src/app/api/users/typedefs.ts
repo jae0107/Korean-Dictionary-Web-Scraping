@@ -27,7 +27,7 @@ export const userTypeDefs = gql`
   }
 
   input UserFilterOptions {
-    status: UserStatus!
+    statuses: [UserStatus!]
     roles: [UserRole!]!
     userName: String
   }
@@ -39,6 +39,7 @@ export const userTypeDefs = gql`
   type User {
     id: ID!
     name: String!
+    email: String
     accountId: String!
     password: String
     year: Int
@@ -58,6 +59,7 @@ export const userTypeDefs = gql`
     number: Int
     role: UserRole
     password: String
+    email: String
   }
 
   input FindPasswordInput {
@@ -66,7 +68,6 @@ export const userTypeDefs = gql`
   }
 
   input PasswordResetInput {
-    accountId: String!
     password: String!
   }
 
@@ -92,8 +93,11 @@ export const userTypeDefs = gql`
 
   type Mutation {
     createUser(input: UserInput!): User!
+    bulkCreateUsers(inputs: [UserInput!]!): [User!]!
     changeCurrentPassword(id: ID!, input: FindPasswordInput!): User!
-    passwordReset(input: PasswordResetInput!): User!
+    passwordSetUp(id: ID!, password: String!): User!
+    passwordReset(id: ID!, password: String): User!
+    bulkPasswordReset(ids: [ID!]!): Boolean!
     updateUser(id: ID!, input: UserInput!): User!
     approveUser(id: ID!): Boolean!
     bulkApproveUsers(ids: [ID!]!): Boolean!

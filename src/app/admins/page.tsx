@@ -33,7 +33,7 @@ const AdminManagement = () => {
         },
         filterOptions: {
           roles: [UserRole.Admin, UserRole.Superadmin],
-          status: adminStatus,
+          statuses: [adminStatus],
           userName: userNameKeyword,
         },
       },

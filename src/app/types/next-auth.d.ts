@@ -6,7 +6,8 @@ declare module "next-auth" {
       id: string;
       name: string;
       accountId: string;
-      role: string;
+      status: 'PENDING' | 'DENIED' | 'APPROVED';
+      role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPERADMIN';
       accessToken: string;
     };
   }

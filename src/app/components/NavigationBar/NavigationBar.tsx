@@ -28,7 +28,7 @@ const NavigationBar = ({
   const pathname = usePathname();
   const { myRole, refetch, loading, networkStatus } = useCurrentUser();
   const { data: session } = useSession();
-  const maxWidth424 = useMediaQuery('(max-width:424px)');
+  const maxWidth620 = useMediaQuery('(max-width:620px)');
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
@@ -42,8 +42,8 @@ const NavigationBar = ({
   }, [session, refetch]);
 
   useEffect(() => {
-    !maxWidth424 && setOpenDrawer(false);
-  }, [maxWidth424]);
+    !maxWidth620 && setOpenDrawer(false);
+  }, [maxWidth620]);
 
   const navigationUser = (url: string) => {
     router.push(url);
@@ -78,7 +78,7 @@ const NavigationBar = ({
         <Container sx={{ maxWidth: 'unset !important' }}>
           <Toolbar disableGutters>
             {
-              maxWidth424 &&
+              maxWidth620 &&
               <IconButton
                 size="large"
                 edge="start"
@@ -121,7 +121,7 @@ const NavigationBar = ({
                   justifyContent: 'center',
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname === '/vocabulary-list' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                  '@media (max-width: 424px)': {
+                  '@media (max-width: 620px)': {
                     display: 'none',
                   }
                 }}
@@ -139,7 +139,7 @@ const NavigationBar = ({
                     display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 424px)': {
+                    '@media (max-width: 620px)': {
                       display: 'none',
                     }
                   }}
@@ -159,7 +159,7 @@ const NavigationBar = ({
                     display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 424px)': {
+                    '@media (max-width: 620px)': {
                       display: 'none',
                     }
                   }}
@@ -185,24 +185,6 @@ const NavigationBar = ({
                 open={Boolean(anchorElUserManagement)}
                 onClose={() => setAnchorElUserManagement(null)}
               >
-                <MenuItem 
-                  sx={{ backgroundColor: pathname.includes('/account-creation') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
-                  onClick={() => navigationUser('/account-creation')}
-                  component={Link}
-                  href={'/account-creation'}
-                >
-                  <Typography 
-                    sx={{ 
-                      textAlign: 'center', 
-                      color: 'inherit', 
-                      cursor: 'pointer',
-                    }} 
-                    display={'flex'}
-                    alignItems={'center'}
-                  >
-                    <PersonAdd sx={{ mr: '4px' }}/>계정 만들기
-                  </Typography>
-                </MenuItem>
                 <MenuItem 
                   sx={{ backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                   onClick={() => navigationUser('/students')}
@@ -263,7 +245,45 @@ const NavigationBar = ({
                     </Typography>
                   </MenuItem>
                 }
+                <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/account-creation') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/account-creation')}
+                  component={Link}
+                  href={'/account-creation'}
+                >
+                  <Typography 
+                    sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    display={'flex'}
+                    alignItems={'center'}
+                  >
+                    <PersonAdd sx={{ mr: '4px' }}/>학생 계정 만들기
+                  </Typography>
+                </MenuItem>
               </Menu>
+              {
+                (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') &&
+                <Button
+                  sx={{ 
+                    my: 2, 
+                    color: 'white', 
+                    display: getDisplay(!!myRole && myRole !== 'STUDENT'),
+                    borderRadius: '0px',
+                    borderBottom: `2px solid ${pathname === '/password-reset-request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                    '@media (max-width: 620px)': {
+                      display: 'none',
+                    }
+                  }}
+                  loading={loading}
+                  component={Link}
+                  href={'/password-reset-request-management'}
+                >
+                  비밀번호 재설정 요청 관리
+                </Button>
+              }
             </Box>
             <Box sx={{ flexGrow: 0 }}>
               <ColourModeSwitch margin='0 16px 0 0'/>
@@ -294,7 +314,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:424px)': {
+                    '@media (max-width:620px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -320,7 +340,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/password-change' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:424px)': {
+                    '@media (max-width:620px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -346,7 +366,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:424px)': {
+                    '@media (max-width:620px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -374,7 +394,7 @@ const NavigationBar = ({
                   <MenuItem 
                     onClick={logOut}
                     sx={{
-                      '@media (max-width:424px)': {
+                      '@media (max-width:620px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -401,7 +421,7 @@ const NavigationBar = ({
         </Container>
       </AppBar>
       {
-        maxWidth424 && 
+        maxWidth620 && 
         <MobileNavDrawer 
           openDrawer={openDrawer} 
           setOpenDrawer={setOpenDrawer} 

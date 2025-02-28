@@ -33,7 +33,7 @@ const StudentManagement = () => {
         },
         filterOptions: {
           roles: [UserRole.Student],
-          status: studentStatus,
+          statuses: [studentStatus],
           userName: userNameKeyword,
         },
       },

@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<ID>;
   declare name: string;
+  declare email: string;
   declare accountId: string;
   declare password: string;
   declare role: string;
@@ -32,6 +33,11 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
       constraints: false,
     });
   }
+
+  async checkAccountIdUnique(accountId: string): Promise<boolean> {
+    const existingAccount = await User.count({ where: { accountId: accountId } });
+    return existingAccount === 0;
+  }
 }
 
 User.init(
@@ -42,6 +48,7 @@ User.init(
       primaryKey: true,
     },
     name: DataTypes.STRING,
+    email: DataTypes.STRING,
     accountId: DataTypes.STRING,
     password: DataTypes.STRING,
     role: DataTypes.ENUM('ADMIN', 'STUDENT', 'TEACHER'),
@@ -66,7 +73,7 @@ User.init(
         if (!isPresent(this.role)) throw new Error('역할은 필수입니다.');
         if (!isPresent(this.status)) throw new Error('상태는 필수입니다.');
         if (!/^[a-zA-Z0-9_]+$/.test(this.accountId as string)) {
-          throw new Error('Invalid account ID format.');
+          throw new Error('아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.');
         }
         if ((this.password as string).length < 8) {
           throw new Error('패스워드는 8자 이상이어야 합니다.');
@@ -84,6 +91,12 @@ User.init(
           throw new Error('패스워드에 최소 하나의 특수문자 (!@#$%^&*)가 포함되어야 합니다.');
         }
       },
+      async validateUniqueAccountId() {
+        const existingUserCount = await User.count({ where: { accountId: this.accountId as string } });
+        if (existingUserCount !== 0) {
+          throw new Error('아이디는 고유해야 합니다.');
+        }
+      }
     },
   },
 );
@@ -96,6 +109,12 @@ User.addHook('beforeValidate', 'defaultValues', (user: User) => {
 
 User.addHook('beforeSave', 'hashPassword', async (user: User) => {
   user.password = await bcrypt.hash(user.password, 10);
+});
+
+User.addHook('beforeBulkCreate', 'bulkHashPassword', async (users: User[]) => {
+  for (const user of users) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
 });
 
 export { User };
