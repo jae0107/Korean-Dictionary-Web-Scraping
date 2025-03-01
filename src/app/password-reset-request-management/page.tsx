@@ -45,7 +45,7 @@ const PasswordResetRequestManagement = () => {
   
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mt={2}>
+      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mt={2} mb={2}>
         <PasswordResetRequestManagementTable
           loading={loading}
           passwordResetRequests={data?.getPasswordResetRequests.records ?? []}

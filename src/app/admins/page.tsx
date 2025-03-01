@@ -67,7 +67,7 @@ const AdminManagement = () => {
           setSelectedAdmins={setSelectedAdmins}
         />
       </Box>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
+      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
         <AdminTable
           loading={loading}
           admins={data?.getUsers.records || []}

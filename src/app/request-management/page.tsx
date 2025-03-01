@@ -77,7 +77,7 @@ const RequestManagement = () => {
           setSelectedRequests={setSelectedRequests}
         />
       </Box>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
+      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
         <RequestManagementTable
           loading={loading}
           words={data?.getWords.records ?? []}

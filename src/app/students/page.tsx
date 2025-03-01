@@ -67,7 +67,7 @@ const StudentManagement = () => {
           setSelectedStudents={setSelectedStudents}
         />
       </Box>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
+      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
         <StudentTable
           loading={loading}
           students={data?.getUsers.records || []}

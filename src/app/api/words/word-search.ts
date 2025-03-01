@@ -49,7 +49,7 @@ export class WordSearch {
     }
 
     if (isPresent(page) && page) {
-      query = query.where('words.page', '=', page);
+      query = query.whereRaw('? = ANY(words.pages)', [page]);
     }
 
     if (!isPresent(pageNum) || pageNum < 0) {

@@ -22,7 +22,7 @@ export const wordRequestFragment = gql(`
     naverDicResults
     status
     title
-    page
+    pages
     example
     deniedReason
   }

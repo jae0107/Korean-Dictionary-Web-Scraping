@@ -7,7 +7,7 @@ export const userRequestFragment = gql(`
     naverDicResults
     status
     title
-    page
+    pages
     example
     deniedReason
   }

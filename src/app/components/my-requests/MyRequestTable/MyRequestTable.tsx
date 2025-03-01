@@ -52,7 +52,7 @@ const MyRequestTable = ({
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [selectedWordId, setSelectedWordId] = useState<string>('');
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
-    page: !maxWidth475,
+    pages: !maxWidth475,
     naverDicResults: !maxWidth750,
     example: !maxWidth435,
     title: true,
@@ -61,7 +61,7 @@ const MyRequestTable = ({
   
   useEffect(() => {
     setColumnVisibilityModel({
-      page: !maxWidth475,
+      pages: !maxWidth475,
       naverDicResults: !maxWidth750,
       example: !maxWidth435,
       title: columnVisibilityModel.title,
@@ -73,15 +73,16 @@ const MyRequestTable = ({
   
   const columns: GridColDef[] = [
     { 
-      field: 'page', 
+      field: 'pages', 
       headerName: '페이지', 
       width: 60, 
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<MyRequestItemsFragment>) => {
-        return (
-          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
-        );
+        if (!params.row.pages || params.row.pages.length === 0) {
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        return params.row.pages.map((page) => `${page}\n`);
       }
     },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },

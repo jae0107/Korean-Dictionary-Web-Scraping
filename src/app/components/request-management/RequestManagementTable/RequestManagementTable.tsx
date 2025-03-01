@@ -68,7 +68,7 @@ const RequestManagementTable = ({
   const [openRequestDetailPopUp, setOpenRequestDetailPopUp] = useState<boolean>(false);
   const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
-    page: !maxWidth850,
+    pages: !maxWidth850,
     requestor: !maxWidth1000,
     example: !maxWidth750,
     title: true,
@@ -80,7 +80,7 @@ const RequestManagementTable = ({
   
   useEffect(() => {
     setColumnVisibilityModel({
-      page: !maxWidth850,
+      pages: !maxWidth850,
       requestor: !maxWidth1000,
       example: !maxWidth750,
       title: columnVisibilityModel.title,
@@ -364,7 +364,7 @@ const RequestManagementTable = ({
     actions
   ] : [
     { 
-      field: 'page', 
+      field: 'pages', 
       headerName: '페이지', 
       headerClassName: 'page-header',
       cellClassName: 'page-cell',
@@ -372,9 +372,10 @@ const RequestManagementTable = ({
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
-        return (
-          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
-        );
+        if (!params.row.pages || params.row.pages.length === 0) {
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        return params.row.pages.map((page) => `${page}\n`);
       }
     },
     { 

@@ -1,14 +1,15 @@
-import { CreationOptional, DataTypes, HasManyCountAssociationsMixin, HasManyGetAssociationsMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model, ModelStatic } from "sequelize";
+import { CreationOptional, DataTypes, DestroyOptions, HasManyCountAssociationsMixin, HasManyGetAssociationsMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model, ModelStatic, Op } from "sequelize";
 import { ID } from "../utils/shared-types";
 import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 import { Word } from "./word";
 import * as bcrypt from 'bcrypt';
+import { MyVocabulary } from ".";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<ID>;
   declare name: string;
-  declare email: string;
+  declare email?: string;
   declare accountId: string;
   declare password: string;
   declare role: string;
@@ -93,7 +94,7 @@ User.init(
       },
       async validateUniqueAccountId() {
         const existingUserCount = await User.count({ where: { accountId: this.accountId as string } });
-        if (existingUserCount !== 1) {
+        if (existingUserCount > 1) {
           throw new Error('아이디는 고유해야 합니다.');
         }
       }
@@ -115,6 +116,25 @@ User.addHook('beforeBulkCreate', 'bulkHashPassword', async (users: User[]) => {
   for (const user of users) {
     user.password = await bcrypt.hash(user.password, 10);
   }
+});
+
+User.addHook('beforeDestroy', 'delete my vocabularies', async (user: User) => {
+  await MyVocabulary.destroy({
+    where: {
+      userId: user.id,
+    },
+  });
+});
+
+User.addHook('beforeBulkDestroy', 'bulk delete my vocabularies', async (options: DestroyOptions<InferAttributes<User>>) => {
+  const users = await User.findAll({ where: options.where });
+  await MyVocabulary.destroy({
+    where: {
+      userId: {
+        [Op.in]: users.map(user => user.id),
+      },
+    },
+  });
 });
 
 export { User };

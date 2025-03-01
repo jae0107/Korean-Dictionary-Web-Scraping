@@ -1,9 +1,10 @@
-import { Association, BelongsToGetAssociationMixin, CreationOptional, DataTypes, HasManyCountAssociationsMixin, HasManyGetAssociationsMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model, ModelStatic } from "sequelize";
+import { Association, BelongsToGetAssociationMixin, CreationOptional, DataTypes, DestroyOptions, HasManyCountAssociationsMixin, HasManyGetAssociationsMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model, ModelStatic, Op } from "sequelize";
 import { ID } from "../utils/shared-types";
 import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 import { User } from "./user";
 import { WordStatus } from "@/app/generated/gql/graphql";
+import { MyVocabulary } from "./my-vocabulary";
 
 class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare id: CreationOptional<ID>;
@@ -13,7 +14,7 @@ class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare requestorId: ID;
   declare status: string;
   declare previousStatus?: string;
-  declare page?: number;
+  declare pages?: number[];
   declare example?: string;
   declare deniedReason?: string;
   declare createdAt: CreationOptional<Date>;
@@ -48,7 +49,7 @@ Word.init(
     requestorId: DataTypes.UUID,
     status: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
     previousStatus: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
-    page: DataTypes.INTEGER,
+    pages: DataTypes.ARRAY(DataTypes.INTEGER),
     example: DataTypes.STRING,
     deniedReason: DataTypes.STRING,
     createdAt: DataTypes.DATE,
@@ -73,6 +74,25 @@ Word.addHook('beforeValidate', 'defaultValues', (word: Word) => {
   if (word.isNewRecord) {
     word.status = word.status || WordStatus.Pending;
   }
+});
+
+Word.addHook('beforeDestroy', 'delete my vocabularies', async (word: Word) => {
+  await MyVocabulary.destroy({
+    where: {
+      wordId: word.id,
+    },
+  });
+});
+
+Word.addHook('beforeBulkDestroy', 'bulk delete my vocabularies', async (options: DestroyOptions<InferAttributes<Word>>) => {
+  const words = await Word.findAll({ where: options.where });
+  await MyVocabulary.destroy({
+    where: {
+      wordId: {
+        [Op.in]: words.map(word => word.id),
+      },
+    },
+  });
 });
 
 export { Word };

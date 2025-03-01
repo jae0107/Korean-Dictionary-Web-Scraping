@@ -23,10 +23,11 @@ export const wordTypeDefs = gql`
     previousStatus: WordStatus
     korDicResults: [String!]
     naverDicResults: [String!]
-    page: Int
+    pages: [Int]
     example: String
     deniedReason: String
     requestor: User
+    isMyVocabulary: Boolean
     createdAt: DateTime!
   }
 
@@ -35,7 +36,7 @@ export const wordTypeDefs = gql`
     status: WordStatus
     korDicResults: [String!]
     naverDicResults: [String!]
-    page: Int
+    pages: [Int!]
     example: String
     deniedReason: String
     requestorId: ID

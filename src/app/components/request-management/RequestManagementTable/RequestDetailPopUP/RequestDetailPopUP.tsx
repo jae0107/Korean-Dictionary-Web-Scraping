@@ -85,7 +85,7 @@ const RequestDetailPopUP = ({
           <Stack spacing={2} direction={'column'}>
             <Stack spacing={0.5} direction={'row'}>
               <DialogContentText>
-                <b>페이지: </b>{' '}{getWordRequest ? getWordRequest.page || '-' : '-'}
+                <b>페이지: </b>{' '}{getWordRequest ? getWordRequest.pages || '-' : '-'}
               </DialogContentText>
             </Stack>
             {

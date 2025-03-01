@@ -22,7 +22,7 @@ const VocabularyList = () => {
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   
-  const { data, loading } =
+  const { data, loading, refetch } =
     useQuery(getVocabulariesQuery, {
       fetchPolicy: 'network-only',
       variables: {
@@ -72,6 +72,7 @@ const VocabularyList = () => {
             page={paginationModel.page}
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
+            refetch={refetch}
           />
         </Box>
       </Stack>

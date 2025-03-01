@@ -29,6 +29,9 @@ export const wordResolvers = {
     async requestor(word: Word, _args: unknown, { dataloaders }: Context) {
       return word.requestorId ? await dataloaders.user.load(word.requestorId) : null;
     },
+    async isMyVocabulary(word: Word, _args: unknown, { currentUser, dataloaders }: Context) {
+      return word.requestorId && currentUser ? !!await dataloaders.myVocabulary.load({ userId: currentUser.id, wordId: word.id }) : false;
+    }
   },
 };
 
@@ -83,12 +86,24 @@ async function createWordRequest(
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
 
+    if (input.title) {
+      const existingWord = await Word.findOne({
+        where: {
+          title: input.title, 
+        }
+      });
+
+      if (existingWord) {
+        throw new Error('이미 등록된 단어입니다.');
+      }
+    }
+
     const newInput = {
       ...input,
       requestorId: currentUser.id,
       korDicResults: input.korDicResults ?? [],
       naverDicResults: input.naverDicResults ?? [],
-      page: input.page ?? undefined, 
+      pages: input.pages ?? [], 
       example: input.example ?? undefined, 
       deniedReason: input.deniedReason ?? undefined, 
       title: input.title ?? "",

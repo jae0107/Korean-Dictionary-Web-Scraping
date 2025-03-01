@@ -716,7 +716,7 @@ const SignUpForm = () => {
                     <em>-</em>
                   </MenuItem>
                   <MenuItem 
-                    value={1}
+                    value={'1'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -729,7 +729,7 @@ const SignUpForm = () => {
                     1반
                   </MenuItem>
                   <MenuItem 
-                    value={2}
+                    value={'2'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -742,7 +742,7 @@ const SignUpForm = () => {
                     2반
                   </MenuItem>
                   <MenuItem 
-                    value={3}
+                    value={'3'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -755,7 +755,7 @@ const SignUpForm = () => {
                     3반
                   </MenuItem>
                   <MenuItem 
-                    value={4}
+                    value={'4'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -768,7 +768,7 @@ const SignUpForm = () => {
                     4반
                   </MenuItem>
                   <MenuItem 
-                    value={5}
+                    value={'5'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -781,7 +781,7 @@ const SignUpForm = () => {
                     5반
                   </MenuItem>
                   <MenuItem 
-                    value={6}
+                    value={'6'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -794,7 +794,7 @@ const SignUpForm = () => {
                     6반
                   </MenuItem>
                   <MenuItem 
-                    value={7}
+                    value={'7'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -807,7 +807,7 @@ const SignUpForm = () => {
                     7반
                   </MenuItem>
                   <MenuItem 
-                    value={8}
+                    value={'8'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -820,7 +820,7 @@ const SignUpForm = () => {
                     8반
                   </MenuItem>
                   <MenuItem 
-                    value={9}
+                    value={'9'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',
@@ -833,7 +833,7 @@ const SignUpForm = () => {
                     9반
                   </MenuItem>
                   <MenuItem 
-                    value={10}
+                    value={'10'}
                     sx={{
                       '@media (max-width:530px)': {
                         fontSize: '0.875rem',

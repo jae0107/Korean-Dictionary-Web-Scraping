@@ -3,10 +3,11 @@ import { gql } from "../generated/gql";
 export const VocabularyFragment = gql(`
   fragment VocabularyItems on Word {
     id
+    isMyVocabulary
     korDicResults
     naverDicResults
     title
-    page
+    pages
     example
   }
 `);

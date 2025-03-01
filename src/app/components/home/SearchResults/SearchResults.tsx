@@ -23,7 +23,7 @@ const schema = z.object({
   title: z.string().nonempty(),
   korDicResults: z.array(z.string()),
   naverDicResults: z.array(z.string()),
-  page: z.union([z.string(), z.number().int(), z.null()]).optional(),
+  pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
   example: z.union([z.string(), z.null()]).optional(),
 })
 .refine((data) => data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
@@ -49,7 +49,7 @@ const SearchResults = ({
       title: searchResults.title,
       korDicResults: searchResults.koDic,
       naverDicResults: searchResults.naverDic,
-      page: null,
+      pages: [0],
       example: '',
     },
     resolver: zodResolver(schema),
@@ -91,7 +91,10 @@ const SearchResults = ({
     setLoader(true);
     createWordRequest({
       variables: {
-        input: word,
+        input: {
+          ...word,
+          pages: (word.pages || []).filter((page) => page > 0),
+        },
       },
       onError: (error) => {
         setLoader(false);
@@ -115,6 +118,14 @@ const SearchResults = ({
       },
     });
   }
+
+  const handleAddPageOption = () => {
+    const newOption = 0;
+    setValue('pages', [
+      ...(watch('pages') ?? []),
+      newOption,
+    ]);
+  };
   
   const getResults = (results: string[], dicType: string) => {
     return (
@@ -199,7 +210,7 @@ const SearchResults = ({
                   ),
                 },
                 htmlInput: { 
-                  style: { 
+                  sx: { 
                     '@media (max-width:500px)': {
                       fontSize: '0.8rem'
                     }
@@ -235,10 +246,10 @@ const SearchResults = ({
       </Box>
     );
   }
-
+  
   return (
     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} width={'100%'}>
-      <Stack spacing={2} maxWidth={'700px'}>
+      <Stack spacing={3} maxWidth={'700px'}>
         <Typography 
           variant={'h6'} 
           ml={'66px !important'}
@@ -273,30 +284,68 @@ const SearchResults = ({
             {getResults(watch('naverDicResults') ?? [], 'naverDic')}
           </Box>
         }
-        <TextField
-          label={'페이지'}
-          {...register('page')}
-          type='number'
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              style: { 
-                '@media (max-width:500px)': {
-                  fontSize: '0.8rem'
+        <Stack spacing={1}>
+          {
+            watch('pages') && (watch('pages') || []).length > 0 &&
+            (watch('pages') || []).map((page, index) => (
+              <Stack spacing={1} direction={'row'} key={index} width={'100%'}>
+                <TextField
+                  label={'페이지'}
+                  fullWidth={index > 0}
+                  type='number'
+                  value={page}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setValue(`pages.${index}`, value);
+                  }}
+                  sx={{
+                    width: 'calc(100% - 64px - 8px)',
+                  }}
+                  slotProps={{
+                    htmlInput: {
+                      min: 0,
+                      sx: { 
+                        '@media (max-width:500px)': {
+                          fontSize: '0.8rem'
+                        }
+                      } 
+                    },
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setValue(`pages.${index}`, 0)}>
+                            <Cancel sx={{ width: '15px', height: '15px' }}/>
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                {
+                  index > 0 &&
+                  <Button
+                    color='error'
+                    variant="outlined"
+                    sx={{ 
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    onClick={() => {
+                      watch('pages')?.splice(index, 1);
+                      setValue('pages', watch('pages'));
+                    }}
+                  >
+                    <DeleteForever/>
+                  </Button>
                 }
-              } 
-            },
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setValue('page', 0)}>
-                    <Cancel sx={{ width: '15px', height: '15px' }}/>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
+              </Stack>
+            ))
+          }
+          <Button variant='outlined' onClick={handleAddPageOption}>
+            페이지 추가
+          </Button>
+        </Stack>
         <TextField
           label={'예문'}
           {...register('example')}

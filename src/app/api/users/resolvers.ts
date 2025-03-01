@@ -128,7 +128,7 @@ async function createUser(
       role: input.role || '',
       password: input.password || '',
       status: UserStatus.Pending,
-      email: input.email || '',
+      email: input.email || undefined,
     });
 
     return user;
@@ -252,7 +252,7 @@ async function passwordReset(
 
     if (user) {
       const newPassword = password ? password : `${user.year}${String(user.class).padStart(2, '0')}${String(user.number).padStart(2, '0')}`;
-      user = await user.update({ password: newPassword }, { validate: false });
+      user = await user.update({ password: newPassword, status: UserStatus.Pending, previousStatus: user.status }, { validate: false });
       await PasswordResetRequest.destroy({ where: { requestorId: user.id } });
     } else {
       throw new Error('No User Found');
@@ -294,12 +294,14 @@ async function bulkPasswordReset(
       
       return {
         ...user.dataValues,
+        status: UserStatus.Pending,
+        previousStatus: user.status,
         password: newPassword,
       };
     });
     
     await User.bulkCreate(updatedUsers, {
-      updateOnDuplicate: ['password'],
+      updateOnDuplicate: ['password', 'status', 'previousStatus'],
       fields: ['id', 'name', 'year', 'class', 'number', 'password', 'status', 'previousStatus', 'role', 'accountId', 'email', 'createdAt', 'updatedAt'],
     });
     

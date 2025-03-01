@@ -75,7 +75,7 @@ const UserContainer = ({
   const [openRequestDetailPopUp, setOpenRequestDetailPopUp] = useState<boolean>(false);
   const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
-    page: !maxWidth850,
+    pages: !maxWidth850,
     requestor: !maxWidth1000,
     example: !maxWidth750,
     title: true,
@@ -87,7 +87,7 @@ const UserContainer = ({
     
   useEffect(() => {
     setColumnVisibilityModel({
-      page: !maxWidth850,
+      pages: !maxWidth850,
       requestor: !maxWidth1000,
       example: !maxWidth750,
       title: columnVisibilityModel.title,
@@ -257,7 +257,7 @@ const UserContainer = ({
             label="복구"
             showInMenu={true}
             onClick={() => onRecover(params.row.id)}
-            dense={!!maxWidth495}
+            dense={maxWidth495}
           />,
           <GridActionsCellItem
             key="delete"
@@ -273,7 +273,7 @@ const UserContainer = ({
               setSelectedWordId(params.row.id);
               setOpenConfirmDialog(true);
             }}
-            dense={!!maxWidth495}
+            dense={maxWidth495}
           />,
           <GridActionsCellItem
             key="reason"
@@ -290,7 +290,7 @@ const UserContainer = ({
               setSelectedDeniedReason(params.row.deniedReason || '');
               setOpenDeniedReasonPopUp(true);
             }}
-            dense={!!maxWidth495}
+            dense={maxWidth495}
           />
         ];
       }
@@ -317,7 +317,7 @@ const UserContainer = ({
           }
           label="승인"
           showInMenu={maxWidth360}
-          dense={!!maxWidth360}
+          dense={maxWidth360}
           onClick={() => onApproval(params.row.id)}
         />,
         <GridActionsCellItem
@@ -332,7 +332,7 @@ const UserContainer = ({
           }
           label="거절"
           showInMenu={maxWidth360}
-          dense={!!maxWidth360}
+          dense={maxWidth360}
           onClick={() => {
             setSelectedWordId(params.row.id);
             setOpenDeniedReasonPopUp(true);
@@ -377,14 +377,14 @@ const UserContainer = ({
     actions
   ] : [
     { 
-      field: 'page', 
+      field: 'pages', 
       headerName: '페이지', 
       width: 60, 
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
         return (
-          params.row.page ? params.row.page : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+          params.row.pages ? params.row.pages : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
         );
       }
     },

@@ -52,49 +52,49 @@ const UserForm = ({
     return '';
   };
   
-    const onError: SubmitErrorHandler<UserInput> = (errors) => {
-      if (Object.keys(errors).length) {
+  const onError: SubmitErrorHandler<UserInput> = (errors) => {
+    if (Object.keys(errors).length) {
+      dispatchCurrentSnackBar({
+        payload: {
+          open: true,
+          type: 'error',
+          message: getErrorMsg(errors),
+        },
+      });
+    }
+  };
+  
+  const onUpdateUser = (userInput: UserInput) => {
+    setUpdateLoader(true);
+    updateUser({
+      variables: {
+        updateUserId: id,
+        input: userInput,
+      },
+      onError: (error) => {
+        setUpdateLoader(false);
         dispatchCurrentSnackBar({
           payload: {
             open: true,
             type: 'error',
-            message: getErrorMsg(errors),
+            message: error.message,
           },
         });
-      }
-    };
-  
-    const onUpdateUser = (userInput: UserInput) => {
-      setUpdateLoader(true);
-      updateUser({
-        variables: {
-          updateUserId: id,
-          input: userInput,
-        },
-        onError: (error) => {
-          setUpdateLoader(false);
-          dispatchCurrentSnackBar({
-            payload: {
-              open: true,
-              type: 'error',
-              message: error.message,
-            },
-          });
-        },
-        onCompleted: () => {
-          refetch();
-          setEditMode(false);
-          setUpdateLoader(false);
-          dispatchCurrentSnackBar({
-            payload: {
-              open: true,
-              type: 'success',
-              message: '성공적으로 업데이트 되었습니다.',
-            },
-          });
-        },
-      });
-    }
+      },
+      onCompleted: () => {
+        refetch();
+        setEditMode(false);
+        setUpdateLoader(false);
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '성공적으로 업데이트 되었습니다.',
+          },
+        });
+      },
+    });
+  }
   
   return (
     <Stack spacing={2} >

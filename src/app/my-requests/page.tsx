@@ -58,7 +58,7 @@ const MyRequests = () => {
           setSelectedRequests={setSelectedRequests}
         />
       </Box>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} height={'100%'}>
+      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} height={'100%'} mb={2}>
         <MyRequestTable
           loading={loading}
           words={data?.getMyRequests.records ?? []}

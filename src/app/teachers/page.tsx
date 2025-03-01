@@ -67,7 +67,7 @@ const TeacherManagement = () => {
           setSelectedTeachers={setSelectedTeachers}
         />
       </Box>
-      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>
+      <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
         <TeacherTable
           loading={loading}
           teachers={data?.getUsers.records || []}
