@@ -1,7 +1,7 @@
 import { OffsetPaginationOptions, RequestorFilterOptions } from "../../generated/gql/graphql";
 import { User } from "../models";
 import { OffsetPaginationResponse } from "../utils/shared-types";
-import { QueryBuilder, queryBuilder, sequelize } from "../initialisers";
+import { knex, QueryBuilder, queryBuilder, sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 
 export class RequestorSearch {
@@ -25,7 +25,10 @@ export class RequestorSearch {
     query = query
       .select('users.*')
       .distinct()
-      .leftJoin('users', 'words.requestorId', 'users.id')
+      .leftJoin(
+        knex.raw('LATERAL jsonb_array_elements_text(to_jsonb(words."requestorIds")) AS "requestorId" ON true')
+      )
+      .leftJoin('users', 'users.id', knex.raw('"requestorId"::uuid'))
       .where('users.name', 'is not', null);
 
     if (isPresent(userName)) {
@@ -43,7 +46,7 @@ export class RequestorSearch {
     }
 
     const countQuery = query.clone();
-    const [results] = (await sequelize.query(countQuery.clearSelect().count('users.id').toString())) as [
+    const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('users.id').toString())) as [
       [{ count: string }],
       unknown,
     ];

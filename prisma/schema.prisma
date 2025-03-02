@@ -25,7 +25,6 @@ model User {
   role                  String
   status                String  @default("PENDING")
   previousStatus        String?
-  words                 Word[]
   passwordResetRequests PasswordResetRequest[]
   myVocabularies        MyVocabulary[]
   createdAt             DateTime @default(now())
@@ -39,8 +38,7 @@ model Word {
   title           String
   korDicResults   String[]
   naverDicResults String[]
-  requestor       User?    @relation(fields: [requestorId], references: [id])
-  requestorId     String? @db.Uuid
+  requestorIds    String[]
   pages           Int[]
   example         String?
   status          String  @default("PENDING")

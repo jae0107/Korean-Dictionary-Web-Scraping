@@ -37,11 +37,6 @@ export const userResolvers = {
     bulkDeleteUsers,
     findMyId,
   },
-  User: {
-    async words(user: User, _args: unknown, { dataloaders }: Context): Promise<Word[]> {
-      return await dataloaders.wordByRequestorId.load(user.id);
-    },
-  },
 };
 
 async function getUsers(

@@ -26,11 +26,11 @@ export const wordResolvers = {
     updateDeniedReason,
   },
   Word: {
-    async requestor(word: Word, _args: unknown, { dataloaders }: Context) {
-      return word.requestorId ? await dataloaders.user.load(word.requestorId) : null;
+    async requestors(word: Word, _args: unknown, { dataloaders }: Context) {
+      return word.requestorIds ? await dataloaders.user.loadMany(word.requestorIds) : [];
     },
     async isMyVocabulary(word: Word, _args: unknown, { currentUser, dataloaders }: Context) {
-      return word.requestorId && currentUser ? !!await dataloaders.myVocabulary.load({ userId: currentUser.id, wordId: word.id }) : false;
+      return word.requestorIds && currentUser ? !!await dataloaders.myVocabulary.load({ userId: currentUser.id, wordId: word.id }) : false;
     }
   },
 };
@@ -100,7 +100,7 @@ async function createWordRequest(
 
     const newInput = {
       ...input,
-      requestorId: currentUser.id,
+      requestorIds: [currentUser.id],
       korDicResults: input.korDicResults ?? [],
       naverDicResults: input.naverDicResults ?? [],
       pages: input.pages ?? [], 

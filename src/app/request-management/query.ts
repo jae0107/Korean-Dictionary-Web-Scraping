@@ -15,7 +15,7 @@ export const requestorFragment = gql(`
 export const wordRequestFragment = gql(`
   fragment WordRequestItems on Word {
     id
-    requestor {
+    requestors {
       ...RequestorItems
     }
     korDicResults

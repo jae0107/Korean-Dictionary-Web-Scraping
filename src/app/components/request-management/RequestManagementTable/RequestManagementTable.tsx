@@ -1,8 +1,8 @@
-import { Box, Button, Chip, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, Chip, CircularProgress, IconButton, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
-import { CheckCircleOutline, Create, DeleteForever, HighlightOff, Remove, Restore } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, Groups, HighlightOff, Remove, Restore } from "@mui/icons-material";
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
@@ -16,6 +16,7 @@ import RequestManagementBulkAction from "./RequestManagementBulkAction/RequestMa
 import DeniedReasonPopUp from "../../shared/DeniedReasonPopUp";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
 import RequestDetailPopUP from "./RequestDetailPopUP/RequestDetailPopUP";
+import RequestorsPopUp from "./RequestorsPopUp/RequestorsPopUp";
 
 const RequestManagementTable = ({
   loading,
@@ -55,7 +56,9 @@ const RequestManagementTable = ({
   const maxWidth1000 = useMediaQuery('(max-width:1000px)');
   
   const [getRequestor, setRequestor] = useState<RequestorItemsFragment | null>(null);
+  const [getRequestors, setRequestors] = useState<RequestorItemsFragment[]>([]);
   const [openUserInfoPopUp, setOpenUserInfoPopUp] = useState<boolean>(false);
+  const [openRequestorsPopUp, setOpenRequestorsPopUp] = useState<boolean>(false);
   const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
   const [getRecoverLoader, setRecoverLoader] = useState<{ [key: string]: boolean }>({});
@@ -192,6 +195,36 @@ const RequestManagementTable = ({
         });
       },
     });
+  }
+
+  const getRequestorChip = (requestors?: RequestorItemsFragment[] | null) => {
+    if (!requestors || requestors.length === 0) {
+      return <Remove/>;
+    } else if (requestors.length === 1) {
+      return (
+        <Chip 
+          label={requestors[0].name} 
+          color="primary" 
+          variant="outlined" 
+          onClick={() => {
+            setRequestor(requestors[0]);
+            setOpenUserInfoPopUp(true);
+          }} 
+        /> 
+      );
+    }
+    return (
+      <IconButton 
+        color='primary' 
+        sx={{ border: 'solid 1px' }}
+        onClick={() => {
+          setRequestors(requestors);
+          setOpenRequestorsPopUp(true);
+        }}
+      >
+        <Groups/>
+      </IconButton>
+    );
   }
 
   const actions: GridColDef = {
@@ -457,20 +490,8 @@ const RequestManagementTable = ({
       sortable: false,
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         return (
-          params.row.requestor ?
           <Box display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
-            <Chip 
-              label={params.row.requestor.name} 
-              color="primary" 
-              variant="outlined" 
-              onClick={() => {
-                params.row.requestor && setRequestor(params.row.requestor);
-                setOpenUserInfoPopUp(true);
-              }} 
-            /> 
-          </Box> : 
-          <Box display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
-            <Remove/>
+            {getRequestorChip(params.row.requestors)}
           </Box>
         );
       },
@@ -714,6 +735,12 @@ const RequestManagementTable = ({
         getDenyLoader={getDenyLoader[selectedWordId]}
         getDeniedReasonLoader={getDeniedReasonLoader[selectedWordId]}
         getDeleteLoader={getDeleteLoader[selectedWordId]}
+      />
+      <RequestorsPopUp
+        getRequestors={getRequestors}
+        setRequestors={setRequestors}
+        openRequestorsPopUp={openRequestorsPopUp}
+        setOpenRequestorsPopUp={setOpenRequestorsPopUp}
       />
     </Box>
   );

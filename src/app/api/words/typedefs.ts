@@ -26,7 +26,7 @@ export const wordTypeDefs = gql`
     pages: [Int]
     example: String
     deniedReason: String
-    requestor: User
+    requestors: [User!]
     isMyVocabulary: Boolean
     createdAt: DateTime!
   }
@@ -39,7 +39,7 @@ export const wordTypeDefs = gql`
     pages: [Int!]
     example: String
     deniedReason: String
-    requestorId: ID
+    requestorIds: [ID!]
   }
 
   type WordOffsetPaginationResponse {

@@ -24,14 +24,22 @@ export class WordSearch {
 
     query = query
       .select('words.*')
-      .leftJoin('users', 'words.requestorId', 'users.id');
+      .distinct()
+      .leftJoin(
+        knex.raw(
+          `LATERAL (
+            SELECT jsonb_array_elements_text(to_jsonb(words."requestorIds")) AS "requestorId"
+          ) AS expanded_requestor ON true`
+        )
+      )
+      .leftJoin('users', 'users.id', knex.raw('expanded_requestor."requestorId"::uuid'));
 
     if (isPresent(status)) {
       query = query.andWhere('words.status', '=', status);
     }
 
     if (isPresent(requestorId) && requestorId) {
-      query = query.andWhere('words.requestorId', '=', requestorId);
+      query = query.whereRaw('? = ANY(words."requestorIds")', [requestorId]);
     }
 
     if (isPresent(year) && year) {
@@ -61,7 +69,7 @@ export class WordSearch {
     }
 
     const countQuery = query.clone();
-    const [results] = (await sequelize.query(countQuery.clearSelect().count('words.id').toString())) as [
+    const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('words.id').toString())) as [
       [{ count: string }],
       unknown,
     ];

@@ -28,12 +28,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare removeWords: HasManyRemoveAssociationsMixin<Word, number>;
   declare countWords: HasManyCountAssociationsMixin;
 
-  static associate(models: { [key: string]: ModelStatic<Model> }) {
-    models['User'].hasMany(models['Word'], {
-      foreignKey: 'requestorId',
-      constraints: false,
-    });
-  }
+  static associate(models: { [key: string]: ModelStatic<Model> }) {}
 
   async checkAccountIdUnique(accountId: string): Promise<boolean> {
     const existingAccount = await User.count({ where: { accountId: accountId } });
