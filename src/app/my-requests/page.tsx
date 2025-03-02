@@ -24,28 +24,28 @@ const MyRequests = () => {
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
 
   const { data, loading, refetch } =
-      useQuery(getMyRequestsQuery, {
-        fetchPolicy: 'network-only',
-        variables: {
-          paginationOptions: {
-            limit: paginationModel.pageSize,
-            pageNum: paginationModel.page,
-          },
-          filterOptions: {
-            status: wordRequestStatus,
-            word: debouncedWordKeyWord,
-          },
+    useQuery(getMyRequestsQuery, {
+      fetchPolicy: 'network-only',
+      variables: {
+        paginationOptions: {
+          limit: paginationModel.pageSize,
+          pageNum: paginationModel.page,
         },
-        onError: (error) => {
-          dispatchCurrentSnackBar({
-            payload: {
-              open: true,
-              type: 'error',
-              message: error.message,
-            },
-          });
+        filterOptions: {
+          status: wordRequestStatus,
+          word: debouncedWordKeyWord,
         },
-      });
+      },
+      onError: (error) => {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+    });
       
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>

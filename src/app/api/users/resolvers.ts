@@ -39,7 +39,7 @@ export const userResolvers = {
   },
   User: {
     async words(user: User, _args: unknown, { dataloaders }: Context): Promise<Word[]> {
-      return await dataloaders.word.load(user.id);
+      return await dataloaders.wordByRequestorId.load(user.id);
     },
   },
 };

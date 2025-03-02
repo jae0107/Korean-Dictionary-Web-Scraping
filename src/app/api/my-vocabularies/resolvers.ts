@@ -14,6 +14,11 @@ export const myVocabularyResolvers = {
     addMyVocabulary,
     removeMyVocabulary,
   },
+  MyVocabulary: {
+    async word(myVocabulary: MyVocabulary, _args: unknown, { dataloaders }: Context) {
+      return myVocabulary.wordId ? await dataloaders.wordById.load(myVocabulary.wordId) : null;
+    }, 
+  }
 };
 
 async function getMyVocabularies(
@@ -27,7 +32,12 @@ async function getMyVocabularies(
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
 
-    const searcher = new MyVocabularySearch({ ...paginationOptions }, { ...filterOptions });
+    const newFilterOptions: MyVocabularyFilterOptions = filterOptions.userId ? filterOptions : {
+      ...filterOptions,
+      userId: currentUser.id,
+    };
+
+    const searcher = new MyVocabularySearch({ ...paginationOptions }, { ...newFilterOptions });
     const offsetMyRequestsResponse: OffsetPaginationResponse<MyVocabulary> = await searcher.process();
     return offsetMyRequestsResponse;
   }).catch((e) => {

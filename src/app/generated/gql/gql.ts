@@ -57,6 +57,8 @@ const documents = {
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
     "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n  }\n": types.MyRequestItemsFragmentDoc,
     "\n  query GetMyRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getMyRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...MyRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetMyRequestsDocument,
+    "\n  fragment MyVocabularyItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n  }\n": types.MyVocabularyItemsFragmentDoc,
+    "\n  query GetMyVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: MyVocabularyFilterOptions!) {\n    getMyVocabularies(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        word {\n          ...MyVocabularyItems\n        }\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetMyVocabulariesDocument,
     "\n  query GetMyPassword {\n    getCurrentUser {\n      id\n      password\n    }\n  }\n": types.GetMyPasswordDocument,
     "\n  query FindMyPassword($accountId: String!) {\n    findPassword(accountId: $accountId)\n  }\n": types.FindMyPasswordDocument,
     "\n  fragment PasswordResetRequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n": types.PasswordResetRequestorItemsFragmentDoc,
@@ -265,6 +267,14 @@ export function gql(source: "\n  fragment MyRequestItems on Word {\n    id\n    
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetMyRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getMyRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...MyRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetMyRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getMyRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...MyRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment MyVocabularyItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n  }\n"): (typeof documents)["\n  fragment MyVocabularyItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetMyVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: MyVocabularyFilterOptions!) {\n    getMyVocabularies(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        word {\n          ...MyVocabularyItems\n        }\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetMyVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: MyVocabularyFilterOptions!) {\n    getMyVocabularies(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        word {\n          ...MyVocabularyItems\n        }\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

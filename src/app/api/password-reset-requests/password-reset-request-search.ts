@@ -48,9 +48,7 @@ export class PasswordResetRequestSearch {
 
     const pageCount = Math.ceil(totalRowCount / limit);
 
-    query = query.orderBy('createdAt', 'desc');
-
-    query = query.orderBy('passwordResetRequests.createdAt', 'asc');
+    query = query.orderBy('passwordResetRequests.createdAt', 'desc');
 
     query = query.limit(limit).offset(pageNum * limit);
 

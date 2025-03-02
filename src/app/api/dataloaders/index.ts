@@ -1,9 +1,10 @@
 import { createMyVocabularyLoader } from "./my-vocabulary";
 import { createUserLoader } from "./user";
-import { createWordLoader } from "./word";
+import { createWordLoaderById, createWordLoaderByRequestorId } from "./word";
 
 export const createDataLoaders = () => ({
-  word: createWordLoader(),
+  wordByRequestorId: createWordLoaderByRequestorId(),
+  wordById: createWordLoaderById(),
   user: createUserLoader(),
   myVocabulary: createMyVocabularyLoader(),
 });

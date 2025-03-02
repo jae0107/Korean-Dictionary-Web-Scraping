@@ -40,7 +40,7 @@ export class MyVocabularySearch {
     }
 
     if (isPresent(page) && page) {
-      query = query.where('words.page', '=', page);
+      query = query.whereRaw('? = ANY(words.pages)', [page]);
     }
 
     if (!isPresent(pageNum) || pageNum < 0) {
@@ -60,9 +60,7 @@ export class MyVocabularySearch {
 
     const pageCount = Math.ceil(totalRowCount / limit);
 
-    query = query.orderBy('createdAt', 'desc');
-
-    query = query.orderBy('myVocabularies.createdAt', 'asc');
+    query = query.orderBy('myVocabularies.createdAt', 'desc');
 
     query = query.limit(limit).offset(pageNum * limit);
 

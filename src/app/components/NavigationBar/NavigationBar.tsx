@@ -1,6 +1,6 @@
 import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import { NetworkStatus } from '@apollo/client';
-import { AccountCircle, AdminPanelSettings, Checklist, Logout, PersonAdd, Portrait, VpnKey } from '@mui/icons-material';
+import { AccountCircle, AdminPanelSettings, Checklist, Logout, MenuBook, PersonAdd, Portrait, VpnKey } from '@mui/icons-material';
 import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -361,6 +361,32 @@ const NavigationBar = ({
                     alignItems={'center'}
                   >
                     <VpnKey sx={{ mr: '4px' }}/>비밀번호 변경
+                  </Typography>
+                </MenuItem>
+                <MenuItem 
+                  sx={{ 
+                    backgroundColor: pathname === '/my-vocabulary-list' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
+                    '@media (max-width:620px)': {
+                      fontSize: '0.875rem',
+                      pt: '4px',
+                      pb: '4px',
+                      minHeight: '32px'
+                    }
+                  }}
+                  onClick={() => navigationMyInfo('/my-vocabulary-list')}
+                  component={Link}
+                  href={'/my-vocabulary-list'}
+                >
+                  <Typography 
+                    sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer' 
+                    }}
+                    display={'flex'}
+                    alignItems={'center'}
+                  >
+                    <MenuBook sx={{ mr: '4px' }}/>나의 단어장
                   </Typography>
                 </MenuItem>
                 <MenuItem 
