@@ -17,6 +17,8 @@ class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare pages?: number[];
   declare example?: string;
   declare deniedReason?: string;
+  declare isDuplicated?: boolean;
+  declare wordId?: ID;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -41,6 +43,8 @@ Word.init(
     pages: DataTypes.ARRAY(DataTypes.INTEGER),
     example: DataTypes.STRING,
     deniedReason: DataTypes.STRING,
+    isDuplicated: DataTypes.BOOLEAN,
+    wordId: DataTypes.UUID,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

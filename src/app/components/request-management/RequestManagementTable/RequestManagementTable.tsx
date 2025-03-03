@@ -481,7 +481,7 @@ const RequestManagementTable = ({
       }
     },
     { 
-      field: 'requestor', 
+      field: 'requestors', 
       headerName: '요청자', 
       headerClassName: 'requestor-header',
       cellClassName: 'requestor-cell',

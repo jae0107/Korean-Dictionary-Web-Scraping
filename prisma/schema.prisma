@@ -45,6 +45,8 @@ model Word {
   previousStatus  String?
   deniedReason    String?
   myVocabularies  MyVocabulary[]
+  isDuplicated    Boolean @default(false)
+  wordId          String? @db.Uuid
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

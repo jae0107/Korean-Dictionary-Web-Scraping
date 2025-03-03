@@ -10,11 +10,15 @@ import { sequelize } from "../initialisers";
 
 export const wordResolvers = {
   Query: {
+    getWord,
+    getWordByTitle,
     getWords,
     getMyRequests,
   },
   Mutation: {
     createWordRequest,
+    duplicateWordRequest,
+    updateWordRequest,
     approveWordRequest,
     denyWordRequest,
     recoverWordRequest,
@@ -31,9 +35,37 @@ export const wordResolvers = {
     },
     async isMyVocabulary(word: Word, _args: unknown, { currentUser, dataloaders }: Context) {
       return word.requestorIds && currentUser ? !!await dataloaders.myVocabulary.load({ userId: currentUser.id, wordId: word.id }) : false;
-    }
+    },
   },
 };
+
+async function getWord(_: any, { id }: { id: string }, { currentUser }: Context): Promise<Word> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+    if (!id) throw new Error('ID is required');
+    const word = await Word.findByPk(id);
+    if (!word) throw new Error('단어를 찾을 수 없습니다.');
+    return word;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function getWordByTitle(_: any, { title }: { title: string }, { currentUser }: Context): Promise<Word> {
+  return await transaction(async (t) => {
+    const word = await Word.findOne({
+      where: {
+        title: title, 
+        status: WordStatus.Approved,
+      }
+    });
+
+    if (!word) throw new Error('단어를 찾을 수 없습니다.');
+    return word;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
 
 async function getWords(
   _: any,
@@ -90,6 +122,7 @@ async function createWordRequest(
       const existingWord = await Word.findOne({
         where: {
           title: input.title, 
+          status: WordStatus.Approved,
         }
       });
 
@@ -108,11 +141,82 @@ async function createWordRequest(
       deniedReason: input.deniedReason ?? undefined, 
       title: input.title ?? "",
       status: WordStatus.Pending,
+      isDuplicated: false,
+      wordId: undefined,
     };
 
     const newWord: Word = await Word.create(newInput);
 
     return newWord;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function duplicateWordRequest(
+  root: any,
+  { input }: { input: WordInput },
+  { currentUser }: Context,
+): Promise<Word> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    const newInput = {
+      ...input,
+      requestorIds: [currentUser.id],
+      korDicResults: input.korDicResults ?? [],
+      naverDicResults: input.naverDicResults ?? [],
+      pages: input.pages ?? [], 
+      example: input.example ?? undefined, 
+      deniedReason: input.deniedReason ?? undefined, 
+      title: input.title ?? "",
+      status: WordStatus.Pending,
+      isDuplicated: true,
+      wordId: input.wordId ?? undefined,
+    };
+
+    const newWord: Word = await Word.create(newInput);
+
+    return newWord;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function updateWordRequest(
+  root: any,
+  { input }: { input: WordInput },
+  { currentUser }: Context,
+): Promise<Word> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+    if (!input.title) throw new Error('단어를 입력해주세요.');
+
+    const existingWord = await Word.findOne({
+      where: {
+        title: input.title, 
+      }
+    });
+
+    if (!existingWord) throw new Error('단어가 존재하지 않습니다.');
+
+    const newInput = {
+      ...input,
+      requestorIds: existingWord.requestorIds && existingWord.requestorIds.length > 0 ? [...existingWord.requestorIds, currentUser.id] : [currentUser.id],
+      korDicResults: input.korDicResults ?? [],
+      naverDicResults: input.naverDicResults ?? [],
+      pages: input.pages ?? [],
+      example: input.example ?? undefined, 
+      deniedReason: input.deniedReason ?? undefined, 
+      title: input.title ?? "",
+      status: WordStatus.Pending,
+      isDuplicated: false,
+      wordId: undefined,
+    };
+
+    const updatedWord: Word = await existingWord.update(newInput);
+
+    return updatedWord;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

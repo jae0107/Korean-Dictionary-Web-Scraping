@@ -5,19 +5,14 @@ import naverLogo from "../../../../assets/images/naverLogo.png";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { AddCircle, ArrowRightAlt, Cancel, DeleteForever } from "@mui/icons-material";
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { createWordRequestMutation } from "./query";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { createWordRequestMutation, getWordByTitleQuery } from "./query";
 import { WordInput } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import './style.scss';
-
-const mock:SearchResult = {
-  title: '강아지',
-  koDic: ["개의 새끼", "부모나 할아버지 할머니가 자식이나 손주를 귀여워하면서 부르는 말"],
-  naverDic: ["개의 새끼", "주로 어린 자식이나 손주를 귀엽게 이르는 말", "자식을 속되게 이르는 말"],
-};
+import MergeWordPopUp from "./MergeWordPopUp/MergeWordPopUp";
 
 const schema = z.object({
   title: z.string().nonempty(),
@@ -25,6 +20,7 @@ const schema = z.object({
   naverDicResults: z.array(z.string()),
   pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
   example: z.union([z.string(), z.null()]).optional(),
+  wordId: z.string().optional(),
 })
 .refine((data) => data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
   message: "국립국어원 사전 또는 네이버 사전의 검색 결과가 필요합니다.",
@@ -41,9 +37,12 @@ const SearchResults = ({
   const [getKorDic, setKorDic] = useState<string>('');
   const [getNaverDic, setNaverDic] = useState<string>('');
   const [getLoader, setLoader] = useState<boolean>(false);
+  const [openMergeWordPopUp, setOpenMergeWordPopUp] = useState<boolean>(false);
 
   const [createWordRequest] = useMutation(createWordRequestMutation);
 
+  const [getWordByTitle, { data, loading }] = useLazyQuery(getWordByTitleQuery);
+  
   const form = useForm<WordInput>({
     defaultValues: {
       title: searchResults.title,
@@ -51,12 +50,13 @@ const SearchResults = ({
       naverDicResults: searchResults.naverDic,
       pages: [0],
       example: '',
+      wordId: '',
     },
     resolver: zodResolver(schema),
   });
 
   const { watch, setValue, handleSubmit, register } = form;
-
+  
   const getErrorMsg = (errors: FieldErrors<WordInput>) => {
     if (errors) {
       return Object.keys(errors)
@@ -96,15 +96,41 @@ const SearchResults = ({
           pages: (word.pages || []).filter((page) => page > 0),
         },
       },
-      onError: (error) => {
+      onError: async (error) => {
         setLoader(false);
-        dispatchCurrentSnackBar({
-          payload: {
-            open: true,
-            type: 'error',
-            message: error.message,
-          },
-        });
+        if (error.message === '이미 등록된 단어입니다.') {
+          setOpenMergeWordPopUp(true);
+          word.title && await getWordByTitle({
+            variables: {
+              title: word.title,
+            },
+            onError: (error) => {
+              dispatchCurrentSnackBar({
+                payload: {
+                  open: true,
+                  type: 'error',
+                  message: error.message,
+                },
+              });
+            },
+          });
+
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'info',
+              message: '이미 등록된 단어입니다. 기존 단어를 수정해주세요.',
+            },
+          });
+        } else {
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        }
       },
       onCompleted: () => {
         setLoader(false);
@@ -299,7 +325,7 @@ const SearchResults = ({
                     setValue(`pages.${index}`, value);
                   }}
                   sx={{
-                    width: 'calc(100% - 64px - 8px)',
+                    width: (watch('pages') || []).length > 1 ? 'calc(100% - 64px - 8px)' : '100%',
                   }}
                   slotProps={{
                     htmlInput: {
@@ -388,6 +414,13 @@ const SearchResults = ({
           </Button>
         </Box>
       </Stack>
+      <MergeWordPopUp
+        openMergeWordPopUp={openMergeWordPopUp}
+        setOpenMergeWordPopUp={setOpenMergeWordPopUp}
+        existingWord={data?.getWordByTitle || null}
+        loading={loading}
+        form={form}
+      />
     </Box>
   );
 }

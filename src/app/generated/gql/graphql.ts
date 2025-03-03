@@ -54,6 +54,7 @@ export type Mutation = {
   deleteWordRequest: Scalars['Boolean']['output'];
   denyUser: Scalars['Boolean']['output'];
   denyWordRequest: Scalars['Boolean']['output'];
+  duplicateWordRequest: Word;
   findMyId: Scalars['String']['output'];
   passwordReset: User;
   passwordSetUp: User;
@@ -62,6 +63,7 @@ export type Mutation = {
   removeMyVocabulary: Scalars['Boolean']['output'];
   updateDeniedReason: Word;
   updateUser: User;
+  updateWordRequest: Word;
 };
 
 
@@ -172,6 +174,11 @@ export type MutationDenyWordRequestArgs = {
 };
 
 
+export type MutationDuplicateWordRequestArgs = {
+  input: WordInput;
+};
+
+
 export type MutationFindMyIdArgs = {
   input: FindMyIdInput;
 };
@@ -213,6 +220,11 @@ export type MutationUpdateDeniedReasonArgs = {
 export type MutationUpdateUserArgs = {
   id: Scalars['ID']['input'];
   input: UserInput;
+};
+
+
+export type MutationUpdateWordRequestArgs = {
+  input: WordInput;
 };
 
 export type MyVocabulary = {
@@ -293,6 +305,8 @@ export type Query = {
   getRequestors: UserOffsetPaginationResponse;
   getUser: User;
   getUsers: UserOffsetPaginationResponse;
+  getWord: Word;
+  getWordByTitle: Word;
   getWords: WordOffsetPaginationResponse;
 };
 
@@ -344,6 +358,16 @@ export type QueryGetUserArgs = {
 export type QueryGetUsersArgs = {
   filterOptions: UserFilterOptions;
   paginationOptions: OffsetPaginationOptions;
+};
+
+
+export type QueryGetWordArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetWordByTitleArgs = {
+  title: Scalars['String']['input'];
 };
 
 
@@ -414,6 +438,7 @@ export type Word = {
   deniedReason?: Maybe<Scalars['String']['output']>;
   example?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  isDuplicated?: Maybe<Scalars['Boolean']['output']>;
   isMyVocabulary?: Maybe<Scalars['Boolean']['output']>;
   korDicResults?: Maybe<Array<Scalars['String']['output']>>;
   naverDicResults?: Maybe<Array<Scalars['String']['output']>>;
@@ -422,6 +447,7 @@ export type Word = {
   requestors?: Maybe<Array<User>>;
   status: WordStatus;
   title: Scalars['String']['output'];
+  wordId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type WordFilterOptions = {
@@ -436,12 +462,14 @@ export type WordFilterOptions = {
 export type WordInput = {
   deniedReason?: InputMaybe<Scalars['String']['input']>;
   example?: InputMaybe<Scalars['String']['input']>;
+  isDuplicated?: InputMaybe<Scalars['Boolean']['input']>;
   korDicResults?: InputMaybe<Array<Scalars['String']['input']>>;
   naverDicResults?: InputMaybe<Array<Scalars['String']['input']>>;
   pages?: InputMaybe<Array<Scalars['Int']['input']>>;
   requestorIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   status?: InputMaybe<WordStatus>;
   title?: InputMaybe<Scalars['String']['input']>;
+  wordId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type WordOffsetPaginationResponse = {
@@ -453,6 +481,7 @@ export type WordOffsetPaginationResponse = {
 export enum WordStatus {
   Approved = 'APPROVED',
   Denied = 'DENIED',
+  Duplicated = 'DUPLICATED',
   Pending = 'PENDING'
 }
 
@@ -504,12 +533,28 @@ export type FindMyIdMutationVariables = Exact<{
 
 export type FindMyIdMutation = { __typename: 'Mutation', findMyId: string };
 
+export type DuplicateWordRequestMutationVariables = Exact<{
+  input: WordInput;
+}>;
+
+
+export type DuplicateWordRequestMutation = { __typename: 'Mutation', duplicateWordRequest: { __typename: 'Word', id: string } };
+
+export type WordByTitleItemsFragment = { __typename: 'Word', id: string, pages?: Array<number | null> | null, title: string, korDicResults?: Array<string> | null, naverDicResults?: Array<string> | null, example?: string | null };
+
 export type CreateWordRequestMutationVariables = Exact<{
   input: WordInput;
 }>;
 
 
 export type CreateWordRequestMutation = { __typename: 'Mutation', createWordRequest: { __typename: 'Word', id: string } };
+
+export type GetWordByTitleQueryVariables = Exact<{
+  title: Scalars['String']['input'];
+}>;
+
+
+export type GetWordByTitleQuery = { __typename: 'Query', getWordByTitle: { __typename: 'Word', id: string, pages?: Array<number | null> | null, title: string, korDicResults?: Array<string> | null, naverDicResults?: Array<string> | null, example?: string | null } };
 
 export type ChangeCurrentPasswordMutationVariables = Exact<{
   changeCurrentPasswordId: Scalars['ID']['input'];
@@ -840,6 +885,7 @@ export type GetVocabulariesQuery = { __typename: 'Query', getWords: { __typename
 export const UserItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"accountId"}}]}}]} as unknown as DocumentNode<UserItemsFragment, unknown>;
 export const SingleAdminItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SingleAdminItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accountId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"class"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]} as unknown as DocumentNode<SingleAdminItemsFragment, unknown>;
 export const AdminItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AdminItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"class"}},{"kind":"Field","name":{"kind":"Name","value":"accountId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]} as unknown as DocumentNode<AdminItemsFragment, unknown>;
+export const WordByTitleItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordByTitleItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"pages"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"korDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"naverDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"example"}}]}}]} as unknown as DocumentNode<WordByTitleItemsFragment, unknown>;
 export const RequestorDropDownItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"RequestorDropDownItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]} as unknown as DocumentNode<RequestorDropDownItemsFragment, unknown>;
 export const UserRequestItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserRequestItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"korDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"naverDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pages"}},{"kind":"Field","name":{"kind":"Name","value":"example"}},{"kind":"Field","name":{"kind":"Name","value":"deniedReason"}}]}}]} as unknown as DocumentNode<UserRequestItemsFragment, unknown>;
 export const MyRequestItemsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MyRequestItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"korDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"naverDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pages"}},{"kind":"Field","name":{"kind":"Name","value":"example"}},{"kind":"Field","name":{"kind":"Name","value":"deniedReason"}}]}}]} as unknown as DocumentNode<MyRequestItemsFragment, unknown>;
@@ -860,7 +906,9 @@ export const GetAdminDocument = {"kind":"Document","definitions":[{"kind":"Opera
 export const GetAdminsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdmins"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginationOptions"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OffsetPaginationOptions"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filterOptions"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UserFilterOptions"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUsers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginationOptions"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginationOptions"}}},{"kind":"Argument","name":{"kind":"Name","value":"filterOptions"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filterOptions"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AdminItems"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalRowCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageCount"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AdminItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"class"}},{"kind":"Field","name":{"kind":"Name","value":"accountId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]} as unknown as DocumentNode<GetAdminsQuery, GetAdminsQueryVariables>;
 export const GetMyRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMyRole"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<GetMyRoleQuery, GetMyRoleQueryVariables>;
 export const FindMyIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FindMyId"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FindMyIdInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findMyId"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<FindMyIdMutation, FindMyIdMutationVariables>;
+export const DuplicateWordRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DuplicateWordRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"WordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"duplicateWordRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DuplicateWordRequestMutation, DuplicateWordRequestMutationVariables>;
 export const CreateWordRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateWordRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"WordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createWordRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateWordRequestMutation, CreateWordRequestMutationVariables>;
+export const GetWordByTitleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWordByTitle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"title"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getWordByTitle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"title"},"value":{"kind":"Variable","name":{"kind":"Name","value":"title"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordByTitleItems"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordByTitleItems"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"pages"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"korDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"naverDicResults"}},{"kind":"Field","name":{"kind":"Name","value":"example"}}]}}]} as unknown as DocumentNode<GetWordByTitleQuery, GetWordByTitleQueryVariables>;
 export const ChangeCurrentPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeCurrentPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"changeCurrentPasswordId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FindPasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changeCurrentPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"changeCurrentPasswordId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ChangeCurrentPasswordMutation, ChangeCurrentPasswordMutationVariables>;
 export const BulkPasswordResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BulkPasswordReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bulkPasswordReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}]}}]} as unknown as DocumentNode<BulkPasswordResetMutation, BulkPasswordResetMutationVariables>;
 export const PasswordResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PasswordReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"passwordResetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"passwordReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"passwordResetId"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<PasswordResetMutation, PasswordResetMutationVariables>;

@@ -4,6 +4,7 @@ export const wordTypeDefs = gql`
   enum WordStatus {
     APPROVED
     PENDING
+    DUPLICATED
     DENIED
   }
 
@@ -28,6 +29,8 @@ export const wordTypeDefs = gql`
     deniedReason: String
     requestors: [User!]
     isMyVocabulary: Boolean
+    isDuplicated: Boolean
+    wordId: ID
     createdAt: DateTime!
   }
 
@@ -40,6 +43,8 @@ export const wordTypeDefs = gql`
     example: String
     deniedReason: String
     requestorIds: [ID!]
+    isDuplicated: Boolean
+    wordId: ID
   }
 
   type WordOffsetPaginationResponse {
@@ -48,6 +53,8 @@ export const wordTypeDefs = gql`
   }
 
   type Query {
+    getWord(id: ID!): Word!
+    getWordByTitle(title: String!): Word!
     getWords(
       paginationOptions: OffsetPaginationOptions!
       filterOptions: WordFilterOptions!
@@ -60,6 +67,8 @@ export const wordTypeDefs = gql`
 
   type Mutation {
     createWordRequest(input: WordInput!): Word!
+    duplicateWordRequest(input: WordInput!): Word!
+    updateWordRequest(input: WordInput!): Word!
     approveWordRequest(id: ID!): Boolean!
     recoverWordRequest(id: ID!): Boolean!
     denyWordRequest(id: ID!, deniedReason: String): Boolean!

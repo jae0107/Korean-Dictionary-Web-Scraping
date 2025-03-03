@@ -1,9 +1,10 @@
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
-import { Close, MenuBook, Remove } from "@mui/icons-material";
+import { Close, Groups, MenuBook, Remove } from "@mui/icons-material";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack } from "@mui/material";
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import RequestorsPopUp from "../RequestorsPopUp/RequestorsPopUp";
 
 const RequestDetailPopUP = ({
   openRequestDetailPopUp,
@@ -40,18 +41,35 @@ const RequestDetailPopUP = ({
   getDeniedReasonLoader: boolean;
   getDeleteLoader: boolean;
 }) => {
+  const [getRequestors, setRequestors] = useState<RequestorItemsFragment[]>([]);
+  const [openRequestorsPopUp, setOpenRequestorsPopUp] = useState<boolean>(false);
+
   const getRequestor = () => {
-    if (getWordRequest?.requestor && setRequestor && setOpenUserInfoPopUp) {
-      return (
+    if (getWordRequest?.requestors && getWordRequest.requestors.length > 0 && setRequestor && setOpenUserInfoPopUp) {
+      if (getWordRequest.requestors.length === 1) {
+        return (
           <Chip 
-            label={getWordRequest.requestor.name} 
+            label={getWordRequest.requestors[0].name} 
             color="primary" 
             variant="outlined" 
             onClick={() => {
-              getWordRequest.requestor && setRequestor(getWordRequest.requestor);
+              getWordRequest.requestors && getWordRequest.requestors[0] && setRequestor(getWordRequest.requestors[0]);
               setOpenUserInfoPopUp(true);
             }} 
           /> 
+        );
+      }
+      return (
+        <IconButton 
+          color='primary' 
+          sx={{ border: 'solid 1px' }}
+          onClick={() => {
+            setRequestors(getWordRequest?.requestors || []);
+            setOpenRequestorsPopUp(true);
+          }}
+        >
+          <Groups/>
+        </IconButton>
       );
     }
     return <></>;
@@ -219,6 +237,12 @@ const RequestDetailPopUP = ({
           }
         </DialogActions>
       </Dialog>
+      <RequestorsPopUp
+        getRequestors={getRequestors}
+        setRequestors={setRequestors}
+        openRequestorsPopUp={openRequestorsPopUp}
+        setOpenRequestorsPopUp={setOpenRequestorsPopUp}
+      />
     </>
   );
 }
