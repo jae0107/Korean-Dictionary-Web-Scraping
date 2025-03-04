@@ -25,6 +25,7 @@ export const wordRequestFragment = gql(`
     pages
     example
     deniedReason
+    wordId
   }
 `);
 

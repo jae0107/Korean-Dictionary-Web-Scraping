@@ -5,7 +5,6 @@ import { FieldErrors, SubmitErrorHandler, UseFormReturn } from "react-hook-form"
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { useState } from "react";
-import { z } from "zod";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { duplicateWordRequestMutation } from "./query";
@@ -16,18 +15,21 @@ const MergeWordPopUp = ({
   existingWord,
   loading,
   form,
+  getLoader,
+  setLoader,
 } : {
   openMergeWordPopUp: boolean;
   setOpenMergeWordPopUp: (value: boolean) => void;
   existingWord: WordByTitleItemsFragment | null;
   loading: boolean;
   form: UseFormReturn<WordInput>;
+  getLoader: boolean;
+  setLoader: (value: boolean) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   
   const [getKorDic, setKorDic] = useState<string>('');
   const [getNaverDic, setNaverDic] = useState<string>('');
-  const [getLoader, setLoader] = useState<boolean>(false);
 
   const [duplicateWordRequest] = useMutation(duplicateWordRequestMutation);
 
@@ -91,7 +93,6 @@ const MergeWordPopUp = ({
   };
 
   const onSubmit = () => {
-    console.log("handleMerge: ", handleMerge());
     setLoader(true);
     duplicateWordRequest({
       variables: {
@@ -112,6 +113,7 @@ const MergeWordPopUp = ({
       },
       onCompleted: () => {
         setLoader(false);
+        setOpenMergeWordPopUp(false);
         dispatchCurrentSnackBar({
           payload: {
             open: true,

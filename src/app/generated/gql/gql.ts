@@ -34,6 +34,9 @@ const documents = {
     "\n  mutation PasswordSetUp($passwordSetUpId: ID!, $password: String!) {\n    passwordSetUp(id: $passwordSetUpId, password: $password) {\n      id\n    }\n  }\n": types.PasswordSetUpDocument,
     "\n  fragment RequestorDropDownItems on User {\n    id\n    name\n  }\n": types.RequestorDropDownItemsFragmentDoc,
     "\n  query GetRequestorsDropDown($paginationOptions: OffsetPaginationOptions!, $filterOptions: RequestorFilterOptions!) {\n    getRequestors(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...RequestorDropDownItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetRequestorsDropDownDocument,
+    "\n  fragment DuplicatedWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n    requestors {\n      ...RequestorItems\n    }\n  }\n": types.DuplicatedWordRequestItemsFragmentDoc,
+    "\n  query GetWord($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...DuplicatedWordRequestItems\n    }\n  }\n": types.GetWordDocument,
+    "\n  mutation ApproveDuplicatedWordRequest($approveDuplicatedWordRequestId: ID!) {\n    approveDuplicatedWordRequest(id: $approveDuplicatedWordRequestId)\n  }\n": types.ApproveDuplicatedWordRequestDocument,
     "\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n": types.BulkApproveWordRequestsDocument,
     "\n  mutation BulkDenyWordRequests($ids: [ID!]!) {\n    bulkDenyWordRequests(ids: $ids)\n  }\n": types.BulkDenyWordRequestsDocument,
     "\n  mutation BulkRecoverWordRequests($ids: [ID!]!) {\n    bulkRecoverWordRequests(ids: $ids)\n  }\n": types.BulkRecoverWordRequestsDocument,
@@ -53,12 +56,12 @@ const documents = {
     "\n  mutation DeleteUser($deleteUserId: ID!) {\n    deleteUser(id: $deleteUserId)\n  }\n": types.DeleteUserDocument,
     "\n  mutation CreateUser($input: UserInput!) {\n    createUser(input: $input) {\n      id\n    }\n  }\n": types.CreateUserDocument,
     "\n  query AccountIdCheck($accountId: String!) {\n    accountIdCheck(accountId: $accountId)\n  }\n": types.AccountIdCheckDocument,
-    "\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n  }\n": types.UserRequestItemsFragmentDoc,
+    "\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n": types.UserRequestItemsFragmentDoc,
     "\n  query GetUserRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetUserRequestsDocument,
     "\n  mutation UpdateUser($updateUserId: ID!, $input: UserInput!) {\n    updateUser(id: $updateUserId, input: $input) {\n      id\n    }\n  }\n": types.UpdateUserDocument,
     "\n  mutation AddMyVocabulary($input: MyVocabularyInput!) {\n    addMyVocabulary(input: $input) {\n      id\n    }\n  }\n": types.AddMyVocabularyDocument,
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
-    "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n  }\n": types.MyRequestItemsFragmentDoc,
+    "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n": types.MyRequestItemsFragmentDoc,
     "\n  query GetMyRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getMyRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...MyRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetMyRequestsDocument,
     "\n  fragment MyVocabularyItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n  }\n": types.MyVocabularyItemsFragmentDoc,
     "\n  query GetMyVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: MyVocabularyFilterOptions!) {\n    getMyVocabularies(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        word {\n          ...MyVocabularyItems\n        }\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetMyVocabulariesDocument,
@@ -70,7 +73,7 @@ const documents = {
     "\n  fragment MyProfileItems on User {\n    accountId\n    name\n    year\n    class\n    number\n    role\n  }\n": types.MyProfileItemsFragmentDoc,
     "\n  query GetMyProfile {\n    getCurrentUser {\n      id\n      ...MyProfileItems\n    }\n  }\n": types.GetMyProfileDocument,
     "\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n": types.RequestorItemsFragmentDoc,
-    "\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n  }\n": types.WordRequestItemsFragmentDoc,
+    "\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n": types.WordRequestItemsFragmentDoc,
     "\n  query GetWordRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...WordRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetWordRequestsDocument,
     "\n  fragment SingleStudentItems on User {\n    accountId\n    name\n    year\n    class\n    number\n    role\n  }\n": types.SingleStudentItemsFragmentDoc,
     "\n  query GetStudent($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleStudentItems\n    }\n  }\n": types.GetStudentDocument,
@@ -181,6 +184,18 @@ export function gql(source: "\n  query GetRequestorsDropDown($paginationOptions:
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  fragment DuplicatedWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n    requestors {\n      ...RequestorItems\n    }\n  }\n"): (typeof documents)["\n  fragment DuplicatedWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n    requestors {\n      ...RequestorItems\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetWord($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...DuplicatedWordRequestItems\n    }\n  }\n"): (typeof documents)["\n  query GetWord($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...DuplicatedWordRequestItems\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ApproveDuplicatedWordRequest($approveDuplicatedWordRequestId: ID!) {\n    approveDuplicatedWordRequest(id: $approveDuplicatedWordRequestId)\n  }\n"): (typeof documents)["\n  mutation ApproveDuplicatedWordRequest($approveDuplicatedWordRequestId: ID!) {\n    approveDuplicatedWordRequest(id: $approveDuplicatedWordRequestId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkApproveWordRequests($ids: [ID!]!) {\n    bulkApproveWordRequests(ids: $ids)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -257,7 +272,7 @@ export function gql(source: "\n  query AccountIdCheck($accountId: String!) {\n  
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n  }\n"): (typeof documents)["\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n  }\n"];
+export function gql(source: "\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n"): (typeof documents)["\n  fragment UserRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -277,7 +292,7 @@ export function gql(source: "\n  mutation RemoveMyVocabulary($input: MyVocabular
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n  }\n"): (typeof documents)["\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n  }\n"];
+export function gql(source: "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n"): (typeof documents)["\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -325,7 +340,7 @@ export function gql(source: "\n  fragment RequestorItems on User {\n    id\n    
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n  }\n"): (typeof documents)["\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n  }\n"];
+export function gql(source: "\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n"): (typeof documents)["\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

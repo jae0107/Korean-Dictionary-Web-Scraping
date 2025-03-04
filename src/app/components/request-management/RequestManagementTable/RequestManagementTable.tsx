@@ -2,7 +2,7 @@ import { Box, Button, Chip, CircularProgress, IconButton, Tooltip, Typography, u
 import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
-import { CheckCircleOutline, Create, DeleteForever, Groups, HighlightOff, Remove, Restore } from "@mui/icons-material";
+import { CheckCircleOutline, Create, DeleteForever, Groups, HighlightOff, Remove, Restore, Search } from "@mui/icons-material";
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
@@ -15,8 +15,9 @@ import ConfirmDialog from "../../shared/ConfirmDialog";
 import RequestManagementBulkAction from "./RequestManagementBulkAction/RequestManagementBulkAction";
 import DeniedReasonPopUp from "../../shared/DeniedReasonPopUp";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
-import RequestDetailPopUP from "./RequestDetailPopUP/RequestDetailPopUP";
+import RequestDetailPopUp from "./RequestDetailPopUp/RequestDetailPopUp";
 import RequestorsPopUp from "./RequestorsPopUp/RequestorsPopUp";
+import DuplicatedRequestPopUp from "./DuplicatedRequestPopUp/DuplicatedRequestPopUp";
 
 const RequestManagementTable = ({
   loading,
@@ -59,6 +60,7 @@ const RequestManagementTable = ({
   const [getRequestors, setRequestors] = useState<RequestorItemsFragment[]>([]);
   const [openUserInfoPopUp, setOpenUserInfoPopUp] = useState<boolean>(false);
   const [openRequestorsPopUp, setOpenRequestorsPopUp] = useState<boolean>(false);
+  const [openDuplicatedRequestPopUp, setOpenDuplicatedRequestPopUp] = useState<boolean>(false);
   const [getApprovalLoader, setApprovalLoader] = useState<{ [key: string]: boolean }>({});
   const [getDenyLoader, setDenyLoader] = useState<{ [key: string]: boolean }>({});
   const [getRecoverLoader, setRecoverLoader] = useState<{ [key: string]: boolean }>({});
@@ -67,6 +69,7 @@ const RequestManagementTable = ({
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [openDeniedReasonPopUp, setOpenDeniedReasonPopUp] = useState<boolean>(false);
   const [selectedWordId, setSelectedWordId] = useState<string>('');
+  const [selectedReferenceWordId, setSelectedReferenceWordId] = useState<string>('');
   const [selectedDeniedReason, setSelectedDeniedReason] = useState<string>('');
   const [openRequestDetailPopUp, setOpenRequestDetailPopUp] = useState<boolean>(false);
   const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
@@ -313,6 +316,28 @@ const RequestManagementTable = ({
             dense={maxWidth495}
           />
         ];
+      } else if (params.row.status === 'DUPLICATED') {
+        return [
+          <GridActionsCellItem
+            key="detail"
+            icon={
+              getApprovalLoader[params.row.id] || getDenyLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'더보기'}>
+                <Search />
+              </Tooltip>
+            }
+            label="더보기"
+            showInMenu={false}
+            onClick={() => {
+              params.row.wordId && setSelectedReferenceWordId(params.row.wordId);
+              setWordRequest(params.row);
+              setSelectedWordId(params.row.id);
+              setOpenDuplicatedRequestPopUp(true);
+            }}
+          />
+        ];
       }
       if (maxWidth360 && (getApprovalLoader[params.row.id] || getDenyLoader[params.row.id])) {
         return [
@@ -386,7 +411,12 @@ const RequestManagementTable = ({
             onClick={() => {
               setSelectedWordId(params.row.id);
               setWordRequest(params.row);
-              setOpenRequestDetailPopUp(true);
+              if (wordRequestStatus !== WordStatus.Duplicated) {
+                setOpenRequestDetailPopUp(true);
+              } else {
+                params.row.wordId && setSelectedReferenceWordId(params.row.wordId);
+                setOpenDuplicatedRequestPopUp(true);
+              }
             }}
           >
             더보기 클릭
@@ -594,7 +624,9 @@ const RequestManagementTable = ({
 
   const handleCloseRequestDetailPopUp = () => {
     setOpenRequestDetailPopUp(false);
+    setOpenDuplicatedRequestPopUp(false);
     setSelectedWordId('');
+    setSelectedReferenceWordId('');
     setWordRequest(null);
   }
   
@@ -609,17 +641,20 @@ const RequestManagementTable = ({
         }
       }}
     >
-      <RequestManagementBulkAction
-        ids={selectedRequests}
-        setSelectedRequests={setSelectedRequests}
-        status={wordRequestStatus}
-        refetch={refetch}
-      />
+      {
+        wordRequestStatus !== WordStatus.Duplicated && 
+        <RequestManagementBulkAction
+          ids={selectedRequests}
+          setSelectedRequests={setSelectedRequests}
+          status={wordRequestStatus}
+          refetch={refetch}
+        />
+      }
       <DataGrid
         pagination
         disableColumnMenu
-        checkboxSelection
-        keepNonExistentRowsSelected
+        checkboxSelection={wordRequestStatus !== WordStatus.Duplicated}
+        keepNonExistentRowsSelected={wordRequestStatus !== WordStatus.Duplicated}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setSelectedRequests(newRowSelectionModel as string[]);
         }}
@@ -718,7 +753,7 @@ const RequestManagementTable = ({
         getDeniedReason={selectedDeniedReason}
         setDeniedReason={setSelectedDeniedReason}
       />
-      <RequestDetailPopUP
+      <RequestDetailPopUp
         openRequestDetailPopUp={openRequestDetailPopUp}
         getWordRequest={getWordRequest}
         setRequestor={setRequestor}
@@ -742,6 +777,22 @@ const RequestManagementTable = ({
         openRequestorsPopUp={openRequestorsPopUp}
         setOpenRequestorsPopUp={setOpenRequestorsPopUp}
       />
+      {
+        selectedReferenceWordId && getWordRequest &&
+        <DuplicatedRequestPopUp
+          openDuplicatedRequestPopUp={openDuplicatedRequestPopUp}
+          getWordRequest={getWordRequest}
+          handleClose={handleCloseRequestDetailPopUp}
+          selectedReferenceWordId={selectedReferenceWordId}
+          getApprovalLoader={getApprovalLoader[selectedWordId]}
+          setApprovalLoader={setApprovalLoader}
+          setOpenDeniedReasonPopUp={setOpenDeniedReasonPopUp}
+          getDenyLoader={getDenyLoader[selectedWordId]}
+          setOpenUserInfoPopUp={setOpenUserInfoPopUp}
+          setRequestor={setRequestor}
+          refetch={refetch}
+        />
+      }
     </Box>
   );
 }

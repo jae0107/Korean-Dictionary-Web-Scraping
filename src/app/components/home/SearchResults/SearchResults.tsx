@@ -119,7 +119,7 @@ const SearchResults = ({
             payload: {
               open: true,
               type: 'info',
-              message: '이미 등록된 단어입니다. 기존 단어를 수정해주세요.',
+              message: '이미 등록된 단어입니다.',
             },
           });
         } else {
@@ -420,6 +420,8 @@ const SearchResults = ({
         existingWord={data?.getWordByTitle || null}
         loading={loading}
         form={form}
+        getLoader={getLoader}
+        setLoader={setLoader}
       />
     </Box>
   );

@@ -1,5 +1,5 @@
-import { MyRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
-import { Cancel } from "@mui/icons-material";
+import { MyRequestItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
+import { Cancel, Search } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -13,6 +13,7 @@ import { deleteWordRequestMutation } from "../../request-management/RequestManag
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import MyRequestBulkAction from "./MyRequestBulkAction/MyRequestBulkAction";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
+import DuplicatedRequestPopUp from "../../request-management/RequestManagementTable/DuplicatedRequestPopUp/DuplicatedRequestPopUp";
 
 const MyRequestTable = ({
   loading,
@@ -51,6 +52,9 @@ const MyRequestTable = ({
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [selectedWordId, setSelectedWordId] = useState<string>('');
+  const [selectedReferenceWordId, setSelectedReferenceWordId] = useState<string>('');
+  const [openDuplicatedRequestPopUp, setOpenDuplicatedRequestPopUp] = useState<boolean>(false);
+  const [getWordRequest, setWordRequest] = useState<WordRequestItemsFragment | null>(null);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
     pages: !maxWidth475,
     naverDicResults: !maxWidth750,
@@ -181,6 +185,33 @@ const MyRequestTable = ({
       filterable: false,
       sortable: false,
     });
+  } else if (wordRequestStatus === 'DUPLICATED') {
+    columns.filter((column) => column.field !== 'deniedReason' && column.type !== 'actions');
+    columns.push({
+      field: 'actions',
+      type: 'actions',
+      headerName: '작업',
+      renderHeader: () => null,
+      width: 40,
+      getActions: (params) => [
+        <GridActionsCellItem
+          key="detail"
+          icon={
+            <Tooltip title={'더보기'}>
+              <Search />
+            </Tooltip>
+          }
+          label="더보기"
+          showInMenu={false}
+          onClick={() => {
+            params.row.wordId && setSelectedReferenceWordId(params.row.wordId);
+            setWordRequest(params.row);
+            setSelectedWordId(params.row.id);
+            setOpenDuplicatedRequestPopUp(true);
+          }}
+        />
+      ]
+    });
   } else {
     columns.filter((column) => column.field !== "deniedReason" && column.type !== "actions");
   }
@@ -218,6 +249,13 @@ const MyRequestTable = ({
       });
     }
     setSelectedWordId('');
+  }
+  
+  const handleCloseRequestDetailPopUp = () => {
+    setOpenDuplicatedRequestPopUp(false);
+    setSelectedWordId('');
+    setSelectedReferenceWordId('');
+    setWordRequest(null);
   }
 
   return (
@@ -318,6 +356,16 @@ const MyRequestTable = ({
         title={'주의'}
         content={'정말 취소하시겠습니까? 취소된 요청은 삭제되며 복구할 수 없습니다.'}
       />
+      {
+        selectedReferenceWordId && getWordRequest &&
+        <DuplicatedRequestPopUp
+          openDuplicatedRequestPopUp={openDuplicatedRequestPopUp}
+          getWordRequest={getWordRequest}
+          handleClose={handleCloseRequestDetailPopUp}
+          selectedReferenceWordId={selectedReferenceWordId}
+          noActions={true}
+        />
+      }
     </Box>
   );
 }

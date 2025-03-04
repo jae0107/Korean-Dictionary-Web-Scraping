@@ -66,7 +66,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
         palette: {
           mode,
           background: {
-            'default': mode === 'light' ? '#f5f5f5' : '#353535',
+            'default': mode === 'light' ? '#eaeaea' : '#353535',
           }
         },
         components: {
@@ -83,14 +83,15 @@ const Providers = ({ children } : { children: ReactNode }) => {
           MuiDataGrid: {
             styleOverrides: {
               root: {
+                borderColor: mode === 'light' ? '#b4b4b4' : '#515151',
                 '& .MuiDataGrid-toolbarContainer': {
-                  borderBottom: mode === 'light' ? '1px solid #e0e0e0' : '1px solid #515151',
+                  borderBottom: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
                 },
                 '& [data-field="actions"]': {
-                  borderLeft: mode === 'light' ? '1px solid #e0e0e0' : '1px solid #515151',
+                  borderLeft: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
                 },
                 '& [data-field="action"]': {
-                  borderLeft: mode === 'light' ? '1px solid #e0e0e0' : '1px solid #515151',
+                  borderLeft: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
                 },
                 '& .MuiDataGrid-cell': {
                   display: 'flex',
@@ -99,8 +100,23 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 },
                 '[aria-label="more"]': {
                   boxShadow: '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);'
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  borderTop: mode === 'light' ? '1px solid #b4b4b4' : '1px solid #515151',
+                },
+                '& .MuiDataGrid-topContainer': {
+                  borderBottom: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
+                },
+                '& .MuiDataGrid-row': {
+                  '&:last-child': {
+                    borderBottom: '0px',
+                  },
+                  borderBottom: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
+                },
+                '& .MuiDataGrid-columnSeparator': {
+                  color: mode === 'light' ? '#b4b4b4' : '#515151',
                 }
-              }
+              },
             }
           },
           MuiTab: {
@@ -112,7 +128,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 textTransform: 'none',
                 '@media (max-width:545px)': {
                   flex: 1,
-                }
+                },
               },
             },
           },
@@ -121,6 +137,15 @@ const Providers = ({ children } : { children: ReactNode }) => {
               root: {
                 '.MuiFormLabel-asterisk': {
                   color: '#f44336',
+                },
+              },
+            },
+          },
+          MuiDialog: {
+            styleOverrides: {
+              root: {
+                '& .MuiPaper-root': {
+                  background: mode === 'light' ? '#eaeaea' : '#353535',
                 },
               },
             },

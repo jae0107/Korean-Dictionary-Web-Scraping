@@ -20,6 +20,7 @@ export const wordResolvers = {
     duplicateWordRequest,
     updateWordRequest,
     approveWordRequest,
+    approveDuplicatedWordRequest,
     denyWordRequest,
     recoverWordRequest,
     deleteWordRequest,
@@ -141,7 +142,6 @@ async function createWordRequest(
       deniedReason: input.deniedReason ?? undefined, 
       title: input.title ?? "",
       status: WordStatus.Pending,
-      isDuplicated: false,
       wordId: undefined,
     };
 
@@ -160,18 +160,33 @@ async function duplicateWordRequest(
 ): Promise<Word> {
   return await transaction(async (t) => {
     if (!currentUser) throw new Error('No Current User Found');
+    if (!input.title) throw new Error('단어를 입력해주세요.');
+
+    const existingWord = await Word.findOne({
+      where: {
+        title: input.title, 
+        status: WordStatus.Approved,
+      }
+    });
+
+    if (!existingWord) {
+      throw new Error('단어가 존재하지 않습니다.');
+    }
+
+    const updatedRequestorIds = existingWord.requestorIds.includes(currentUser.id)
+      ? existingWord.requestorIds
+      : [...existingWord.requestorIds, currentUser.id];
 
     const newInput = {
       ...input,
-      requestorIds: [currentUser.id],
+      requestorIds: updatedRequestorIds,
       korDicResults: input.korDicResults ?? [],
       naverDicResults: input.naverDicResults ?? [],
       pages: input.pages ?? [], 
       example: input.example ?? undefined, 
       deniedReason: input.deniedReason ?? undefined, 
       title: input.title ?? "",
-      status: WordStatus.Pending,
-      isDuplicated: true,
+      status: WordStatus.Duplicated,
       wordId: input.wordId ?? undefined,
     };
 
@@ -210,7 +225,6 @@ async function updateWordRequest(
       deniedReason: input.deniedReason ?? undefined, 
       title: input.title ?? "",
       status: WordStatus.Pending,
-      isDuplicated: false,
       wordId: undefined,
     };
 
@@ -237,6 +251,44 @@ async function approveWordRequest(
     } else {
       throw new Error('No Word Found');
     }
+
+    return true;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function approveDuplicatedWordRequest(
+  root: any,
+  { id }: { id: string },
+  { currentUser }: Context,
+): Promise<Boolean> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    const duplicatedWord = await Word.findByPk(id);
+    if (!duplicatedWord) throw new Error('단어가 존재하지 않습니다.');
+
+    if (!duplicatedWord.wordId) throw new Error('단어가 존재하지 않습니다.');
+
+    const existingWord = await Word.findByPk(duplicatedWord.wordId);
+
+    if (!existingWord) throw new Error('단어가 존재하지 않습니다.');
+
+    const newInput = {
+      requestorIds: duplicatedWord.requestorIds ?? existingWord.requestorIds,
+      korDicResults: duplicatedWord.korDicResults ?? existingWord.korDicResults,
+      naverDicResults: duplicatedWord.naverDicResults ?? existingWord.naverDicResults,
+      pages: duplicatedWord.pages ?? existingWord.pages, 
+      example: duplicatedWord.example ?? existingWord.example, 
+      deniedReason: duplicatedWord.deniedReason ?? existingWord.deniedReason, 
+      title: duplicatedWord.title ?? existingWord.title,
+      status: WordStatus.Approved,
+      wordId: existingWord.wordId,
+    };
+
+    await existingWord.update(newInput);
+    await duplicatedWord.destroy();
 
     return true;
   }).catch((e) => {

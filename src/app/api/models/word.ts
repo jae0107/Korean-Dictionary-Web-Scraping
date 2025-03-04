@@ -2,7 +2,6 @@ import { CreationOptional, DataTypes, DestroyOptions, InferAttributes, InferCrea
 import { ID } from "../utils/shared-types";
 import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
-import { User } from "./user";
 import { WordStatus } from "@/app/generated/gql/graphql";
 import { MyVocabulary } from "./my-vocabulary";
 
@@ -17,7 +16,6 @@ class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare pages?: number[];
   declare example?: string;
   declare deniedReason?: string;
-  declare isDuplicated?: boolean;
   declare wordId?: ID;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -39,12 +37,26 @@ Word.init(
     naverDicResults: DataTypes.ARRAY(DataTypes.STRING),
     requestorIds: DataTypes.ARRAY(DataTypes.UUID),
     status: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
-    previousStatus: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
-    pages: DataTypes.ARRAY(DataTypes.INTEGER),
-    example: DataTypes.STRING,
-    deniedReason: DataTypes.STRING,
-    isDuplicated: DataTypes.BOOLEAN,
-    wordId: DataTypes.UUID,
+    previousStatus: {
+      type: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
+      allowNull: true,
+    },
+    pages: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      allowNull: true,
+    },
+    example: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    deniedReason: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    wordId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },    
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
@@ -75,17 +87,38 @@ Word.addHook('beforeDestroy', 'delete my vocabularies', async (word: Word) => {
       wordId: word.id,
     },
   });
+
+  const duplicatedWord = await Word.findOne({ where: { wordId: word.id } });
+  duplicatedWord && await duplicatedWord.update({ status: WordStatus.Pending, previousStatus: duplicatedWord.status, wordId: sequelize.literal('NULL') });
 });
 
 Word.addHook('beforeBulkDestroy', 'bulk delete my vocabularies', async (options: DestroyOptions<InferAttributes<Word>>) => {
   const words = await Word.findAll({ where: options.where });
+  const ids = words.map(word => word.id);
+
   await MyVocabulary.destroy({
     where: {
       wordId: {
-        [Op.in]: words.map(word => word.id),
+        [Op.in]: ids,
       },
     },
   });
+
+  await Word.update(
+    {
+      status: WordStatus.Pending,
+      previousStatus: sequelize.literal('status'),
+      wordId: sequelize.literal('NULL'),
+    },
+    {
+      where: {
+        wordId: {
+          [Op.in]: ids,
+        },
+      },
+      validate: false,
+    }
+  );
 });
 
 export { Word };

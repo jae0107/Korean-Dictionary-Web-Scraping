@@ -10,6 +10,7 @@ export const userRequestFragment = gql(`
     pages
     example
     deniedReason
+    wordId
   }
 `);
 

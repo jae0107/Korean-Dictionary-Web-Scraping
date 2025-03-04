@@ -29,7 +29,6 @@ export const wordTypeDefs = gql`
     deniedReason: String
     requestors: [User!]
     isMyVocabulary: Boolean
-    isDuplicated: Boolean
     wordId: ID
     createdAt: DateTime!
   }
@@ -43,7 +42,6 @@ export const wordTypeDefs = gql`
     example: String
     deniedReason: String
     requestorIds: [ID!]
-    isDuplicated: Boolean
     wordId: ID
   }
 
@@ -70,6 +68,7 @@ export const wordTypeDefs = gql`
     duplicateWordRequest(input: WordInput!): Word!
     updateWordRequest(input: WordInput!): Word!
     approveWordRequest(id: ID!): Boolean!
+    approveDuplicatedWordRequest(id: ID!): Boolean!
     recoverWordRequest(id: ID!): Boolean!
     denyWordRequest(id: ID!, deniedReason: String): Boolean!
     deleteWordRequest(id: ID!): Boolean!

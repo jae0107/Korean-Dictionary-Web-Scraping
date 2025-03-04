@@ -150,9 +150,7 @@ const AccountCreation = () => {
 
     setWrongData(inValidData);
     setDuplicateAccounts(tmpDuplicates);
-    // setCorrectData(tmpCorrectData);
     onBulkCreate(tmpCorrectData);
-    console.log("tmpCorrectData: ", tmpCorrectData);
   };
 
   const {

@@ -6,7 +6,7 @@ import naverLogo from "../../../../../assets/images/naverLogo.png";
 import { Dispatch, SetStateAction, useState } from "react";
 import RequestorsPopUp from "../RequestorsPopUp/RequestorsPopUp";
 
-const RequestDetailPopUP = ({
+const RequestDetailPopUp = ({
   openRequestDetailPopUp,
   getWordRequest,
   setRequestor,
@@ -247,4 +247,4 @@ const RequestDetailPopUP = ({
   );
 }
 
-export default RequestDetailPopUP; 
+export default RequestDetailPopUp; 

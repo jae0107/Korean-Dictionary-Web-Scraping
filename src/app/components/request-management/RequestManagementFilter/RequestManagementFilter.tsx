@@ -69,6 +69,11 @@ const RequestManagementFilter = ({
               {...a11yProps(WordStatus.Pending)}
             />
             <Tab
+              label="중복"
+              value={WordStatus.Duplicated}
+              {...a11yProps(WordStatus.Duplicated)}
+            />
+            <Tab
               label="거절"
               value={WordStatus.Denied}
               {...a11yProps(WordStatus.Denied)}
