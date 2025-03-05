@@ -1,37 +1,50 @@
-import { WordByTitleItemsFragment, WordInput } from "@/app/generated/gql/graphql";
-import { AddCircle, ArrowRightAlt, Cancel, Close, DeleteForever, MenuBook } from "@mui/icons-material";
-import { Box, Button, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
-import { FieldErrors, SubmitErrorHandler, UseFormReturn } from "react-hook-form";
-import korDicLogo from "../../../../../assets/images/korDicLogo.png";
-import naverLogo from "../../../../../assets/images/naverLogo.png";
-import { useState } from "react";
+import { MyWordRequestItemsFragment, WordInput } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Button, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import korDicLogo from "../../../../assets/images/korDicLogo.png";
+import naverLogo from "../../../../assets/images/naverLogo.png";
+import { AddCircle, ArrowRightAlt, Cancel, DeleteForever } from "@mui/icons-material";
+import { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { duplicateWordRequestMutation } from "./query";
+import { updateWordRequestMutation } from "./query";
 
-const MergeWordPopUp = ({
-  openMergeWordPopUp,
-  setOpenMergeWordPopUp,
-  existingWord,
-  loading,
-  form,
-  getLoader,
-  setLoader,
+const schema = z.object({
+  title: z.string().nonempty(),
+  korDicResults: z.array(z.string()),
+  naverDicResults: z.array(z.string()),
+  pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
+  example: z.union([z.string(), z.null()]).optional(),
+  wordId: z.string().optional(),
+})
+.refine((data) => data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
+  message: "국립국어원 사전 또는 네이버 사전의 검색 결과가 필요합니다.",
+  path: ["korDicResults"],
+});
+
+const MyRequestForm = ({
+  defaultValues,
+  originalWord,
+  refetch,
 } : {
-  openMergeWordPopUp: boolean;
-  setOpenMergeWordPopUp: (value: boolean) => void;
-  existingWord: WordByTitleItemsFragment | null;
-  loading: boolean;
-  form: UseFormReturn<WordInput>;
-  getLoader: boolean;
-  setLoader: (value: boolean) => void;
+  defaultValues: WordInput;
+  originalWord: MyWordRequestItemsFragment | null;
+  refetch: () => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
-  
+
   const [getKorDic, setKorDic] = useState<string>('');
   const [getNaverDic, setNaverDic] = useState<string>('');
+  const [getLoader, setLoader] = useState<boolean>(false);
 
-  const [duplicateWordRequest] = useMutation(duplicateWordRequestMutation);
+  const [updateWordRequest] = useMutation(updateWordRequestMutation);
+  
+  const form = useForm({
+    defaultValues: defaultValues,
+    resolver: zodResolver(schema),
+  });
 
   const { watch, setValue, handleSubmit, register } = form;
 
@@ -46,22 +59,22 @@ const MergeWordPopUp = ({
   };
 
   const handleMerge = () => {
-    if (!existingWord) {
+    if (!originalWord) {
       return watch();
     }
 
     const input: WordInput = {
-      pages: [...(existingWord.pages || []).filter(page => page !== null), ...(watch('pages') || []).filter(page => page !== null)],
-      title: existingWord.title,
-      korDicResults: [...(existingWord.korDicResults || []), ...(watch('korDicResults') || [])],
-      naverDicResults: [...(existingWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
-      example: mergeExamples(existingWord.example || '', watch('example') || ''),
-      wordId: existingWord.id,
+      pages: [...(originalWord.pages || []).filter(page => page !== null), ...(watch('pages') || []).filter(page => page !== null)],
+      title: originalWord.title,
+      korDicResults: [...(originalWord.korDicResults || []), ...(watch('korDicResults') || [])],
+      naverDicResults: [...(originalWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
+      example: mergeExamples(originalWord.example || '', watch().example || ''),
+      wordId: originalWord.id,
     }
 
     return input;
   };
-
+  
   const getErrorMsg = (errors: FieldErrors<WordInput>) => {
     if (errors) {
       return Object.keys(errors)
@@ -94,7 +107,7 @@ const MergeWordPopUp = ({
 
   const onSubmit = () => {
     setLoader(true);
-    duplicateWordRequest({
+    updateWordRequest({
       variables: {
         input: {
           ...handleMerge(),
@@ -113,27 +126,35 @@ const MergeWordPopUp = ({
       },
       onCompleted: () => {
         setLoader(false);
-        setOpenMergeWordPopUp(false);
+        refetch();
         dispatchCurrentSnackBar({
           payload: {
             open: true,
             type: 'success',
-            message: '단어 추가 요청이 성공적으로 제출되었습니다.',
+            message: '단어 요청이 성공적으로 수정되었습니다.',
           },
         });
       },
     });
   };
 
+  const handleAddPageOption = () => {
+    const newOption = 0;
+    setValue('pages', [
+      ...(watch('pages') ?? []),
+      newOption,
+    ]);
+  };
+
   const getResults = (results: string[], dicType: string, isNew: boolean) => {
     return (
       <Box display={'flex'} flexDirection={'column'} width={'100%'}>
-        <List sx={{ width: '100%', pt: 0, pb: 0 }}>
+        <List sx={{ width: '100%' }}>
           {
             results.map((item, index) => (
               <ListItem key={index} sx={{ pl: 0, pr: 0, '&.MuiListItem-padding': { pt: 0 } }} dense>
-                <Typography variant={'body2'} color={isNew? 'success': 'textPrimary'}>
-                  {results.length > 1 ? `${index+(existingWord && isNew ? existingWord[dicType === 'koDic' ? 'korDicResults' : 'naverDicResults'] || [] : []).length+1}. ${item}` : item}
+                <Typography variant={'body2'} color={isNew && originalWord? 'success': 'textPrimary'}>
+                  {results.length > 1 ? `${index+(originalWord && isNew ? originalWord[dicType === 'koDic' ? 'korDicResults' : 'naverDicResults'] || [] : []).length+1}. ${item}` : item}
                 </Typography>
                 {
                   isNew &&
@@ -144,7 +165,7 @@ const MergeWordPopUp = ({
                       setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults);
                     }}
                     sx={{ 
-                      padding: '0 8px',
+                      padding: '8px',
                       fontSize: '1.5rem',
                       '@media (max-width:500px)': {
                         padding: '0 5px',
@@ -253,17 +274,9 @@ const MergeWordPopUp = ({
     );
   };
 
-  const handleAddPageOption = () => {
-    const newOption = 0;
-    setValue('pages', [
-      ...(watch('pages') ?? []),
-      newOption,
-    ]);
-  };
-
   const getPages = (pages: number[], isNew: boolean) => {
     return (
-      <Stack spacing={1}>
+      <Stack spacing={2}>
         {
           pages.map((page, index) => (
             <Stack spacing={1} direction={'row'} key={index} width={'100%'}>
@@ -330,132 +343,122 @@ const MergeWordPopUp = ({
       </Stack>
     );
   };
-
+    
   return (
-    <Dialog
-      open={openMergeWordPopUp}
-      onClose={() => setOpenMergeWordPopUp(false)}
-      sx={{
-        '@media (max-width: 750px)': {
-          '& .MuiDialog-container': {
-            '& .MuiPaper-root': {
-               margin: 1,
-            }
-          }
-        },
-      }}
-    >
-      <Box display={'flex'} justifyContent={'flex-end'}>
-        <IconButton onClick={() => setOpenMergeWordPopUp(false)}>
-          <Close/>
-        </IconButton>
-      </Box>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0, pb: 2 }}>
-        <MenuBook color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/> {existingWord?.title}
-      </DialogTitle>
-      <DialogContent>
-        <Stack spacing={2}>
-          <Stack spacing={1}>
-            <Stack spacing={1} direction={'row'} alignItems={'center'}>
-              <img 
-                src={korDicLogo.src}
-                style={{ 
-                  width: '2rem', 
-                  height: '2rem', 
-                  background: 'white',
-                  borderRadius: '50%',
-                  border: '1px solid #807c7c87',
-                }}
-              />
-              <DialogContentText fontWeight={'bold'}>
-                국립국어원
-              </DialogContentText>
-            </Stack>
-            <Box>
-              {getResults(existingWord?.korDicResults ?? [], 'koDic', false)}
-              {getResults(watch('korDicResults') ?? [], 'koDic', true)}
-            </Box>
+    <Stack spacing={2} mt={2} mb={2} maxWidth={'700px'}>
+      <Typography variant="h5" display={'flex'} justifyContent={'center'}>
+        나의 요청
+      </Typography>
+      <Divider/>
+      <Typography variant="body1">
+        <b>단어:</b>{' '}{watch('title')}
+      </Typography>
+      <Divider/>
+      <Stack spacing={1}>
+        <Stack spacing={1} direction={'row'} alignItems={'center'}>
+          <img 
+            src={korDicLogo.src}
+            style={{ 
+              width: '2rem', 
+              height: '2rem', 
+              background: 'white',
+              borderRadius: '50%',
+              border: '1px solid #807c7c87',
+            }}
+          />
+          <Typography variant="body1" fontWeight={'bold'}>
+            국립국어원
+          </Typography>
+        </Stack>
+        <Box>
+          {originalWord && getResults(originalWord.korDicResults ?? [], 'koDic', false)}
+          {getResults(watch('korDicResults') ?? [], 'koDic', true)}
+        </Box>
+      </Stack>
+      <Stack spacing={1}>
+        <Stack spacing={1} direction={'row'} alignItems={'center'}>
+          <img 
+            src={naverLogo.src}
+            style={{ 
+              width: '2rem', 
+              height: '2rem', 
+            }}
+          />
+          <Typography variant="body1" fontWeight={'bold'}>
+            네이버
+          </Typography>
+        </Stack>
+        <Box>
+          {originalWord && getResults(originalWord.naverDicResults ?? [], 'naverDic', false)}
+          {getResults(watch('naverDicResults') ?? [], 'naverDic', true)}
+        </Box>
+      </Stack>
+      <Divider/>
+      <Stack spacing={2}>
+        {
+          originalWord &&
+          <Typography variant="body1">
+            <b>기존 페이지: </b>{' '}{originalWord.pages?.join(', ') || '-'}
+          </Typography>
+        }
+        <Box display={'flex'} flexDirection={'column'}>
+          {getPages(watch('pages') ?? [], true)}
+        </Box>
+      </Stack>
+      <Divider/>
+      <Stack spacing={2}>
+        {
+          originalWord &&
+          <Stack spacing={0.5} direction={'row'}>
+            <Typography variant="body1">
+              <b>기존 예문: </b>{' '}{originalWord.example || '-'}
+            </Typography>
           </Stack>
-          <Stack spacing={1}>
-            <Stack spacing={1} direction={'row'} alignItems={'center'}>
-              <img 
-                src={naverLogo.src}
-                style={{ 
-                  width: '2rem', 
-                  height: '2rem', 
-                }}
-              />
-              <DialogContentText fontWeight={'bold'}>
-                네이버
-              </DialogContentText>
-            </Stack>
-            <Box>
-              {getResults(existingWord?.naverDicResults ?? [], 'naverDic', false)}
-              {getResults(watch('naverDicResults') ?? [], 'naverDic', true)}
-            </Box>
-          </Stack>
-          <Divider/>
-          <Stack spacing={2}>
-            <DialogContentText>
-              <b>기존 페이지: </b>{' '}{existingWord ? existingWord.pages?.join(', ') || '-' : '-'}
-            </DialogContentText>
-            <Box display={'flex'} flexDirection={'column'}>
-              {getPages(watch('pages') ?? [], true)}
-            </Box>
-          </Stack>
-          <Divider/>
-          <Stack spacing={2}>
-            <Stack spacing={0.5} direction={'row'}>
-              <DialogContentText>
-                <b>기존 예문: </b>{' '}{existingWord ? existingWord.example || '-' : '-'}
-              </DialogContentText>
-            </Stack>
-            <TextField
-              label={'추가될 예문'}
-              {...register('example')}
-              type='text'
-              multiline
-              rows={4}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setValue('example', '')}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-                htmlInput: { 
-                  sx: {
-                    '@media (max-width:500px)': {
-                      fontSize: '0.8rem'
-                    }
-                  },
-                },
-              }}
-            />
-          </Stack>
-          <Divider/>
-          <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
-            <Button
-              variant="contained"
-              loading={getLoader}
-              onClick={handleSubmit(onSubmit, onError)}
-              sx={{ 
-                fontSize: '0.875rem',
+        }
+        <TextField
+          label={'추가될 예문'}
+          {...register('example')}
+          type='text'
+          multiline
+          rows={4}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setValue('example', '')}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+            htmlInput: { 
+              sx: {
                 '@media (max-width:500px)': {
                   fontSize: '0.8rem'
                 }
-              }}
-            >
-              추가 요청
-            </Button>
-          </Box>
-        </Stack>
-      </DialogContent>
-    </Dialog>
+              },
+            },
+          }}
+        />
+      </Stack>
+      <Divider/>
+      <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
+        <Button
+          variant="contained"
+          loading={getLoader}
+          onClick={handleSubmit(onSubmit, onError)}
+          sx={{ 
+            fontSize: '0.875rem',
+            '@media (max-width:500px)': {
+              fontSize: '0.8rem'
+            }
+          }}
+        >
+          수정하기
+        </Button>
+      </Box>
+    </Stack>
   );
 }
 
-export default MergeWordPopUp;
+export default MyRequestForm;

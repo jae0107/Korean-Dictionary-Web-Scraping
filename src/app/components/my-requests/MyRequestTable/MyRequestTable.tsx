@@ -1,5 +1,5 @@
 import { MyRequestItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
-import { Cancel, Search } from "@mui/icons-material";
+import { Cancel, Edit, Search } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -14,6 +14,8 @@ import { useSnackbar } from "@/app/hooks/useSnackbar";
 import MyRequestBulkAction from "./MyRequestBulkAction/MyRequestBulkAction";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
 import DuplicatedRequestPopUp from "../../request-management/RequestManagementTable/DuplicatedRequestPopUp/DuplicatedRequestPopUp";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const MyRequestTable = ({
   loading,
@@ -45,6 +47,7 @@ const MyRequestTable = ({
   setSelectedRequests: (value: string[]) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const router = useRouter();
   const maxWidth750 = useMediaQuery('(max-width:750px)');
   const maxWidth475 = useMediaQuery('(max-width:475px)');
   const maxWidth435 = useMediaQuery('(max-width:435px)');
@@ -149,14 +152,24 @@ const MyRequestTable = ({
   ];
 
   if (wordRequestStatus === 'PENDING') {
-    columns.filter((column) => column.field !== 'deniedReason');
     columns.push({
       field: 'actions',
       type: 'actions',
       headerName: '작업',
       renderHeader: () => null,
-      width: 40,
+      width: 80,
       getActions: (params) => [
+        <GridActionsCellItem
+          key="edit"
+          icon={
+            <Tooltip title={'수정'}>
+              <Edit />
+            </Tooltip>
+          }
+          label="수정"
+          showInMenu={false}
+          onClick={() => router.push(`/my-requests/${params.row.id}`)}
+        />,
         <GridActionsCellItem
           key="cancel"
           icon={
@@ -177,7 +190,6 @@ const MyRequestTable = ({
       ]
     });
   } else if (wordRequestStatus === 'DENIED') {
-    columns.filter((column) => column.type !== 'actions');
     columns.push({
       field: 'deniedReason',
       headerName: '거절 사유',
@@ -185,14 +197,34 @@ const MyRequestTable = ({
       filterable: false,
       sortable: false,
     });
-  } else if (wordRequestStatus === 'DUPLICATED') {
-    columns.filter((column) => column.field !== 'deniedReason' && column.type !== 'actions');
+
     columns.push({
       field: 'actions',
       type: 'actions',
       headerName: '작업',
       renderHeader: () => null,
       width: 40,
+      getActions: (params) => [
+        <GridActionsCellItem
+          key="edit"
+          icon={
+            <Tooltip title={'수정'}>
+              <Edit />
+            </Tooltip>
+          }
+          label="수정"
+          showInMenu={false}
+          onClick={() => router.push(`/my-requests/${params.row.id}`)}
+        />
+      ]
+    });
+  } else if (wordRequestStatus === 'DUPLICATED') {
+    columns.push({
+      field: 'actions',
+      type: 'actions',
+      headerName: '작업',
+      renderHeader: () => null,
+      width: 80,
       getActions: (params) => [
         <GridActionsCellItem
           key="detail"
@@ -209,11 +241,20 @@ const MyRequestTable = ({
             setSelectedWordId(params.row.id);
             setOpenDuplicatedRequestPopUp(true);
           }}
+        />,
+        <GridActionsCellItem
+          key="edit"
+          icon={
+            <Tooltip title={'수정'}>
+              <Edit />
+            </Tooltip>
+          }
+          label="수정"
+          showInMenu={false}
+          onClick={() => router.push(`/my-requests/${params.row.id}`)}
         />
       ]
     });
-  } else {
-    columns.filter((column) => column.field !== "deniedReason" && column.type !== "actions");
   }
 
   const handleClose = (isConfirm: boolean) => {

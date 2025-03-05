@@ -16,7 +16,6 @@ import AccountIdPopUp from "./AccountIdPopUp/AccountIdPopUp";
 const FindMyIdForm = () => {
   const theme = useThemeContext();
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [getRole, setRole] = useState<UserRole | null>(UserRole.Student);

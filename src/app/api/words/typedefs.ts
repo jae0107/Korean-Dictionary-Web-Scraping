@@ -31,6 +31,7 @@ export const wordTypeDefs = gql`
     isMyVocabulary: Boolean
     wordId: ID
     createdAt: DateTime!
+    originalWord: Word
   }
 
   input WordInput {

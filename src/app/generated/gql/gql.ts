@@ -27,6 +27,7 @@ const documents = {
     "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n  }\n": types.WordByTitleItemsFragmentDoc,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n": types.GetWordByTitleDocument,
+    "\n  mutation UpdateWordRequest($input: WordInput!) {\n    updateWordRequest(input: $input) {\n      id\n    }\n  }\n": types.UpdateWordRequestDocument,
     "\n  mutation ChangeCurrentPassword($changeCurrentPasswordId: ID!, $input: FindPasswordInput!) {\n    changeCurrentPassword(id: $changeCurrentPasswordId, input: $input) {\n      id\n    }\n  }\n": types.ChangeCurrentPasswordDocument,
     "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n": types.BulkPasswordResetDocument,
     "\n  mutation PasswordReset($passwordResetId: ID!, $password: String) {\n    passwordReset(id: $passwordResetId, password: $password) {\n      id\n    }\n  }\n": types.PasswordResetDocument,
@@ -61,6 +62,8 @@ const documents = {
     "\n  mutation UpdateUser($updateUserId: ID!, $input: UserInput!) {\n    updateUser(id: $updateUserId, input: $input) {\n      id\n    }\n  }\n": types.UpdateUserDocument,
     "\n  mutation AddMyVocabulary($input: MyVocabularyInput!) {\n    addMyVocabulary(input: $input) {\n      id\n    }\n  }\n": types.AddMyVocabularyDocument,
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
+    "\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      example\n    }\n  }\n": types.MyWordRequestItemsFragmentDoc,
+    "\n  query GetMyWordRequest($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...MyWordRequestItems\n      status\n      requestors {\n        id\n      }\n    }\n  }\n": types.GetMyWordRequestDocument,
     "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    example\n    deniedReason\n    wordId\n  }\n": types.MyRequestItemsFragmentDoc,
     "\n  query GetMyRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getMyRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...MyRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetMyRequestsDocument,
     "\n  fragment MyVocabularyItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n  }\n": types.MyVocabularyItemsFragmentDoc,
@@ -153,6 +156,10 @@ export function gql(source: "\n  mutation CreateWordRequest($input: WordInput!) 
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n"): (typeof documents)["\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateWordRequest($input: WordInput!) {\n    updateWordRequest(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateWordRequest($input: WordInput!) {\n    updateWordRequest(input: $input) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -289,6 +296,14 @@ export function gql(source: "\n  mutation AddMyVocabulary($input: MyVocabularyIn
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n"): (typeof documents)["\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      example\n    }\n  }\n"): (typeof documents)["\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    example\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      example\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetMyWordRequest($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...MyWordRequestItems\n      status\n      requestors {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetMyWordRequest($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...MyWordRequestItems\n      status\n      requestors {\n        id\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

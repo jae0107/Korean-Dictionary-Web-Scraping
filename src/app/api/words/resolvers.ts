@@ -37,6 +37,9 @@ export const wordResolvers = {
     async isMyVocabulary(word: Word, _args: unknown, { currentUser, dataloaders }: Context) {
       return word.requestorIds && currentUser ? !!await dataloaders.myVocabulary.load({ userId: currentUser.id, wordId: word.id }) : false;
     },
+    async originalWord(word: Word, _args: unknown) {
+      return word.wordId ? await Word.findByPk(word.wordId) : null;
+    },
   },
 };
 
@@ -183,8 +186,8 @@ async function duplicateWordRequest(
       korDicResults: input.korDicResults ?? [],
       naverDicResults: input.naverDicResults ?? [],
       pages: input.pages ?? [], 
-      example: input.example ?? undefined, 
-      deniedReason: input.deniedReason ?? undefined, 
+      example: input.example ?? '', 
+      deniedReason: input.deniedReason ?? '', 
       title: input.title ?? "",
       status: WordStatus.Duplicated,
       wordId: input.wordId ?? undefined,
@@ -217,15 +220,16 @@ async function updateWordRequest(
 
     const newInput = {
       ...input,
-      requestorIds: existingWord.requestorIds && existingWord.requestorIds.length > 0 ? [...existingWord.requestorIds, currentUser.id] : [currentUser.id],
+      requestorIds: input.requestorIds ?? existingWord.requestorIds,
       korDicResults: input.korDicResults ?? [],
       naverDicResults: input.naverDicResults ?? [],
       pages: input.pages ?? [],
-      example: input.example ?? undefined, 
-      deniedReason: input.deniedReason ?? undefined, 
+      example: input.example ?? '', 
+      deniedReason: input.deniedReason ?? '', 
       title: input.title ?? "",
       status: WordStatus.Pending,
-      wordId: undefined,
+      previousStatus: existingWord.status,
+      wordId: input.wordId || existingWord.wordId,
     };
 
     const updatedWord: Word = await existingWord.update(newInput);
