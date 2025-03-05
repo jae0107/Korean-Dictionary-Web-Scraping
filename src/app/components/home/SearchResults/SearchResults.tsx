@@ -1,5 +1,5 @@
 import { SearchResult } from "@/app/types/types";
-import { Box, Button, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
@@ -310,6 +310,7 @@ const SearchResults = ({
             {getResults(watch('naverDicResults') ?? [], 'naverDic')}
           </Box>
         }
+        <Divider/>
         <Stack spacing={1}>
           {
             watch('pages') && (watch('pages') || []).length > 0 &&
@@ -372,6 +373,7 @@ const SearchResults = ({
             페이지 추가
           </Button>
         </Stack>
+        <Divider/>
         <TextField
           label={'예문'}
           {...register('example')}
@@ -397,6 +399,7 @@ const SearchResults = ({
             },
           }}
         />
+        <Divider/>
         <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
           <Button
             variant="contained"

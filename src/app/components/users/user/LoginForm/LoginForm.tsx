@@ -101,7 +101,7 @@ const LoginForm = () => {
     }
     setLoading(false);
   };
-
+  
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
       <Stack 
@@ -110,7 +110,7 @@ const LoginForm = () => {
         padding={5} 
         borderRadius={2} 
         boxShadow={2} 
-        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'rgb(224, 223, 223)'}
         sx={{
           '@media (max-width:530px)': {
             width: '95% !important',

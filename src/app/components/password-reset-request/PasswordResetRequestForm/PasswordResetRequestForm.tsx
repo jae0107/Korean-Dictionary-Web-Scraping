@@ -53,7 +53,7 @@ const PasswordResetRequestForm = () => {
           }
         }
         return true
-      },{ message: "학년은 숫자여야 합니다." }),
+      },{ message: "학년을 입력하십시오." }),
     class: z.string().optional()
       .refine((classValue) => {
         if (getRole === UserRole.Student) {
@@ -71,7 +71,7 @@ const PasswordResetRequestForm = () => {
           }
         }
         return true;
-      },{ message: "번호는 숫자여야 합니다." }),
+      },{ message: "번호를 입력하십시오." }),
     role: z.nativeEnum(UserRole, { errorMap: () => ({ message: "역할을 작성하십시오." }) }),
   });
 
@@ -125,9 +125,15 @@ const PasswordResetRequestForm = () => {
     createPasswordResetRequest({
       variables: {
         input: UserRole.Student ? {
-          ...input,
+          name: input.name,
+          accountId: input.accountId,
+          year: input.year,
+          class: input.class,
+          number: input.number,
+          role: input.role,
         } : {
           name: input.name,
+          email: input.email,
           accountId: input.accountId,
           role: input.role,
         },
@@ -163,7 +169,9 @@ const PasswordResetRequestForm = () => {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        width: '100%'
+        width: '100%',
+        marginTop: '50px',
+        marginBottom: '50px',
       }}
     >
       <Stack 
@@ -172,7 +180,7 @@ const PasswordResetRequestForm = () => {
         padding={5} 
         borderRadius={2} 
         boxShadow={2} 
-        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'white'}
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'rgb(224, 223, 223)'}
         sx={{
           '@media (max-width:530px)': {
             width: '95% !important',

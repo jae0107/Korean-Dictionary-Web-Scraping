@@ -2,11 +2,8 @@
 
 import { Box } from "@mui/material";
 import FindMyIdForm from "../components/find-my-id/FindMyIdForm/FindMyIdForm";
-import { useState } from "react";
 
 const FindMyId = () => {
-  const [getAccountId, setAccountId] = useState<string>('');
-
   return (
     <Box 
       display={'flex'} 

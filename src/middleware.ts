@@ -13,6 +13,6 @@ export const config = {
     "/password-change",
     "/password-setup",
     "/my-requests",
-    "/((?!signin|signup|password-reset-request|api|public).*)", // Protect all pages except these
+    "/((?!signin|signup|password-reset-request|find-my-id|api|public).*)", // Protect all pages except these
   ],
 };
