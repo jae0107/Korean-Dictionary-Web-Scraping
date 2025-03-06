@@ -76,7 +76,7 @@ const RequestManagementTable = ({
   const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({
     pages: !maxWidth850,
     requestor: !maxWidth1000,
-    example: !maxWidth750,
+    examples: !maxWidth750,
     title: true,
     korDicResults: !maxWidth750,
     naverDicResults: !maxWidth750,
@@ -88,7 +88,7 @@ const RequestManagementTable = ({
     setColumnVisibilityModel({
       pages: !maxWidth850,
       requestor: !maxWidth1000,
-      example: !maxWidth750,
+      examples: !maxWidth750,
       title: columnVisibilityModel.title,
       korDicResults: !maxWidth750,
       naverDicResults: !maxWidth750,
@@ -431,14 +431,17 @@ const RequestManagementTable = ({
       headerName: '페이지', 
       headerClassName: 'page-header',
       cellClassName: 'page-cell',
-      width: 60, 
+      width: 65, 
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         if (!params.row.pages || params.row.pages.length === 0) {
           return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
         }
-        return params.row.pages.map((page) => `${page}\n`);
+        if (params.row.pages.length === 1) {
+          return params.row.pages[0];
+        }
+        return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
     { 
@@ -497,7 +500,7 @@ const RequestManagementTable = ({
       }
     },
     { 
-      field: 'example',
+      field: 'examples',
       headerName: '예문', 
       headerClassName: 'example-header',
       cellClassName: 'example-cell',
@@ -505,8 +508,14 @@ const RequestManagementTable = ({
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
+        if (!params.row.examples || params.row.examples.length === 0) {
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        if (params.row.examples.length === 1) {
+          return params.row.examples[0];
+        }
         return (
-          params.row.example ? params.row.example : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+          params.row.examples.map((example, i) => `${i+1}. ${example}\n`)
         );
       }
     },

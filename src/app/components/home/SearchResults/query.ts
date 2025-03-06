@@ -7,7 +7,7 @@ export const wordByTitleFragment = gql(`
     title
     korDicResults
     naverDicResults
-    example
+    examples
   }
 `);
 

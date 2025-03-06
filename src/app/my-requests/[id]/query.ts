@@ -7,14 +7,14 @@ export const myWordRequestFragment = gql(`
     title
     korDicResults
     naverDicResults
-    example
+    examples
     originalWord {
       id
       pages
       title
       korDicResults
       naverDicResults
-      example
+      examples
     }
   }
 `);

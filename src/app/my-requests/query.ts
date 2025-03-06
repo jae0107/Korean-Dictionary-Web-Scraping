@@ -7,7 +7,7 @@ export const MyRequestFragment = gql(`
     naverDicResults
     title
     pages
-    example
+    examples
     deniedReason
     wordId
   }

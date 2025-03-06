@@ -23,7 +23,7 @@ export const wordRequestFragment = gql(`
     status
     title
     pages
-    example
+    examples
     deniedReason
     wordId
   }

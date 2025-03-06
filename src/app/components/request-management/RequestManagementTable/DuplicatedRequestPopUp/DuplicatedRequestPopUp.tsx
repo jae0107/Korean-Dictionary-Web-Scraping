@@ -144,8 +144,8 @@ const DuplicatedRequestPopUp = ({
     );
   });
 
-  const newExample = (getWordRequest.example || '').replace((data?.getWord.example || ''), '').trimStart();
-
+  const newExamples = (getWordRequest.examples || []).filter(example => !(data?.getWord.examples || []).includes(example));
+  
   const getResults = (results: string[], dicType: string, isNew: boolean) => {
     return (
       <Box display={'flex'} flexDirection={'column'} width={'100%'}>
@@ -165,7 +165,7 @@ const DuplicatedRequestPopUp = ({
   };
 
   const getExample = () => {
-    if (data?.getWord?.example?.length === 0 && newExample.length === 0) {
+    if (data?.getWord?.examples?.length === 0 && newExamples.length === 0) {
       return (
         <Stack spacing={0.5} direction={'row'}>
           <DialogContentText>
@@ -174,39 +174,39 @@ const DuplicatedRequestPopUp = ({
           <DialogContentText>-</DialogContentText>
         </Stack>
       );
-    } else if (data?.getWord?.example?.length === 0 && newExample.length > 0) {
+    } else if (data?.getWord?.examples?.length === 0 && newExamples.length > 0) {
       return (
         <Stack spacing={0.5} direction={'row'}>
           <DialogContentText>
             <b>예문: </b>
           </DialogContentText>
           <DialogContentText color="success">
-            {newExample}
+            {newExamples.length === 1 ? newExamples[0] : newExamples.map((example, index) => `• ${example}`).join('\n')}
           </DialogContentText>
         </Stack>
       );
-    } else if (data && data.getWord && data.getWord.example && data.getWord.example.length > 0 && newExample.length === 0) {
+    } else if (data && data.getWord && data.getWord.examples && data.getWord.examples.length > 0 && newExamples.length === 0) {
       return (
         <Stack spacing={0.5} direction={'row'}>
           <DialogContentText>
             <b>예문: </b>
           </DialogContentText>
           <DialogContentText>
-            {data.getWord.example}
+            {data.getWord.examples.length === 1 ? data.getWord.examples[0] : data.getWord.examples.map((example, index) => `• ${example}`).join('\n')}
           </DialogContentText>
         </Stack>
       );
-    } else if (data && data.getWord && data.getWord.example && data.getWord.example.length > 0 && newExample.length > 0) {
+    } else if (data && data.getWord && data.getWord.examples && data.getWord.examples.length > 0 && newExamples.length > 0) {
       return (
         <Stack spacing={0.5}>
           <DialogContentText>
             <b>예문: </b>
           </DialogContentText>
           <DialogContentText whiteSpace={'pre-line'}>
-            {data.getWord.example || '-'}
+            {data.getWord.examples.map((example, index) => `• ${example}`).join('\n')}
           </DialogContentText>
           <DialogContentText color="success" whiteSpace={'pre-line'}>
-            {newExample}
+            {newExamples.map((example, index) => `• ${example}`).join('\n')}
           </DialogContentText>
         </Stack>
       );

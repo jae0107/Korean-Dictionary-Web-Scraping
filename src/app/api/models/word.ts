@@ -14,7 +14,7 @@ class Word extends Model<InferAttributes<Word>, InferCreationAttributes<Word>> {
   declare status: string;
   declare previousStatus?: string;
   declare pages?: number[];
-  declare example?: string;
+  declare examples?: string[];
   declare deniedReason?: string;
   declare wordId?: ID;
   declare createdAt: CreationOptional<Date>;
@@ -45,8 +45,8 @@ Word.init(
       type: DataTypes.ARRAY(DataTypes.INTEGER),
       allowNull: true,
     },
-    example: {
-      type: DataTypes.STRING,
+    examples: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
     deniedReason: {

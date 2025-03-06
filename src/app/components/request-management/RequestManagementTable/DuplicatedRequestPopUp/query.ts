@@ -7,7 +7,7 @@ export const duplicatedWordRequestFragment = gql(`
     title
     korDicResults
     naverDicResults
-    example
+    examples
     requestors {
       ...RequestorItems
     }

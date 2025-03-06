@@ -35,14 +35,14 @@ const MergeWordPopUp = ({
 
   const { watch, setValue, handleSubmit, register } = form;
 
-  const mergeExamples = (existingExample: string, newExample: string) => {
-    if (!existingExample) {
-      return newExample;
+  const mergeExamples = (existingExamples: string[], newExamples: string[]) => {
+    if (!existingExamples || existingExamples.length === 0) {
+      return newExamples;
     }
-    if (existingExample && !newExample) {
-      return existingExample;
+    if (existingExamples && existingExamples.length > 0 && (!newExamples || newExamples.length === 0)) {
+      return existingExamples;
     }
-    return existingExample + '\n' + newExample;
+    return [...existingExamples, ...newExamples];
   };
 
   const handleMerge = () => {
@@ -55,7 +55,7 @@ const MergeWordPopUp = ({
       title: existingWord.title,
       korDicResults: [...(existingWord.korDicResults || []), ...(watch('korDicResults') || [])],
       naverDicResults: [...(existingWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
-      example: mergeExamples(existingWord.example || '', watch('example') || ''),
+      examples: mergeExamples(existingWord.examples || [], watch('examples') || []),
       wordId: existingWord.id,
     }
 
@@ -144,7 +144,7 @@ const MergeWordPopUp = ({
                       setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults);
                     }}
                     sx={{ 
-                      padding: '0 8px',
+                      padding: '4px',
                       fontSize: '1.5rem',
                       '@media (max-width:500px)': {
                         padding: '0 5px',
@@ -257,6 +257,14 @@ const MergeWordPopUp = ({
     const newOption = 0;
     setValue('pages', [
       ...(watch('pages') ?? []),
+      newOption,
+    ]);
+  };
+
+  const handleAddExampleOption = () => {
+    const newOption = '';
+    setValue('examples', [
+      ...(watch('examples') ?? []),
       newOption,
     ]);
   };
@@ -407,34 +415,45 @@ const MergeWordPopUp = ({
           <Stack spacing={2}>
             <Stack spacing={0.5} direction={'row'}>
               <DialogContentText>
-                <b>기존 예문: </b>{' '}{existingWord ? existingWord.example || '-' : '-'}
+                <b>기존 예문: </b>{' '}{existingWord ? existingWord.examples || '-' : '-'}
               </DialogContentText>
             </Stack>
-            <TextField
-              label={'추가될 예문'}
-              {...register('example')}
-              type='text'
-              multiline
-              rows={4}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setValue('example', '')}>
-                        <Cancel sx={{ width: '15px', height: '15px' }}/>
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-                htmlInput: { 
-                  sx: {
-                    '@media (max-width:500px)': {
-                      fontSize: '0.8rem'
-                    }
-                  },
-                },
-              }}
-            />
+            {
+              watch('examples') && (watch('examples') || []).length > 0 && 
+              <Stack spacing={2}>
+                {(watch('examples') || []).map((example, i) => (
+                  <TextField
+                    key={i}
+                    label={'추가될 예문'}
+                    {...register(`examples.${i}`)}
+                    type='text'
+                    multiline
+                    rows={4}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setValue('examples', [])}>
+                              <Cancel sx={{ width: '15px', height: '15px' }}/>
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                      htmlInput: { 
+                        sx: {
+                          '@media (max-width:500px)': {
+                            fontSize: '0.8rem'
+                          }
+                        },
+                      },
+                    }}
+                  />
+                ))}
+              </Stack>
+            }
+            <Button variant='outlined' onClick={handleAddExampleOption}>
+              예문 추가
+            </Button>
           </Stack>
           <Divider/>
           <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>

@@ -16,7 +16,7 @@ const schema = z.object({
   korDicResults: z.array(z.string()),
   naverDicResults: z.array(z.string()),
   pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
-  example: z.union([z.string(), z.null()]).optional(),
+  examples: z.array(z.union([z.string(), z.null()])).optional(),
   wordId: z.string().optional(),
 })
 .refine((data) => data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
@@ -48,14 +48,14 @@ const MyRequestForm = ({
 
   const { watch, setValue, handleSubmit, register } = form;
 
-  const mergeExamples = (existingExample: string, newExample: string) => {
-    if (!existingExample) {
-      return newExample;
+  const mergeExamples = (existingExamples: string[], newExamples: string[]) => {
+    if (!existingExamples || existingExamples.length === 0) {
+      return newExamples;
     }
-    if (existingExample && !newExample) {
-      return existingExample;
+    if (existingExamples && existingExamples.length > 0 && (!newExamples || newExamples.length === 0)) {
+      return existingExamples;
     }
-    return existingExample + '\n' + newExample;
+    return [...existingExamples, ...newExamples];
   };
 
   const handleMerge = () => {
@@ -68,7 +68,7 @@ const MyRequestForm = ({
       title: originalWord.title,
       korDicResults: [...(originalWord.korDicResults || []), ...(watch('korDicResults') || [])],
       naverDicResults: [...(originalWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
-      example: mergeExamples(originalWord.example || '', watch().example || ''),
+      examples: mergeExamples(originalWord.examples || [], watch('examples') || []),
       wordId: originalWord.id,
     }
 
@@ -146,6 +146,14 @@ const MyRequestForm = ({
     ]);
   };
 
+  const handleAddExampleOption = () => {
+    const newOption = '';
+    setValue('examples', [
+      ...(watch('examples') ?? []),
+      newOption,
+    ]);
+  };
+
   const getResults = (results: string[], dicType: string, isNew: boolean) => {
     return (
       <Box display={'flex'} flexDirection={'column'} width={'100%'}>
@@ -165,7 +173,7 @@ const MyRequestForm = ({
                       setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults);
                     }}
                     sx={{ 
-                      padding: '8px',
+                      padding: '4px',
                       fontSize: '1.5rem',
                       '@media (max-width:500px)': {
                         padding: '0 5px',
@@ -411,35 +419,46 @@ const MyRequestForm = ({
           originalWord &&
           <Stack spacing={0.5} direction={'row'}>
             <Typography variant="body1">
-              <b>기존 예문: </b>{' '}{originalWord.example || '-'}
+              <b>기존 예문: </b>{' '}{originalWord.examples || '-'}
             </Typography>
           </Stack>
         }
-        <TextField
-          label={'추가될 예문'}
-          {...register('example')}
-          type='text'
-          multiline
-          rows={4}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setValue('example', '')}>
-                    <Cancel sx={{ width: '15px', height: '15px' }}/>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-            htmlInput: { 
-              sx: {
-                '@media (max-width:500px)': {
-                  fontSize: '0.8rem'
-                }
-              },
-            },
-          }}
-        />
+        {
+          watch('examples') && (watch('examples') || []).length > 0 && 
+          <Stack spacing={2}>
+            {(watch('examples') || []).map((example, i) => (
+              <TextField
+                key={i}
+                label={'추가될 예문'}
+                {...register(`examples.${i}`)}
+                type='text'
+                multiline
+                rows={4}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setValue('examples', [])}>
+                          <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                  htmlInput: { 
+                    sx: {
+                      '@media (max-width:500px)': {
+                        fontSize: '0.8rem'
+                      }
+                    },
+                  },
+                }}
+              />
+            ))}
+          </Stack>
+        }
+        <Button variant='outlined' onClick={handleAddExampleOption}>
+          예문 추가
+        </Button>
       </Stack>
       <Divider/>
       <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>

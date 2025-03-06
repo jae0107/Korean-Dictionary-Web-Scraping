@@ -7,7 +7,7 @@ export const MyVocabularyFragment = gql(`
     title
     korDicResults
     naverDicResults
-    example
+    examples
   }
 `);
 

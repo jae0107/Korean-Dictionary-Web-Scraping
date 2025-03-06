@@ -19,7 +19,7 @@ const schema = z.object({
   korDicResults: z.array(z.string()),
   naverDicResults: z.array(z.string()),
   pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
-  example: z.union([z.string(), z.null()]).optional(),
+  examples: z.array(z.union([z.string(), z.null()])).optional(),
   wordId: z.string().optional(),
 })
 .refine((data) => data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
@@ -49,7 +49,7 @@ const SearchResults = ({
       korDicResults: searchResults.koDic,
       naverDicResults: searchResults.naverDic,
       pages: [0],
-      example: '',
+      examples: [''],
       wordId: '',
     },
     resolver: zodResolver(schema),
@@ -149,6 +149,14 @@ const SearchResults = ({
     const newOption = 0;
     setValue('pages', [
       ...(watch('pages') ?? []),
+      newOption,
+    ]);
+  };
+
+  const handleAddExampleOption = () => {
+    const newOption = '';
+    setValue('examples', [
+      ...(watch('examples') ?? []),
       newOption,
     ]);
   };
@@ -374,31 +382,42 @@ const SearchResults = ({
           </Button>
         </Stack>
         <Divider/>
-        <TextField
-          label={'예문'}
-          {...register('example')}
-          type='text'
-          multiline
-          rows={4}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setValue('example', '')}>
-                    <Cancel sx={{ width: '15px', height: '15px' }}/>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-            htmlInput: { 
-              sx: {
-                '@media (max-width:500px)': {
-                  fontSize: '0.8rem'
-                }
-              },
-            },
-          }}
-        />
+        {
+          watch('examples') && (watch('examples') || []).length > 0 && 
+          <Stack spacing={2}>
+            {(watch('examples') || []).map((example, i) => (
+              <TextField
+                key={i}
+                label={'추가될 예문'}
+                {...register(`examples.${i}`)}
+                type='text'
+                multiline
+                rows={4}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setValue('examples', [])}>
+                          <Cancel sx={{ width: '15px', height: '15px' }}/>
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                  htmlInput: { 
+                    sx: {
+                      '@media (max-width:500px)': {
+                        fontSize: '0.8rem'
+                      }
+                    },
+                  },
+                }}
+              />
+            ))}
+          </Stack>
+        }
+        <Button variant='outlined' onClick={handleAddExampleOption}>
+          예문 추가
+        </Button>
         <Divider/>
         <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
           <Button

@@ -5,7 +5,6 @@ import { WordStatus } from "@/app/generated/gql/graphql";
 import { useRouter } from "next/navigation";
 import RequestorDropDown from "./RequestorDropDown/RequestorDropDown";
 import { Cancel } from "@mui/icons-material";
-
 const a11yProps = (index: string) => {
   return {
     id: `simple-tab-${index}`,
@@ -62,21 +61,42 @@ const RequestManagementFilter = ({
               label="승인"
               value={WordStatus.Approved}
               {...a11yProps(WordStatus.Approved)}
+              sx={{
+                '@media (max-width:420px)': {
+                  minWidth: 'unset',
+                }
+              }}
             />
             <Tab
               label="승인 대기중"
               value={WordStatus.Pending}
               {...a11yProps(WordStatus.Pending)}
+              sx={{
+                '@media (max-width:420px)': {
+                  flex: 2,
+                  minWidth: 'unset',
+                }
+              }}
             />
             <Tab
               label="중복"
               value={WordStatus.Duplicated}
               {...a11yProps(WordStatus.Duplicated)}
+              sx={{
+                '@media (max-width:420px)': {
+                  minWidth: 'unset',
+                }
+              }}
             />
             <Tab
               label="거절"
               value={WordStatus.Denied}
               {...a11yProps(WordStatus.Denied)}
+              sx={{
+                '@media (max-width:420px)': {
+                  minWidth: 'unset',
+                }
+              }}
             />
           </TabList>
         </Box>

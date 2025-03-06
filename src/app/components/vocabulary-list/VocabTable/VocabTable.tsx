@@ -162,17 +162,26 @@ const VocabTable = ({
       headerClassName: 'page-header',
       cellClassName: 'page-cell',
       headerName: '페이지', 
-      width: 60, 
+      width: 65, 
       filterable: false, 
       sortable: false,
       valueGetter: (value, row: VocabularyItemsFragment) => {
-        return row.pages && row.pages.length > 0 ? row.pages.join('\n') : '';
+        if (!row.pages || row.pages.length === 0) {
+          return '';
+        }
+        if (row.pages.length === 1) {
+          return row.pages[0];
+        }
+        return row.pages.map((page) => `• ${page}\n`);
       },
       renderCell: (params: GridRenderCellParams<VocabularyItemsFragment>) => {
         if (!params.row.pages || params.row.pages.length === 0) {
           return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
         }
-        return params.row.pages.map((page) => `${page}\n`);
+        if (params.row.pages.length === 1) {
+          return params.row.pages[0];
+        }
+        return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
@@ -239,16 +248,31 @@ const VocabTable = ({
       }
     },
     { 
-      field: 'example',
+      field: 'examples',
       headerClassName: 'example-header',
       cellClassName: 'example-cell',
       headerName: '예문', 
       flex: 1, 
       filterable: false, 
       sortable: false,
+      valueGetter: (value, row: VocabularyItemsFragment) => {
+        if (!row.examples || row.examples.length === 0) {
+          return '';
+        }
+        if (row.examples.length === 1) {
+          return row.examples[0];
+        }
+        return row.examples.map((example, i) => `${i+1}. ${example}\n`);
+      },
       renderCell: (params: GridRenderCellParams<VocabularyItemsFragment>) => {
+        if (!params.row.examples || params.row.examples.length === 0) {
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        if (params.row.examples.length === 1) {
+          return params.row.examples[0];
+        }
         return (
-          params.row.example ? params.row.example : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+          params.row.examples.map((example, i) => `${i+1}. ${example}\n`)
         );
       }
     },

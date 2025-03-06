@@ -25,7 +25,7 @@ export const wordTypeDefs = gql`
     korDicResults: [String!]
     naverDicResults: [String!]
     pages: [Int]
-    example: String
+    examples: [String!]
     deniedReason: String
     requestors: [User!]
     isMyVocabulary: Boolean
@@ -40,7 +40,7 @@ export const wordTypeDefs = gql`
     korDicResults: [String!]
     naverDicResults: [String!]
     pages: [Int!]
-    example: String
+    examples: [String!]
     deniedReason: String
     requestorIds: [ID!]
     wordId: ID

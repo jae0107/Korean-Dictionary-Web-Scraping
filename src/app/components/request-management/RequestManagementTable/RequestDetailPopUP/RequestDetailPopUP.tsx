@@ -75,6 +75,24 @@ const RequestDetailPopUp = ({
     return <></>;
   }
 
+  const getPages = () => {
+    if (!getWordRequest || !getWordRequest.pages || getWordRequest.pages?.length === 0) {
+      return '-';
+    } else if (getWordRequest.pages.length === 1) {
+      return getWordRequest.pages[0];
+    }
+    return `\n${getWordRequest.pages.map((example) => `${example}`).join(', ')}`;
+  }
+
+  const getExamples = () => {
+    if (!getWordRequest || !getWordRequest.examples || getWordRequest.examples?.length === 0) {
+      return '-';
+    } else if (getWordRequest.examples.length === 1) {
+      return getWordRequest.examples[0];
+    }
+    return `\n${getWordRequest.examples.map((example, index) => `${index+1}. ${example}`).join('\n')}`;
+  }
+
   return (
     <>
       <Dialog
@@ -103,7 +121,7 @@ const RequestDetailPopUp = ({
           <Stack spacing={2} direction={'column'}>
             <Stack spacing={0.5} direction={'row'}>
               <DialogContentText>
-                <b>페이지: </b>{' '}{getWordRequest ? getWordRequest.pages || '-' : '-'}
+                <b>페이지: </b>{getPages()}
               </DialogContentText>
             </Stack>
             {
@@ -182,8 +200,8 @@ const RequestDetailPopUp = ({
               </Stack>
             }
             <Stack spacing={0.5} direction={'row'}>
-              <DialogContentText>
-                <b>예문: </b>{' '}{getWordRequest ? getWordRequest.example || '-' : '-'}
+              <DialogContentText whiteSpace={'pre-line'}>
+                <b>예문: </b>{' '}{getExamples()}
               </DialogContentText>
             </Stack>
             {

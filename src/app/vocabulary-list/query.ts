@@ -8,7 +8,7 @@ export const VocabularyFragment = gql(`
     naverDicResults
     title
     pages
-    example
+    examples
   }
 `);
 

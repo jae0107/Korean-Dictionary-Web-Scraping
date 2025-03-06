@@ -8,7 +8,7 @@ export const userRequestFragment = gql(`
     status
     title
     pages
-    example
+    examples
     deniedReason
     wordId
   }

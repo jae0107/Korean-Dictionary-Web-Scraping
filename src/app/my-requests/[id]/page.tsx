@@ -116,14 +116,14 @@ const SingleMyRequest = () => {
     );
   });
 
-  const newExample = (data?.getWord.example || '').replace((originalWord ? originalWord.example || '' : ''), '').trimStart();
+  const newExamples = (data?.getWord.examples || []).filter(example => !(originalWord?.examples || []).includes(example));
 
   const defaultValues: WordInput = {
     title: data?.getWord.title || '',
     pages: (newPages || []).filter((page): page is number => page !== null),
     korDicResults: newKorDicResults || [],
     naverDicResults: newNaverDicResults || [],
-    example: newExample || '',
+    examples: newExamples || [],
     wordId: data?.getWord?.originalWord?.id || '',
   };
 

@@ -409,13 +409,17 @@ const UserContainer = ({
     { 
       field: 'pages', 
       headerName: '페이지', 
-      width: 60, 
+      width: 65, 
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
-        return (
-          params.row.pages ? params.row.pages : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
-        );
+        if (!params.row.pages || params.row.pages.length === 0) {
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        if (params.row.pages.length === 1) {
+          return params.row.pages[0];
+        }
+        return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
     { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
@@ -464,14 +468,20 @@ const UserContainer = ({
       }
     },
     { 
-      field: 'example',
+      field: 'examples',
       headerName: '예문', 
       flex: 1, 
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<UserRequestItemsFragment>) => {
+        if (!params.row.examples || params.row.examples.length === 0) {
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        if (params.row.examples.length === 1) {
+          return params.row.examples[0];
+        }
         return (
-          params.row.example ? params.row.example : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>
+          params.row.examples.map((example, i) => `${i+1}. ${example}\n`)
         );
       }
     },
@@ -598,21 +608,42 @@ const UserContainer = ({
                 label="승인"
                 value={WordStatus.Approved}
                 {...a11yProps(WordStatus.Approved)}
+                sx={{
+                  '@media (max-width:420px)': {
+                    minWidth: 'unset',
+                  }
+                }}
               />
               <Tab
                 label="승인 대기중"
                 value={WordStatus.Pending}
                 {...a11yProps(WordStatus.Pending)}
+                sx={{
+                  '@media (max-width:420px)': {
+                    flex: 2,
+                    minWidth: 'unset',
+                  }
+                }}
               />
               <Tab
                 label="중복"
                 value={WordStatus.Duplicated}
                 {...a11yProps(WordStatus.Duplicated)}
+                sx={{
+                  '@media (max-width:420px)': {
+                    minWidth: 'unset',
+                  }
+                }}
               />
               <Tab
                 label="거절"
                 value={WordStatus.Denied}
                 {...a11yProps(WordStatus.Denied)}
+                sx={{
+                  '@media (max-width:420px)': {
+                    minWidth: 'unset',
+                  }
+                }}
               />
             </TabList>
           </Box>
