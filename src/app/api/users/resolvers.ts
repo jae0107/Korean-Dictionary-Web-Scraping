@@ -37,6 +37,14 @@ export const userResolvers = {
     bulkDeleteUsers,
     findMyId,
   },
+  User: {
+    async approvedCount(user: User, _: any, { dataloaders }: Context) {
+      return await dataloaders.approvedCountByRequestor.load(user.id);
+    },
+    async myVocabCount(user: User, _: any, { dataloaders }: Context) {
+      return await dataloaders.myVocabCount.load(user.id);
+    },
+  }
 };
 
 async function getUsers(
@@ -48,8 +56,6 @@ async function getUsers(
   { currentUser }: Context
 ): Promise<OffsetPaginationResponse<User>> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const searcher = new UserSearch({ ...paginationOptions }, { ...filterOptions });
     const offsetUsersResponse: OffsetPaginationResponse<User> = await searcher.process();
     return offsetUsersResponse;
@@ -67,8 +73,6 @@ async function getRequestors(
   { currentUser }: Context
 ): Promise<OffsetPaginationResponse<User>> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const searcher = new RequestorSearch({ ...paginationOptions }, { ...filterOptions });
     const offsetUsersResponse: OffsetPaginationResponse<User> = await searcher.process();
     return offsetUsersResponse;
@@ -79,7 +83,6 @@ async function getRequestors(
 
 async function getUser(_: any, { id }: { id: string }, { currentUser }: Context): Promise<User> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
     if (!id) throw new Error('ID is required');
     const user = await User.findByPk(id);
     if (!user) throw new Error('No User Found');
@@ -167,8 +170,6 @@ async function updateUser(
   { currentUser }: Context,
 ): Promise<User> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     let user = await User.findByPk(id);
 
     if (user) {
@@ -196,8 +197,6 @@ async function changeCurrentPassword(
   { currentUser }: Context,
 ): Promise<User> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     let user = await User.findByPk(id);
 
     if (user) {
@@ -337,8 +336,6 @@ async function approveUser(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const user = await User.findByPk(id);
 
     if (user) {
@@ -386,8 +383,6 @@ async function denyUser(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const user = await User.findByPk(id);
 
     if (user) {
@@ -408,8 +403,6 @@ async function bulkDenyUsers(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     await sequelize.query(
       `
       UPDATE users
@@ -436,8 +429,6 @@ async function recoverUser(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const user = await User.findByPk(id);
 
     if (user) {
@@ -458,8 +449,6 @@ async function bulkRecoverUsers(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     await sequelize.query(
       `
       UPDATE users
@@ -486,8 +475,6 @@ async function deleteUser(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const user = await User.findByPk(id);
 
     if (user) {
@@ -508,8 +495,6 @@ async function bulkDeleteUsers(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     await User.destroy({
       where: {
         id: {

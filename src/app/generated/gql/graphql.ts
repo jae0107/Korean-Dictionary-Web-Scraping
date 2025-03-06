@@ -389,10 +389,12 @@ export type RequestorFilterOptions = {
 export type User = {
   __typename: 'User';
   accountId: Scalars['String']['output'];
+  approvedCount?: Maybe<Scalars['Int']['output']>;
   class?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  myVocabCount?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   number?: Maybe<Scalars['Int']['output']>;
   password?: Maybe<Scalars['String']['output']>;

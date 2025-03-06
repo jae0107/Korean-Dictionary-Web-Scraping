@@ -45,7 +45,6 @@ export const wordResolvers = {
 
 async function getWord(_: any, { id }: { id: string }, { currentUser }: Context): Promise<Word> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
     if (!id) throw new Error('ID is required');
     const word = await Word.findByPk(id);
     if (!word) throw new Error('단어를 찾을 수 없습니다.');
@@ -80,8 +79,6 @@ async function getWords(
   { currentUser }: Context
 ): Promise<OffsetPaginationResponse<Word>> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const searcher = new WordSearch({ ...paginationOptions }, { ...filterOptions });
     const offsetWordsResponse: OffsetPaginationResponse<Word> = await searcher.process();
     return offsetWordsResponse;
@@ -207,7 +204,6 @@ async function updateWordRequest(
   { currentUser }: Context,
 ): Promise<Word> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
     if (!input.title) throw new Error('단어를 입력해주세요.');
 
     const existingWord = await Word.findOne({
@@ -246,8 +242,6 @@ async function approveWordRequest(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const word = await Word.findByPk(id);
 
     if (word) {
@@ -268,8 +262,6 @@ async function approveDuplicatedWordRequest(
   { currentUser }: Context,
 ): Promise<Boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const duplicatedWord = await Word.findByPk(id);
     if (!duplicatedWord) throw new Error('단어가 존재하지 않습니다.');
 
@@ -306,7 +298,6 @@ async function bulkApproveWordRequests(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
     await sequelize.query(
       `
       UPDATE words
@@ -333,8 +324,6 @@ async function denyWordRequest(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const word = await Word.findByPk(id);
 
     if (word) {
@@ -355,8 +344,6 @@ async function bulkDenyWordRequests(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     await sequelize.query(
       `
       UPDATE words
@@ -383,8 +370,6 @@ async function recoverWordRequest(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const word = await Word.findByPk(id);
 
     if (word) {
@@ -405,8 +390,6 @@ async function bulkRecoverWordRequests(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     await sequelize.query(
       `
       UPDATE words
@@ -433,8 +416,6 @@ async function deleteWordRequest(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const word = await Word.findByPk(id);
 
     if (word) {
@@ -455,8 +436,6 @@ async function bulkDeleteWordRequests(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     await Word.destroy({
       where: {
         id: {
@@ -477,8 +456,6 @@ async function updateDeniedReason(
   { currentUser }: Context,
 ): Promise<Word> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     let word = await Word.findByPk(id);
 
     if (word) {

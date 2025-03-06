@@ -29,8 +29,6 @@ async function getPasswordResetRequests(
   { currentUser }: Context
 ): Promise<OffsetPaginationResponse<PasswordResetRequest>> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const searcher = new PasswordResetRequestSearch({ ...paginationOptions }, { ...filterOptions });
     const offsetMyRequestsResponse: OffsetPaginationResponse<PasswordResetRequest> = await searcher.process();
     return offsetMyRequestsResponse;

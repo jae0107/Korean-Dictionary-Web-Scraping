@@ -359,9 +359,9 @@ const DuplicatedRequestPopUp = ({
               <DialogContentText display={'flex'} alignItems={'center'}>
                 {
                   loading ?
-                  <Box display={'flex'} alignItems={'center'} flexDirection={'row'}>
+                  <>
                     <Skeleton variant="rounded" width={48} height={19}/><b>:</b>
-                  </Box> :
+                  </> :
                   <b>페이지: </b>
                 }
               </DialogContentText>

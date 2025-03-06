@@ -48,6 +48,8 @@ export const userTypeDefs = gql`
     role: UserRole!
     status: UserStatus!
     words: [Word!]
+    approvedCount: Int
+    myVocabCount: Int
     createdAt: DateTime!
   }
 
