@@ -2,8 +2,20 @@
 
 import { Box } from "@mui/material";
 import PasswordResetRequestForm from "../components/password-reset-request/PasswordResetRequestForm/PasswordResetRequestForm";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const PasswordResetRequest = () => {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
+    
   return (
     <Box 
       display={'flex'} 

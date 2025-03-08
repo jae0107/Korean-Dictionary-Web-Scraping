@@ -2,16 +2,26 @@
 
 import { Box } from '@mui/material';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 const LoginForm = dynamic(() => import('../components/users/user/LoginForm/LoginForm'), { ssr: false });
 
 const Login = () => {
+  const { status } = useSession();
+  const router = useRouter();
+  
   const searchParams = useSearchParams();
   const error = searchParams?.get("error");
   const { dispatchCurrentSnackBar } = useSnackbar();
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
   
   useEffect(() => {
     const isNotAuthorized = searchParams?.get('callbackUrl');

@@ -2,8 +2,20 @@
 
 import { Box } from "@mui/material";
 import FindMyIdForm from "../components/find-my-id/FindMyIdForm/FindMyIdForm";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const FindMyId = () => {
+  const { status } = useSession();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
+    
   return (
     <Box 
       display={'flex'} 
