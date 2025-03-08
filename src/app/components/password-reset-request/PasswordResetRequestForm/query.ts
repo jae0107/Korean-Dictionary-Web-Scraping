@@ -7,3 +7,9 @@ export const createPasswordResetRequestMutation = gql(`
     }
   }
 `);
+
+export const sendPasswordResetEmailMutation = gql(`
+  mutation SendPasswordResetEmail($input: PasswordResetEmailInput!) {
+    sendPasswordResetEmail(input: $input)
+  }
+`);

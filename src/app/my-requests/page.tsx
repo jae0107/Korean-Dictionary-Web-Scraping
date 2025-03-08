@@ -11,8 +11,11 @@ import { Box } from "@mui/material";
 import MyRequestFilter from "../components/my-requests/MyRequestFilter/MyRequestFilter";
 import MyRequestTable from "../components/my-requests/MyRequestTable/MyRequestTable";
 import { useDebounce } from "../hooks/useDebounce";
+import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 
 const MyRequests = () => {
+  useCheckSessionVersion();
+  
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();

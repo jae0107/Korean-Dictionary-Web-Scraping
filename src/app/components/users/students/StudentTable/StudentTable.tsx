@@ -193,7 +193,7 @@ const StudentTable = ({
             }
             label="프로필 보기"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360}
             onClick={() => router.push(`/students/${params.row.id}`)}
           />,
           <GridActionsCellItem
@@ -208,7 +208,7 @@ const StudentTable = ({
             }
             label="거절"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360}
             onClick={() => onDeny(params.row.id)}
           />
         ];
@@ -236,7 +236,7 @@ const StudentTable = ({
             }
             label="복구"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360}
             onClick={() => onRecover(params.row.id)}
           />,
           <GridActionsCellItem
@@ -251,7 +251,7 @@ const StudentTable = ({
             }
             label="삭제"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360}
             onClick={() => {
               setSelectedUserId(params.row.id);
               setOpenConfirmDialog(true);
@@ -279,7 +279,7 @@ const StudentTable = ({
           }
           label="프로필 보기"
           showInMenu={maxWidth400}
-          dense={!!maxWidth400}
+          dense={maxWidth400}
           onClick={() => router.push(`/students/${params.row.id}`)}
         />,
         <GridActionsCellItem
@@ -294,7 +294,7 @@ const StudentTable = ({
           }
           label="승인"
           showInMenu={maxWidth400}
-          dense={!!maxWidth400}
+          dense={maxWidth400}
           onClick={() => onApproval(params.row.id)}
         />,
         <GridActionsCellItem
@@ -309,7 +309,7 @@ const StudentTable = ({
           }
           label="거절"
           showInMenu={maxWidth400}
-          dense={!!maxWidth400}
+          dense={maxWidth400}
           onClick={() => onDeny(params.row.id)}
         />
       ]

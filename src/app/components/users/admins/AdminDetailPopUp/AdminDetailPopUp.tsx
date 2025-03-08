@@ -30,7 +30,7 @@ const AdminDetailPopUp = ({
   onRecover: (id: string) => void;
   onDeny: (id: string) => void;
   setOpenConfirmDialog: (value: boolean) => void;
-  myRole: string;
+  myRole: string | undefined;
 }) => {
   const disabled = myRole !== 'SUPERADMIN' && user?.role === 'SUPERADMIN';
   return (

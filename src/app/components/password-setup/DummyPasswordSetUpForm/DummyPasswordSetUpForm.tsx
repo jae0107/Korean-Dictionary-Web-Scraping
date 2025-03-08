@@ -15,7 +15,7 @@ const DummyPasswordSetUpForm = ({ theme } : { theme: Theme | null }) => {
         padding={5} 
         borderRadius={2} 
         boxShadow={2} 
-        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'rgb(224, 223, 223)'}
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : '#dfdcdc'}
         sx={{
           '@media (max-width:530px)': {
             width: '95% !important',

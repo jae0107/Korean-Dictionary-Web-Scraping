@@ -9,33 +9,12 @@ import { createTheme, CssBaseline, Theme, ThemeProvider, useMediaQuery } from "@
 import { ApolloProvider } from "@apollo/client";
 import client from "@/app/lib/apolloClient";
 import type {} from '@mui/x-data-grid/themeAugmentation';
-import { CurrentUserProvider } from "./CurrentUserProvider";
 import { SnackbarProvider } from "@/app/hooks/useSnackbar";
 import { SearchResult } from "@/app/types/types";
 import SearchProvider from "./SearchProvider";
-import { UserStatus } from "@/app/generated/gql/graphql";
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 export const useColorModeContext = () => useContext(ColorModeContext);
-
-export interface CurrentUserContextValue {
-  refetch: () => void;
-  loading: boolean;
-  myRole: string | null;
-  myStatus: UserStatus | null;
-  myId: string | null;
-  networkStatus: number;
-}
-
-export interface CurrentUserContextValueWithUser
-  extends Omit<CurrentUserContextValue, 'user'> {
-  myRole: string;
-  myId: string;
-}
-
-export const CurrentUserContext = createContext<CurrentUserContextValue | null>(
-  null
-);
 
 export const ThemeContext = createContext<Theme | null>(null);
 
@@ -66,7 +45,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
         palette: {
           mode,
           background: {
-            'default': mode === 'light' ? '#eaeaea' : '#353535',
+            'default': mode === 'light' ? '#d6d2d2' : '#353535',
           }
         },
         components: {
@@ -84,6 +63,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
             styleOverrides: {
               root: {
                 borderColor: mode === 'light' ? '#b4b4b4' : '#515151',
+                background: mode === 'light' ? '#dfdcdc' : 'transparent',
                 '& .MuiDataGrid-toolbarContainer': {
                   borderBottom: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
                 },
@@ -115,7 +95,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 },
                 '& .MuiDataGrid-columnSeparator': {
                   color: mode === 'light' ? '#b4b4b4' : '#515151',
-                }
+                },
               },
             }
           },
@@ -145,11 +125,25 @@ const Providers = ({ children } : { children: ReactNode }) => {
             styleOverrides: {
               root: {
                 '& .MuiPaper-root': {
-                  background: mode === 'light' ? '#eaeaea' : '#353535',
+                  background: mode === 'light' ? '#d6d2d2' : '#353535',
                 },
               },
             },
           },
+          MuiMenu: {
+            styleOverrides: {
+              paper: {
+                background: mode === 'light' ? '#dfdcdc' : '#353535',
+              },
+            },
+          },
+          MuiInputBase: {
+            styleOverrides: {
+              root: {
+                background: mode === 'light' ? '#dfdcdc' : '#353535',
+              },
+            },
+          }
         }
       }),
     [mode],
@@ -167,10 +161,8 @@ const Providers = ({ children } : { children: ReactNode }) => {
                   <Suspense fallback={null}>
                     <SearchProvider searchResults={searchResults} setSearchResults={setSearchResults}>
                       <SnackbarProvider>
-                        <CurrentUserProvider>
-                          <NavigationBar theme={theme} colorMode={colorMode} setSearchResults={setSearchResults}/>
-                          {children}
-                        </CurrentUserProvider>
+                        <NavigationBar theme={theme} setSearchResults={setSearchResults}/>
+                        {children}
                       </SnackbarProvider>
                     </SearchProvider>
                   </Suspense>

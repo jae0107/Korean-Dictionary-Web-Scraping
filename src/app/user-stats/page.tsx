@@ -1,36 +1,32 @@
 'use client'
 
 import { useQuery } from "@apollo/client";
-import { getStudentsQuery } from "./query";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
+import { getUserStatsQuery } from "./query";
 import { UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Box } from "@mui/material";
-import StudentFilter from "../components/users/students/StudentFilter/StudentFilter";
-import StudentTable from "../components/users/students/StudentTable/StudentTable";
-import AccessDenied from "../components/shared/AccessDenied";
 import { useDebounce } from "../hooks/useDebounce";
+import AccessDenied from "../components/shared/AccessDenied";
+import { Box, IconButton, InputAdornment, Stack, TextField } from "@mui/material";
+import { Cancel } from "@mui/icons-material";
+import UserStatTable from "../components/user-stats/UserStatTable/UserStatTable";
 import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 import { useSession } from "next-auth/react";
 
-const StudentManagement = () => {
+const UserStats = () => {
   useCheckSessionVersion();
   const { data: session } = useSession();
 
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const searchParams = useSearchParams();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
-  const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
   const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
-  const { data, loading, refetch } =
-    useQuery(getStudentsQuery, {
+  const { data, loading } =
+    useQuery(getUserStatsQuery, {
       fetchPolicy: 'network-only',
       variables: {
         paginationOptions: {
@@ -39,7 +35,7 @@ const StudentManagement = () => {
         },
         filterOptions: {
           roles: [UserRole.Student],
-          statuses: [studentStatus],
+          statuses: [UserStatus.Approved],
           userName: debouncedUserNameKeyWord,
         },
       },
@@ -60,32 +56,50 @@ const StudentManagement = () => {
   }
 
   return (
-    <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-      <Box display={'flex'} justifyContent={'center'}>
-        <StudentFilter
-          userNameKeyword={userNameKeyword}
-          setUserNameKeyword={setUserNameKeyword}
-          studentStatus={studentStatus}
-          setStudentStatus={setStudentStatus}
-          setSelectedStudents={setSelectedStudents}
+    <Stack spacing={2} width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'} alignItems={'center'}>
+      <Box width={'90%'}>
+        <TextField
+          label="이름 검색"
+          value={userNameKeyword}
+          onChange={(e) => setUserNameKeyword(e.target.value)}
+          sx={{ 
+            width: '250px',
+            '@media (max-width:600px)': {
+              width: '100%',
+            }
+          }}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setUserNameKeyword('')}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+            htmlInput: {
+              sx: {
+                '@media (max-width:600px)': {
+                  fontSize: '0.8rem',
+                }
+              },
+            },
+          }}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
-        <StudentTable
+        <UserStatTable
           loading={loading}
           students={data?.getUsers.records || []}
           pageCount={data?.getUsers.pageInfo.pageCount || 0}
           page={paginationModel.page}
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
-          studentStatus={studentStatus}
-          refetch={refetch}
-          selectedStudents={selectedStudents}
-          setSelectedStudents={setSelectedStudents}
         />
       </Box>
-    </Box>
+    </Stack>
   );
 }
 
-export default StudentManagement;
+export default UserStats;

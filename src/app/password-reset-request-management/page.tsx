@@ -2,18 +2,21 @@
 
 import { Box } from "@mui/material";
 import AccessDenied from "../components/shared/AccessDenied";
-import { useCurrentUser } from "../hooks/useCurrentUser";
 import PasswordResetRequestManagementTable from "../components/password-reset-request-management/PasswordResetRequestManagementTable/PasswordResetRequestManagementTable";
 import { useQuery } from "@apollo/client";
 import { getPasswordRequestsQuery } from "./query";
 import { UserRole } from "../generated/gql/graphql";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
+import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
+import { useSession } from "next-auth/react";
 
 const PasswordResetRequestManagement = () => {
+  useCheckSessionVersion();
+  const { data: session } = useSession();
+
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const { myRole } = useCurrentUser();
 
   const { data, loading, refetch } =
     useQuery(getPasswordRequestsQuery, {
@@ -27,7 +30,7 @@ const PasswordResetRequestManagement = () => {
           roles: [UserRole.Student]
         },
       },
-      skip: myRole === "STUDENT",
+      skip: session?.user.role === "STUDENT",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -39,7 +42,7 @@ const PasswordResetRequestManagement = () => {
       },
     });
   
-  if (myRole === 'STUDENT') {
+  if (session?.user.role === 'STUDENT') {
     return <AccessDenied/>;
   }
   

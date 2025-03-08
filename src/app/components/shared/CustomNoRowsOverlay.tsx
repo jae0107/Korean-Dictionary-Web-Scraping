@@ -15,7 +15,7 @@ const StyledGridOverlay = styled('div')(({ theme }) => ({
   '& .no-rows-secondary': {
     fill: '#1D2126',
     ...theme.applyStyles('light', {
-      fill: '#E8EAED',
+      fill: '#999b9c',
     }),
   },
 }));

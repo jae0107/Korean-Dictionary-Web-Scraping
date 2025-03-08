@@ -1,7 +1,5 @@
-import { useCurrentUser } from '@/app/hooks/useCurrentUser';
-import { NetworkStatus } from '@apollo/client';
-import { AccountCircle, AdminPanelSettings, Checklist, Logout, MenuBook, PersonAdd, Portrait, VpnKey } from '@mui/icons-material';
-import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
+import { AccountCircle, AdminPanelSettings, Assessment, Checklist, Logout, MenuBook, PersonAdd, Portrait, VpnKey } from '@mui/icons-material';
+import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Skeleton, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -12,34 +10,24 @@ import { TeacherIcon } from '../shared/icons/TeacherIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import MobileNavDrawer from './MobileNavDrawer/MobileNavDrawer';
 import { SearchResult } from '@/app/types/types';
+import DummyNavigationBar from './DummyNavigationBar/DummyNavigationBar';
 
 const NavigationBar = ({
   theme,
-  colorMode,
   setSearchResults,
 } : {
   theme: Theme;
-  colorMode: {
-    toggleColorMode: () => void;
-  };
   setSearchResults: Dispatch<SetStateAction<SearchResult | null>>
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { myRole, refetch, loading, networkStatus } = useCurrentUser();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const maxWidth620 = useMediaQuery('(max-width:620px)');
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
-
-  useEffect(() => {
-    if (session) {
-      refetch();
-    }
-  }, [session, refetch]);
 
   useEffect(() => {
     !maxWidth620 && setOpenDrawer(false);
@@ -54,15 +42,11 @@ const NavigationBar = ({
     router.push(url);
     setAnchorElUser(null);
   }
-
-  if (!session) {
+  
+  if (status === 'loading') {
+    return <DummyNavigationBar/>;
+  } else if (status === 'unauthenticated' || !session) {
     return <></>;
-  }
-
-  const getDisplay = (show: boolean) => {
-    if (loading || networkStatus === NetworkStatus.refetch) return 'inline-flex';
-    if (show) return 'block';
-    return 'none';
   }
 
   const logOut = async () => {
@@ -78,7 +62,7 @@ const NavigationBar = ({
         <Container sx={{ maxWidth: 'unset !important' }}>
           <Toolbar disableGutters>
             {
-              maxWidth620 &&
+              maxWidth620 && session.user.role !== 'STUDENT' &&
               <IconButton
                 size="large"
                 edge="start"
@@ -98,9 +82,11 @@ const NavigationBar = ({
                 setSearchResults(null);
                 setOpenDrawer(false);
               }}
+              paddingBottom={'2px'}
               sx={{
                 mr: 2,
                 display: 'flex',
+                alignItems: 'center',
                 fontFamily: 'monospace',
                 fontWeight: 700,
                 letterSpacing: '.3rem',
@@ -122,7 +108,7 @@ const NavigationBar = ({
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname === '/vocabulary-list' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                   '@media (max-width: 620px)': {
-                    display: 'none',
+                    display: session.user.role === 'STUDENT' ? 'flex' : 'none',
                   }
                 }}
                 component={Link}
@@ -131,19 +117,17 @@ const NavigationBar = ({
                 단어장
               </Button>
               {
-                (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') &&
+                (session.user.role !== 'STUDENT') &&
                 <Button
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                     '@media (max-width: 620px)': {
                       display: 'none',
                     }
                   }}
-                  loading={loading}
                   component={Link}
                   href={'/request-management'}
                 >
@@ -151,19 +135,17 @@ const NavigationBar = ({
                 </Button>
               }
               {
-                (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') && 
+                (session.user.role !== 'STUDENT') && 
                 <Button
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
-                    borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                    borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') || pathname.includes('/user-stats') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                     '@media (max-width: 620px)': {
                       display: 'none',
                     }
                   }}
-                  loading={loading}
                   onClick={(e) => setAnchorElUserManagement(e.currentTarget)}
                 >
                   사용자 관리
@@ -204,7 +186,7 @@ const NavigationBar = ({
                   </Typography>
                 </MenuItem>
                 {
-                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
+                  (session.user.role === 'SUPERADMIN' || session.user.role === 'ADMIN') &&
                   <MenuItem 
                     sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                     onClick={() => navigationUser('/teachers')}
@@ -225,7 +207,7 @@ const NavigationBar = ({
                   </MenuItem>
                 }
                 {
-                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
+                  (session.user.role === 'SUPERADMIN' || session.user.role === 'ADMIN') &&
                   <MenuItem 
                     sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
                     onClick={() => navigationUser('/admins')}
@@ -263,21 +245,37 @@ const NavigationBar = ({
                     <PersonAdd sx={{ mr: '4px' }}/>학생 계정 만들기
                   </Typography>
                 </MenuItem>
+                <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/user-stats') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/user-stats')}
+                  component={Link}
+                  href={'/user-stats'}
+                >
+                  <Typography 
+                    sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    display={'flex'}
+                    alignItems={'center'}
+                  >
+                    <Assessment sx={{ mr: '4px' }}/>학생 통계
+                  </Typography>
+                </MenuItem>
               </Menu>
               {
-                (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') &&
+                (session.user.role !== 'STUDENT') &&
                 <Button
                   sx={{ 
                     my: 2, 
                     color: 'white', 
-                    display: getDisplay(!!myRole && myRole !== 'STUDENT'),
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/password-reset-request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
                     '@media (max-width: 620px)': {
                       display: 'none',
                     }
                   }}
-                  loading={loading}
                   component={Link}
                   href={'/password-reset-request-management'}
                 >
@@ -285,7 +283,7 @@ const NavigationBar = ({
                 </Button>
               }
             </Box>
-            <Box sx={{ flexGrow: 0 }}>
+            <Box display={'flex'} flexDirection={'row'} alignItems={'center'} sx={{ flexGrow: 0 }}>
               <ColourModeSwitch margin='0 16px 0 0'/>
               <IconButton 
                 onClick={(e) => {
@@ -451,10 +449,7 @@ const NavigationBar = ({
         <MobileNavDrawer 
           openDrawer={openDrawer} 
           setOpenDrawer={setOpenDrawer} 
-          loading={loading} 
           session={session} 
-          myRole={myRole} 
-          networkStatus={networkStatus}
           pathname={pathname}
           theme={theme}
         />

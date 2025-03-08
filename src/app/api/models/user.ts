@@ -21,6 +21,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare accessToken?: string;
+  declare sessionVersion?: number;
 
   declare words?: Word[];
   declare getWords: HasManyGetAssociationsMixin<Word>;
@@ -56,6 +57,7 @@ User.init(
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
     accessToken: DataTypes.VIRTUAL,
+    sessionVersion: DataTypes.INTEGER,
   },
   {
     sequelize,
@@ -104,12 +106,20 @@ User.addHook('beforeValidate', 'defaultValues', (user: User) => {
 });
 
 User.addHook('beforeSave', 'hashPassword', async (user: User) => {
-  user.password = await bcrypt.hash(user.password, 10);
+  if (user.changed('password')) {
+    user.password = await bcrypt.hash(user.password, 10);
+    user.sessionVersion = (user.sessionVersion || 0) + 1;
+  } else if (user.changed('role')) {
+    user.sessionVersion = (user.sessionVersion || 0) + 1;
+  }
 });
 
 User.addHook('beforeBulkCreate', 'bulkHashPassword', async (users: User[]) => {
   for (const user of users) {
-    user.password = await bcrypt.hash(user.password, 10);
+    if (user.changed('password')) {
+      user.password = await bcrypt.hash(user.password, 10);
+      user.sessionVersion = (user.sessionVersion || 0) + 1;
+    }
   }
 });
 

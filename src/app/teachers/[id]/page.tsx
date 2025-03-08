@@ -12,15 +12,18 @@ import UserContainer from '@/app/components/users/user/UserContainer/UserContain
 import { getUserRequestsQuery } from '@/app/components/users/user/UserContainer/query';
 import DummyUserForm from '@/app/components/users/user/UserFormContainer/DummyUserForm/DummyUserForm';
 import UserFormContainer from '@/app/components/users/user/UserFormContainer/UserFormContainer';
-import { useCurrentUser } from '@/app/hooks/useCurrentUser';
 import AccessDenied from '@/app/components/shared/AccessDenied';
+import { useCheckSessionVersion } from '@/app/hooks/useCheckSessionVersion';
+import { useSession } from 'next-auth/react';
 
 const SingleTeacher = () => {
+  useCheckSessionVersion();
+  const { data: session } = useSession();
+
   const params = useParams();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const searchParams = useSearchParams();
-  const { myRole } = useCurrentUser();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -31,7 +34,7 @@ const SingleTeacher = () => {
     variables: {
       getUserId: id,
     },
-    skip: myRole === "STUDENT" || myRole === "TEACHER",
+    skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
     onError: (error) => {
       dispatchCurrentSnackBar({
         payload: {
@@ -64,7 +67,7 @@ const SingleTeacher = () => {
           requestorId: id,
         },
       },
-      skip: myRole === "STUDENT" || myRole === "TEACHER",
+      skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -76,7 +79,7 @@ const SingleTeacher = () => {
       },
     });
   
-  if (myRole === 'STUDENT' || myRole === 'TEACHER') {
+  if (session?.user.role === 'STUDENT' || session?.user.role === 'TEACHER') {
     return <AccessDenied/>;
   }
   

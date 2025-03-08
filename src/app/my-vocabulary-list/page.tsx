@@ -9,8 +9,11 @@ import { useDebounce } from "../hooks/useDebounce";
 import { Box, Stack } from "@mui/material";
 import MyVocabFilter from "../components/my-vocabulary-list/MyVocabFilter/MyVocabFilter";
 import MyVocabTable from "../components/my-vocabulary-list/MyVocabTable/MyVocabTable";
+import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 
 const MyVocabularyList = () => {
+  useCheckSessionVersion();
+  
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
 

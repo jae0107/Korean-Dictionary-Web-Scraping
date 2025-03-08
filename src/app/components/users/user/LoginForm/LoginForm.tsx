@@ -80,7 +80,6 @@ const LoginForm = () => {
       username: watch('accountId'),
       password: watch('password'),
       redirect: false,
-      // callbackUrl: '/',
     });
 
     if (res && res.error) {
@@ -93,7 +92,7 @@ const LoginForm = () => {
       });
     } else {
       const session = await getSession();
-      if (session?.user.status === 'PENDING' && session?.user.role === 'STUDENT') {
+      if (session?.user.status === 'PENDING') {
         router.push('/password-setup');
       } else if (session?.user.status === 'APPROVED') {
         router.push('/');
@@ -110,7 +109,7 @@ const LoginForm = () => {
         padding={5} 
         borderRadius={2} 
         boxShadow={2} 
-        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'rgb(224, 223, 223)'}
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : '#dfdcdc'}
         sx={{
           '@media (max-width:530px)': {
             width: '95% !important',

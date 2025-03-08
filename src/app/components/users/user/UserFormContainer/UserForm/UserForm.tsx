@@ -1,12 +1,12 @@
 import { UserInput, UserRole } from "@/app/generated/gql/graphql";
 import { Controller, FieldErrors, SubmitErrorHandler, UseFormReturn } from "react-hook-form";
 import { Box, Button, FormControl, Grid2, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
-import { useCurrentUser } from "@/app/hooks/useCurrentUser";
 import { Cancel, Edit, HighlightOff, SaveAlt } from "@mui/icons-material";
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { updateUserMutation } from "./query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
+import { useSession } from "next-auth/react";
 
 const UserForm = ({
   id,
@@ -26,7 +26,7 @@ const UserForm = ({
   defaultValues: UserInput;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const { myRole, myId } = useCurrentUser();
+  const { data: session } = useSession();
 
   const [getUpdateLoader, setUpdateLoader] = useState<boolean>(false);
 
@@ -149,13 +149,13 @@ const UserForm = ({
           type='text'
           placeholder="아이디를 입력하세요."
           fullWidth
-          disabled={myRole === 'SUPERADMIN' ? !editMode : !editMode || myRole === 'STUDENT' || myId !== id}
+          disabled={session?.user.role === 'SUPERADMIN' ? !editMode : !editMode || session?.user.role === 'STUDENT' || session?.user.id !== id}
           error={!!errors.accountId}
           slotProps={{
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setValue('accountId', '')} disabled={myRole === 'SUPERADMIN' ? !editMode : !editMode || myRole === 'STUDENT' || myId !== id} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
+                  <IconButton onClick={() => setValue('accountId', '')} disabled={session?.user.role === 'SUPERADMIN' ? !editMode : !editMode || session?.user.role === 'STUDENT' || session?.user.id !== id} sx={{ display: editMode ? 'inline-flex' : 'none' }}>
                     <Cancel sx={{ width: '15px', height: '15px' }}/>
                   </IconButton>
                 </InputAdornment>
@@ -224,14 +224,14 @@ const UserForm = ({
                 field.onChange(e);
                 setRole && setRole(e.target.value as UserRole);
               }}
-              disabled={!editMode || myRole === 'STUDENT' || myRole === 'TEACHER'}
+              disabled={!editMode || session?.user.role === 'STUDENT' || session?.user.role === 'TEACHER'}
               error={!!errors.role}
             >
               <MenuItem value={''}><em>-</em></MenuItem>
               <MenuItem value={'STUDENT'}>학생</MenuItem>
-              {(myRole === 'SUPERADMIN' || myRole === 'ADMIN' || myRole === 'TEACHER') && <MenuItem value={'TEACHER'}>교사</MenuItem>}
-              {(myRole === 'SUPERADMIN' || myRole === 'ADMIN') && <MenuItem value={'ADMIN'}>관리자</MenuItem>}
-              {myRole === 'SUPERADMIN' && <MenuItem value={'SUPERADMIN'}>최고 관리자</MenuItem>}
+              {(session?.user.role === 'SUPERADMIN' || session?.user.role === 'ADMIN' || session?.user.role === 'TEACHER') && <MenuItem value={'TEACHER'}>교사</MenuItem>}
+              {(session?.user.role === 'SUPERADMIN' || session?.user.role === 'ADMIN') && <MenuItem value={'ADMIN'}>관리자</MenuItem>}
+              {session?.user.role === 'SUPERADMIN' && <MenuItem value={'SUPERADMIN'}>최고 관리자</MenuItem>}
             </Select>
           )}
         />

@@ -19,6 +19,13 @@ export const passwordResetRequestTypeDefs = gql`
     role: UserRole!
   }
 
+  input PasswordResetEmailInput {
+    name: String!
+    accountId: String!
+    email: String
+    role: UserRole!
+  }
+
   input PasswordResetRequestFilterOptions {
     roles: [UserRole!]!
   }
@@ -37,5 +44,6 @@ export const passwordResetRequestTypeDefs = gql`
 
   type Mutation {
     createPasswordResetRequest(input: PasswordResetRequestInput!): PasswordResetRequest!
+    sendPasswordResetEmail(input: PasswordResetEmailInput!): Boolean!
   }
 `;

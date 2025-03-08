@@ -10,15 +10,18 @@ import { useQuery } from "@apollo/client";
 import { getAdminsQuery } from "./query";
 import AdminFilter from "../components/users/admins/AdminFilter/AdminFilter";
 import AdminTable from "../components/users/admins/AdminTable/AdminTable";
-import { useCurrentUser } from "../hooks/useCurrentUser";
 import AccessDenied from "../components/shared/AccessDenied";
 import { useDebounce } from "../hooks/useDebounce";
+import { useSession } from "next-auth/react";
+import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 
 const AdminManagement = () => {
+  useCheckSessionVersion();
+  const { data: session } = useSession();
+
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
   const searchParams = useSearchParams();
-  const { myRole } = useCurrentUser();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
@@ -40,7 +43,7 @@ const AdminManagement = () => {
           userName: debouncedUserNameKeyWord,
         },
       },
-      skip: myRole === "STUDENT" || myRole === "TEACHER",
+      skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -52,7 +55,7 @@ const AdminManagement = () => {
       },
     });
 
-  if (myRole === 'STUDENT' || myRole === 'TEACHER') {
+  if (session?.user.role === 'STUDENT' || session?.user.role === 'TEACHER') {
     return <AccessDenied/>;
   }
 
@@ -79,7 +82,7 @@ const AdminManagement = () => {
           refetch={refetch}
           selectedAdmins={selectedAdmins}
           setSelectedAdmins={setSelectedAdmins}
-          myRole={myRole}
+          myRole={session?.user.role}
         />
       </Box>
     </Box>

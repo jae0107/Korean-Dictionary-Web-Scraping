@@ -157,7 +157,7 @@ async function bulkCreateUsers(
 
     return users;
   }).catch((e) => {
-    if (e.errors[0].message === 'accountId must be unique') {
+    if (e.errors && e.errors[0].message === 'accountId must be unique') {
       e.message = '아이디가 중복되었습니다.';
     }
     throw new ApolloResponseError(e);
@@ -295,8 +295,8 @@ async function bulkPasswordReset(
     });
     
     await User.bulkCreate(updatedUsers, {
-      updateOnDuplicate: ['password', 'status', 'previousStatus'],
-      fields: ['id', 'name', 'year', 'class', 'number', 'password', 'status', 'previousStatus', 'role', 'accountId', 'email', 'createdAt', 'updatedAt'],
+      updateOnDuplicate: ['password', 'status', 'previousStatus', 'sessionVersion'],
+      fields: ['id', 'name', 'year', 'class', 'number', 'password', 'status', 'previousStatus', 'role', 'accountId', 'email', 'sessionVersion', 'createdAt', 'updatedAt'],
     });
     
 

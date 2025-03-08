@@ -8,11 +8,14 @@ import { Box, Divider, Skeleton, Stack, Typography } from '@mui/material';
 import MyRequestForm from '@/app/components/my-requests/MyRequestForm/MyRequestForm';
 import { MyWordRequestItemsFragment, WordInput, WordStatus } from '@/app/generated/gql/graphql';
 import { useSession } from 'next-auth/react';
+import { useCheckSessionVersion } from '@/app/hooks/useCheckSessionVersion';
 
 const SingleMyRequest = () => {
+  useCheckSessionVersion();
+  const { data: session } = useSession();
+  
   const params = useParams();
   const { dispatchCurrentSnackBar } = useSnackbar();
-  const {data: session} = useSession();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 

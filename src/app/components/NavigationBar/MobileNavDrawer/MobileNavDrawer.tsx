@@ -9,26 +9,16 @@ import { TeacherIcon } from "../../shared/icons/TeacherIcon";
 const MobileNavDrawer = ({
   openDrawer,
   setOpenDrawer,
-  loading,
   session,
-  myRole,
-  networkStatus,
   pathname,
   theme,
 } : {
   openDrawer: boolean;
   setOpenDrawer: (open: boolean) => void;
-  loading: boolean;
   session: Session;
-  myRole: string;
-  networkStatus: number;
   pathname: string;
   theme: Theme;
 }) => {
-  const getDisplay = (show: boolean) => {
-    return loading || networkStatus === NetworkStatus.refetch || show ? 'block' : 'none';
-  }
-
   return (
     <Drawer 
       open={openDrawer} 
@@ -55,56 +45,56 @@ const MobileNavDrawer = ({
         </List>
         <Divider />
         {
-          (session.user.role !== 'STUDENT' || myRole !== 'STUDENT') &&
+          (session.user.role !== 'STUDENT') &&
           <>
-            <List sx={{ display: getDisplay(!!myRole && myRole !== 'STUDENT') }}>
+            <List>
               <ListItem disablePadding sx={{ backgroundColor: pathname === '/request-management' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                 <ListItemButton LinkComponent={Link} href={'/request-management'}>
                   <ListItemIcon>
-                    {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <Chat/>}
+                    <Chat/>
                   </ListItemIcon>
-                  {loading ? <Skeleton variant="rounded" height={'24px'} width={'74.55px'}/> : <ListItemText primary={'요청 관리'} />}
+                  <ListItemText primary={'요청 관리'} />
                 </ListItemButton>
               </ListItem>
             </List>
             <Divider />
-            <List sx={{ display: getDisplay(!!myRole && myRole !== 'STUDENT') }}>
+            <List>
               <ListItem disablePadding>
                 <ListItemButton LinkComponent={Link} href={'/students'}>
                   <ListItemIcon>
-                    {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <Groups/>}
+                    <Groups/>
                   </ListItemIcon>
-                  {loading ? <Skeleton variant="rounded" height={'24px'} width={'74.55px'}/> : <ListItemText primary={'사용자 관리'} />}
+                  <ListItemText primary={'사용자 관리'} />
                 </ListItemButton>
               </ListItem>
               <List disablePadding>
                 <ListItem disablePadding sx={{backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                   <ListItemButton LinkComponent={Link} href={'/students'} sx={{ pl: '40px !important' }}>
                     <ListItemIcon>
-                      {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <StudentIcon style={{ height: '24px', width: '24px' }}/>}
+                      <StudentIcon style={{ height: '24px', width: '24px' }}/>
                     </ListItemIcon>
-                    {loading ? <Skeleton variant="rounded" height={'24px'} width={'50.55px'}/> : <ListItemText primary={'학생'} />}
+                    <ListItemText primary={'학생'} />
                   </ListItemButton>
                 </ListItem>
                 {
-                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
+                  (session.user.role === 'SUPERADMIN' || session.user.role === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                     <ListItemButton LinkComponent={Link} href={'/teachers'} sx={{ pl: '40px !important' }}>
                       <ListItemIcon>
-                        {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <TeacherIcon style={{ height: '24px', width: '24px' }}/>}
+                        <TeacherIcon style={{ height: '24px', width: '24px' }}/>
                       </ListItemIcon>
-                      {loading ? <Skeleton variant="rounded" height={'24px'} width={'50.55px'}/> : <ListItemText primary={'선생님'} />}
+                      <ListItemText primary={'선생님'} />
                     </ListItemButton>
                   </ListItem>
                 }
                { 
-                  myRole && (myRole === 'SUPERADMIN' || myRole === 'ADMIN') &&
+                  (session.user.role === 'SUPERADMIN' || session.user.role === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
                     <ListItemButton LinkComponent={Link} href={'/admins'} sx={{ pl: '40px !important' }}>
                       <ListItemIcon>
-                        {loading ? <CircularProgress color='inherit' sx={{ width: '20px !important', height: '20px  !important' }}/> : <AdminPanelSettings style={{ height: '24px', width: '24px' }}/>}
+                        <AdminPanelSettings style={{ height: '24px', width: '24px' }}/>
                       </ListItemIcon>
-                      {loading ? <Skeleton variant="rounded" height={'24px'} width={'50.55px'}/> : <ListItemText primary={'관리자'} />}
+                      <ListItemText primary={'관리자'} />
                     </ListItemButton>
                   </ListItem>
                 }

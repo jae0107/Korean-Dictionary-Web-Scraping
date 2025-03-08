@@ -7,8 +7,10 @@ import { Box, Stack, Typography } from "@mui/material";
 import PasswordChangeForm from "../components/password-change/PasswordChangeForm/PasswordChangeForm";
 import { VpnKey } from "@mui/icons-material";
 import DummyPasswordChangeForm from "../components/password-change/DummyPasswordChangeForm/DummyPasswordChangeForm";
+import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 
 const PasswordChange = () => {
+  useCheckSessionVersion();
   const { dispatchCurrentSnackBar } = useSnackbar();
 
   const { data, loading } = useQuery(getMyPasswordQuery, {

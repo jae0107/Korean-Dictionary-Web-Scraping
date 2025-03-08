@@ -27,6 +27,7 @@ model User {
   previousStatus        String?
   passwordResetRequests PasswordResetRequest[]
   myVocabularies        MyVocabulary[]
+  sessionVersion        Int     @default(1)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 

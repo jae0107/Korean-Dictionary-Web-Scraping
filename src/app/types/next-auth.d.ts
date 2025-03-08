@@ -9,6 +9,11 @@ declare module "next-auth" {
       status: 'PENDING' | 'DENIED' | 'APPROVED';
       role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPERADMIN';
       accessToken: string;
+      sessionVersion: number;
     };
+  }
+
+  interface JWT {
+    sessionVersion: number;
   }
 }

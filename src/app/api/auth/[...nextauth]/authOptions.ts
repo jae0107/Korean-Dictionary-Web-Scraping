@@ -1,6 +1,7 @@
-import { User, UserStatus } from "@/app/generated/gql/graphql";
+import { UserStatus } from "@/app/generated/gql/graphql";
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { User } from "../../models";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -20,6 +21,11 @@ export const authOptions: AuthOptions = {
         password: { label: "비밀번호", type: "password" },
       },
       async authorize(credentials, req) {
+        const tmpUser = await User.findOne({
+          where: { email: credentials?.username },
+          attributes: ["id", "sessionVersion"],
+        });
+
         const res = await fetch(`${process.env.NEXTAUTH_URL}/api/login`, {
           method: 'POST',
           headers: {
@@ -28,6 +34,7 @@ export const authOptions: AuthOptions = {
           body: JSON.stringify({
             username: credentials?.username,
             password: credentials?.password,
+            sessionVersion: tmpUser?.sessionVersion,
           }),
         })
         const user = await res.json()
@@ -46,15 +53,19 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      if (user) {
+        token.sessionVersion = (user as User).sessionVersion; // 로그인 시 설정
+      }
       return { ...token, ...user };
     },
     async session({ session, token }) {
       session.user = token as any;
+      session.user.sessionVersion = token.sessionVersion as number;
       return session;
     },
     async signIn({ user }) {
       const tmpUser = user as User;
-      if (tmpUser.status === UserStatus.Pending && tmpUser.role !== 'STUDENT') {
+      if (tmpUser.status === UserStatus.Pending && tmpUser.previousStatus !== 'APPROVED' && tmpUser.role !== 'STUDENT') {
         throw new Error('승인 대기중인 계정입니다.');
       } else if (tmpUser.status === UserStatus.Denied) {
         throw new Error('승인이 거부된 계정입니다.');

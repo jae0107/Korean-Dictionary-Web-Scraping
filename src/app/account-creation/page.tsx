@@ -2,9 +2,7 @@
 
 import { Backdrop, Box, CircularProgress, InputLabel, Skeleton, Stack, Typography } from "@mui/material";
 import AccessDenied from "../components/shared/AccessDenied";
-import { useCurrentUser } from "../hooks/useCurrentUser";
 import {useDropzone} from 'react-dropzone';
-import { useThemeContext } from "../components/Providers/Providers";
 import { FileUpload, PersonAdd } from "@mui/icons-material";
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx'; 
@@ -17,15 +15,16 @@ import { bulkCreateStudentMutation, getUsersQuery } from "./query";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
 import AccountCreationContainer from "../components/users/account-creation/AccountCreationContainer/AccountCreationContainer";
+import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
+import { useSession } from "next-auth/react";
 
 const AccountCreation = () => {
-  const theme = useThemeContext();
-  const { myRole } = useCurrentUser();
+  useCheckSessionVersion();
+  const { data: session } = useSession();
+
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
 
-  // const [getUserType, setUserType] = useState('');
-  const [getCorrectData, setCorrectData] = useState<UserInput[]>([]);
   const [getDuplicateAccounts, setDuplicateAccounts] = useState<ExtendedUserInput[]>([]);
   const [getWrongData, setWrongData] = useState<RawJsonDataProps[]>([]);
   const [getMutationLoading, setMutationLoading] = useState(false);
@@ -35,7 +34,7 @@ const AccountCreation = () => {
 
   const [bulkCreateStudents] = useMutation(bulkCreateStudentMutation);
 
-  const { data, loading, refetch } =
+  const { data, loading } =
     useQuery(getUsersQuery, {
       fetchPolicy: 'network-only',
       variables: {
@@ -48,7 +47,7 @@ const AccountCreation = () => {
           statuses: [],
         },
       },
-      skip: myRole === "STUDENT" || myRole === "TEACHER",
+      skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
       onError: (error) => {
         dispatchCurrentSnackBar({
           payload: {
@@ -60,7 +59,7 @@ const AccountCreation = () => {
       },
     });
 
-  if (myRole === 'STUDENT') {
+  if (session?.user.role === 'STUDENT') {
     return <AccessDenied/>;
   }
 

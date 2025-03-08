@@ -21,7 +21,6 @@ const documents = {
     "\n  query GetAdmin($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleAdminItems\n    }\n  }\n": types.GetAdminDocument,
     "\n  fragment AdminItems on User {\n    id\n    name\n    year\n    class\n    accountId\n    status\n    role\n  }\n": types.AdminItemsFragmentDoc,
     "\n  query GetAdmins($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...AdminItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetAdminsDocument,
-    "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n": types.GetMyRoleDocument,
     "\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n": types.FindMyIdDocument,
     "\n  mutation DuplicateWordRequest($input: WordInput!) {\n    duplicateWordRequest(input: $input) {\n      id\n    }\n  }\n": types.DuplicateWordRequestDocument,
     "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n  }\n": types.WordByTitleItemsFragmentDoc,
@@ -32,6 +31,7 @@ const documents = {
     "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n": types.BulkPasswordResetDocument,
     "\n  mutation PasswordReset($passwordResetId: ID!, $password: String) {\n    passwordReset(id: $passwordResetId, password: $password) {\n      id\n    }\n  }\n": types.PasswordResetDocument,
     "\n  mutation CreatePasswordResetRequest($input: PasswordResetRequestInput!) {\n    createPasswordResetRequest(input: $input) {\n      id\n    }\n  }\n": types.CreatePasswordResetRequestDocument,
+    "\n  mutation SendPasswordResetEmail($input: PasswordResetEmailInput!) {\n    sendPasswordResetEmail(input: $input)\n  }\n": types.SendPasswordResetEmailDocument,
     "\n  mutation PasswordSetUp($passwordSetUpId: ID!, $password: String!) {\n    passwordSetUp(id: $passwordSetUpId, password: $password) {\n      id\n    }\n  }\n": types.PasswordSetUpDocument,
     "\n  fragment RequestorDropDownItems on User {\n    id\n    name\n  }\n": types.RequestorDropDownItemsFragmentDoc,
     "\n  query GetRequestorsDropDown($paginationOptions: OffsetPaginationOptions!, $filterOptions: RequestorFilterOptions!) {\n    getRequestors(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...RequestorDropDownItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetRequestorsDropDownDocument,
@@ -62,6 +62,7 @@ const documents = {
     "\n  mutation UpdateUser($updateUserId: ID!, $input: UserInput!) {\n    updateUser(id: $updateUserId, input: $input) {\n      id\n    }\n  }\n": types.UpdateUserDocument,
     "\n  mutation AddMyVocabulary($input: MyVocabularyInput!) {\n    addMyVocabulary(input: $input) {\n      id\n    }\n  }\n": types.AddMyVocabularyDocument,
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
+    "\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n": types.GetUserDocument,
     "\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      examples\n    }\n  }\n": types.MyWordRequestItemsFragmentDoc,
     "\n  query GetMyWordRequest($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...MyWordRequestItems\n      status\n      requestors {\n        id\n      }\n    }\n  }\n": types.GetMyWordRequestDocument,
     "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    examples\n    deniedReason\n    wordId\n  }\n": types.MyRequestItemsFragmentDoc,
@@ -86,6 +87,8 @@ const documents = {
     "\n  query GetTeacher($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleTeacherItems\n    }\n  }\n": types.GetTeacherDocument,
     "\n  fragment TeacherItems on User {\n    id\n    name\n    year\n    class\n    accountId\n    status\n    role\n    status\n  }\n": types.TeacherItemsFragmentDoc,
     "\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetTeachersDocument,
+    "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n  }\n": types.UserStatItemsFragmentDoc,
+    "\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserStatItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetUserStatsDocument,
     "\n  fragment VocabularyItems on Word {\n    id\n    isMyVocabulary\n    korDicResults\n    naverDicResults\n    title\n    pages\n    examples\n  }\n": types.VocabularyItemsFragmentDoc,
     "\n  query GetVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...VocabularyItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetVocabulariesDocument,
 };
@@ -135,10 +138,6 @@ export function gql(source: "\n  query GetAdmins($paginationOptions: OffsetPagin
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n"): (typeof documents)["\n  query GetMyRole {\n    getCurrentUser {\n      id\n      role\n      status\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n"): (typeof documents)["\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -176,6 +175,10 @@ export function gql(source: "\n  mutation PasswordReset($passwordResetId: ID!, $
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation CreatePasswordResetRequest($input: PasswordResetRequestInput!) {\n    createPasswordResetRequest(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreatePasswordResetRequest($input: PasswordResetRequestInput!) {\n    createPasswordResetRequest(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation SendPasswordResetEmail($input: PasswordResetEmailInput!) {\n    sendPasswordResetEmail(input: $input)\n  }\n"): (typeof documents)["\n  mutation SendPasswordResetEmail($input: PasswordResetEmailInput!) {\n    sendPasswordResetEmail(input: $input)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -299,6 +302,10 @@ export function gql(source: "\n  mutation RemoveMyVocabulary($input: MyVocabular
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n"): (typeof documents)["\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      examples\n    }\n  }\n"): (typeof documents)["\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      examples\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -392,6 +399,14 @@ export function gql(source: "\n  fragment TeacherItems on User {\n    id\n    na
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n  }\n"): (typeof documents)["\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserStatItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserStatItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

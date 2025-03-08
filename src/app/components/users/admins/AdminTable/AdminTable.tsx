@@ -43,7 +43,7 @@ const AdminTable = ({
   refetch: () => void;
   selectedAdmins: string[];
   setSelectedAdmins: (value: string[]) => void;
-  myRole: string;
+  myRole: string | undefined;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();

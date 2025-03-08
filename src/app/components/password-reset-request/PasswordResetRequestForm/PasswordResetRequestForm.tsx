@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { Cancel, Login, RestartAlt } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { createPasswordResetRequestMutation } from "./query";
+import { createPasswordResetRequestMutation, sendPasswordResetEmailMutation } from "./query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useThemeContext } from "../../Providers/Providers";
 import { Controller, FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
@@ -22,6 +22,7 @@ const PasswordResetRequestForm = () => {
   const [getRole, setRole] = useState<UserRole | null>(UserRole.Student);
 
   const [createPasswordResetRequest] = useMutation(createPasswordResetRequestMutation); 
+  const [sendPasswordResetEmail] = useMutation(sendPasswordResetEmailMutation); 
   
   const schema = z.object({
     name: z.string().nonempty({ message: "이름을 작성하십시오." }),
@@ -122,44 +123,78 @@ const PasswordResetRequestForm = () => {
   
   const onSubmit = async (input: PasswordResetRequestInput) => {
     setLoading(true);
-    createPasswordResetRequest({
-      variables: {
-        input: UserRole.Student ? {
-          name: input.name,
-          accountId: input.accountId,
-          year: input.year,
-          class: input.class,
-          number: input.number,
-          role: input.role,
-        } : {
-          name: input.name,
-          email: input.email,
-          accountId: input.accountId,
-          role: input.role,
+    if (input.role === UserRole.Student) {
+      createPasswordResetRequest({
+        variables: {
+          input: input.role === UserRole.Student ? {
+            name: input.name,
+            accountId: input.accountId,
+            year: input.year,
+            class: input.class,
+            number: input.number,
+            role: input.role,
+          } : {
+            name: input.name,
+            email: input.email,
+            accountId: input.accountId,
+            role: input.role,
+          },
         },
-      },
-      onError: (error) => {
-        setLoading(false);
-        dispatchCurrentSnackBar({
-          payload: {
-            open: true,
-            type: 'error',
-            message: error.message,
+        onError: (error) => {
+          setLoading(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+        onCompleted: () => {
+          setLoading(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'success',
+              message: '비밀번호 재설정 요청이 성공적으로 제출되었습니다.',
+            },
+          });
+          router.push('/signin');
+        },
+      });
+    } else {
+      sendPasswordResetEmail({
+        variables: {
+          input: {
+            name: input.name,
+            email: input.email,
+            accountId: input.accountId,
+            role: input.role,
           },
-        });
-      },
-      onCompleted: () => {
-        setLoading(false);
-        dispatchCurrentSnackBar({
-          payload: {
-            open: true,
-            type: 'success',
-            message: '비밀번호 재설정 요청이 성공적으로 제출되었습니다.',
-          },
-        });
-        router.push('/signin');
-      },
-    });
+        },
+        onError: (error) => {
+          setLoading(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        },
+        onCompleted: () => {
+          setLoading(false);
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'success',
+              message: '비밀번호 재설정 이메일이 성공적으로 전송되었습니다.',
+            },
+          });
+          router.push('/signin');
+        },
+      });
+    }
   };
   
   return (
@@ -180,7 +215,7 @@ const PasswordResetRequestForm = () => {
         padding={5} 
         borderRadius={2} 
         boxShadow={2} 
-        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : 'rgb(224, 223, 223)'}
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : '#dfdcdc'}
         sx={{
           '@media (max-width:530px)': {
             width: '95% !important',

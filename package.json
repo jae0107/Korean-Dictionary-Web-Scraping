@@ -29,6 +29,7 @@
     "@mui/x-data-grid": "^7.24.0",
     "@parcel/watcher": "^2.5.0",
     "@prisma/client": "^5.19.0",
+    "@sendinblue/client": "^3.3.1",
     "@tanstack/react-query": "^5.64.2",
     "@types/cls-hooked": "^4.3.9",
     "apollo-server-micro": "^3.13.0",

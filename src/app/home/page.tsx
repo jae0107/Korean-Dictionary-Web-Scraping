@@ -9,8 +9,10 @@ import SearchResults from '../components/home/SearchResults/SearchResults';
 import logo from "../../assets/images/logo.png";
 import { useSearch } from '../hooks/useSearch';
 import './style.scss';
+import { useCheckSessionVersion } from '../hooks/useCheckSessionVersion';
 
 const Home = () => {
+  useCheckSessionVersion();
   const { searchResults, setSearchResults } = useSearch();
 
   const [isLoading, setIsLoading] = useState(false);
