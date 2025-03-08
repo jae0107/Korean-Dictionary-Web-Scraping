@@ -58,7 +58,7 @@ const Home = () => {
         }}
       >
         {
-          searchResults === null &&
+          searchResults === null && !isLoading &&
           <Box display={'flex'} justifyContent={'center'}>
             <img 
               className='logo'
