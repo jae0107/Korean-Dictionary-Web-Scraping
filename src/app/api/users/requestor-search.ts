@@ -3,6 +3,7 @@ import { User } from "../models";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { knex, QueryBuilder, queryBuilder, sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
+import assert from "node:assert";
 
 export class RequestorSearch {
   private paginationOptions: OffsetPaginationOptions;
@@ -37,13 +38,8 @@ export class RequestorSearch {
         .where('users.name', 'ilike', `%${userName}%`);
     }
 
-    if (!isPresent(pageNum) || pageNum < 0) {
-      throw new Error('Page number must be positive');
-    }
-
-    if (!isPresent(limit) || limit <= 0) {
-      throw new Error('Limit must be greater than 0');
-    }
+    assert(!isPresent(limit) || limit > 0, 'Limit must be greater than 0');
+    assert(!isPresent(pageNum) || pageNum >= 0, 'Page number must be positive');
 
     const countQuery = query.clone();
     const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('users.id').toString())) as [
