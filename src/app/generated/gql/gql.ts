@@ -26,7 +26,7 @@ const documents = {
     "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n  }\n": types.WordByTitleItemsFragmentDoc,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n": types.GetWordByTitleDocument,
-    "\n  mutation UpdateWordRequest($input: WordInput!) {\n    updateWordRequest(input: $input) {\n      id\n    }\n  }\n": types.UpdateWordRequestDocument,
+    "\n  mutation UpdateWordRequest($updateWordRequestId: ID!, $input: WordInput!) {\n    updateWordRequest(id: $updateWordRequestId, input: $input) {\n      id\n    }\n  }\n": types.UpdateWordRequestDocument,
     "\n  mutation ChangeCurrentPassword($changeCurrentPasswordId: ID!, $input: FindPasswordInput!) {\n    changeCurrentPassword(id: $changeCurrentPasswordId, input: $input) {\n      id\n    }\n  }\n": types.ChangeCurrentPasswordDocument,
     "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n": types.BulkPasswordResetDocument,
     "\n  mutation PasswordReset($passwordResetId: ID!, $password: String) {\n    passwordReset(id: $passwordResetId, password: $password) {\n      id\n    }\n  }\n": types.PasswordResetDocument,
@@ -158,7 +158,7 @@ export function gql(source: "\n  query GetWordByTitle($title: String!) {\n    ge
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation UpdateWordRequest($input: WordInput!) {\n    updateWordRequest(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateWordRequest($input: WordInput!) {\n    updateWordRequest(input: $input) {\n      id\n    }\n  }\n"];
+export function gql(source: "\n  mutation UpdateWordRequest($updateWordRequestId: ID!, $input: WordInput!) {\n    updateWordRequest(id: $updateWordRequestId, input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateWordRequest($updateWordRequestId: ID!, $input: WordInput!) {\n    updateWordRequest(id: $updateWordRequestId, input: $input) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

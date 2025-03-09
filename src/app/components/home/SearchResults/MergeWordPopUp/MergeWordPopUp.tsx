@@ -13,6 +13,7 @@ const MergeWordPopUp = ({
   openMergeWordPopUp,
   setOpenMergeWordPopUp,
   existingWord,
+  setExistingWord,
   loading,
   form,
   getLoader,
@@ -21,6 +22,7 @@ const MergeWordPopUp = ({
   openMergeWordPopUp: boolean;
   setOpenMergeWordPopUp: (value: boolean) => void;
   existingWord: WordByTitleItemsFragment | null;
+  setExistingWord: (value: WordByTitleItemsFragment | null) => void;
   loading: boolean;
   form: UseFormReturn<WordInput>;
   getLoader: boolean;
@@ -133,15 +135,31 @@ const MergeWordPopUp = ({
             results.map((item, index) => (
               <ListItem key={index} sx={{ pl: 0, pr: 0, '&.MuiListItem-padding': { pt: 0 } }} dense>
                 <Typography variant={'body2'} color={isNew? 'success': 'textPrimary'}>
-                  {results.length > 1 ? `${index+(existingWord && isNew ? existingWord[dicType === 'koDic' ? 'korDicResults' : 'naverDicResults'] || [] : []).length+1}. ${item}` : item}
+                  • {item}
                 </Typography>
                 {
-                  isNew &&
                   <IconButton 
                     color='error' 
                     onClick={() => {
                       const newResults = results.filter((_, i) => i !== index);
-                      setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults);
+                      if (isNew) {
+                        setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults)
+                      } else if (existingWord) {
+                        let tmp = existingWord;
+                        if (dicType === 'koDic') {
+                          tmp = {
+                            ...existingWord,
+                            korDicResults: newResults,
+                          };
+                        } else {
+                          tmp = {
+                            ...existingWord,
+                            naverDicResults: newResults,
+                          };
+                        }
+
+                        setExistingWord(tmp);
+                      }
                     }}
                     sx={{ 
                       padding: '4px',
@@ -269,7 +287,7 @@ const MergeWordPopUp = ({
     ]);
   };
 
-  const getPages = (pages: number[], isNew: boolean) => {
+  const getPages = (pages: number[]) => {
     return (
       <Stack spacing={1}>
         {
@@ -280,7 +298,6 @@ const MergeWordPopUp = ({
                 fullWidth={index > 0}
                 type='number'
                 value={page}
-                disabled={!isNew}
                 onChange={(e) => {
                   const value = Number(e.target.value);
                   setValue(`pages.${index}`, value);
@@ -300,7 +317,7 @@ const MergeWordPopUp = ({
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton disabled={!isNew} onClick={() => setValue(`pages.${index}`, 0)}>
+                        <IconButton onClick={() => setValue(`pages.${index}`, 0)}>
                           <Cancel sx={{ width: '15px', height: '15px' }}/>
                         </IconButton>
                       </InputAdornment>
@@ -309,7 +326,7 @@ const MergeWordPopUp = ({
                 }}
               />
               {
-                isNew && index > 0 &&
+                index > 0 &&
                 <Button
                   color='error'
                   variant="outlined"
@@ -329,13 +346,94 @@ const MergeWordPopUp = ({
             </Stack>
           ))
         }
-        {
-          isNew &&
-          <Button variant='outlined' onClick={handleAddPageOption}>
-            페이지 추가
-          </Button>
-        }
+        <Button variant='outlined' onClick={handleAddPageOption}>
+          페이지 추가
+        </Button>
       </Stack>
+    );
+  };
+
+  const getExistingPages = (pages: number[]) => {
+    return (
+      pages.map((page, index) => 
+        <DialogContentText key={index} display={'flex'} alignItems={'center'}>
+          • {page}
+          <IconButton 
+            color='error' 
+            onClick={() => {
+              const newResults = pages.filter((_, i) => i !== index);
+              if (existingWord) {
+                const tmp = {
+                  ...existingWord,
+                  pages: newResults,
+                }
+                setExistingWord(tmp);
+              }
+            }}
+            sx={{ 
+              padding: '4px',
+              fontSize: '1.5rem',
+              '@media (max-width:500px)': {
+                padding: '0 5px',
+                fontSize: '1.125rem',
+              }
+            }}
+          >
+            <DeleteForever 
+              sx={{
+                width: '20px', 
+                height: '20px',
+                '@media (max-width:500px)': {
+                  width: '1.25rem', 
+                  height: '1.25rem',
+                }
+              }}
+            />
+          </IconButton>
+        </DialogContentText>
+      )
+    );
+  };
+
+  const getExistingExamples = (examples: string[]) => {
+    return (
+      examples.map((example, index) => 
+        <DialogContentText key={index} display={'flex'} alignItems={'center'}>
+          • {example}
+          <IconButton 
+            color='error' 
+            onClick={() => {
+              const newResults = examples.filter((_, i) => i !== index);
+              if (existingWord) {
+                const tmp = {
+                  ...existingWord,
+                  examples: newResults,
+                }
+                setExistingWord(tmp);
+              }
+            }}
+            sx={{ 
+              padding: '4px',
+              fontSize: '1.5rem',
+              '@media (max-width:500px)': {
+                padding: '0 5px',
+                fontSize: '1.125rem',
+              }
+            }}
+          >
+            <DeleteForever 
+              sx={{
+                width: '20px', 
+                height: '20px',
+                '@media (max-width:500px)': {
+                  width: '1.25rem', 
+                  height: '1.25rem',
+                }
+              }}
+            />
+          </IconButton>
+        </DialogContentText>
+      )
     );
   };
 
@@ -404,19 +502,23 @@ const MergeWordPopUp = ({
           </Stack>
           <Divider/>
           <Stack spacing={2}>
-            <DialogContentText>
-              <b>기존 페이지: </b>{' '}{existingWord ? existingWord.pages?.join(', ') || '-' : '-'}
-            </DialogContentText>
+            <Stack spacing={0.5}>
+              <DialogContentText>
+                <b>기존 페이지: </b>{' '}{!existingWord ||(existingWord && existingWord.pages?.length === 0) && '-'}
+              </DialogContentText>
+              {getExistingPages((existingWord?.pages || []).filter((page): page is number => page !== null))}
+            </Stack>
             <Box display={'flex'} flexDirection={'column'}>
-              {getPages(watch('pages') ?? [], true)}
+              {getPages(watch('pages') ?? [])}
             </Box>
           </Stack>
           <Divider/>
           <Stack spacing={2}>
-            <Stack spacing={0.5} direction={'row'}>
+            <Stack spacing={0.5}>
               <DialogContentText>
-                <b>기존 예문: </b>{' '}{existingWord ? existingWord.examples || '-' : '-'}
+                <b>기존 예문: </b>{' '}{!existingWord ||(existingWord && existingWord.examples?.length === 0) && '-'}
               </DialogContentText>
+              {getExistingExamples(existingWord?.examples || [])}
             </Stack>
             {
               watch('examples') && (watch('examples') || []).length > 0 && 

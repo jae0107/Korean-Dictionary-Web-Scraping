@@ -7,7 +7,7 @@ import { AddCircle, ArrowRightAlt, Cancel, DeleteForever } from "@mui/icons-mate
 import { useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { createWordRequestMutation, getWordByTitleQuery } from "./query";
-import { WordInput } from "@/app/generated/gql/graphql";
+import { WordByTitleItemsFragment, WordInput } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,10 +38,11 @@ const SearchResults = ({
   const [getNaverDic, setNaverDic] = useState<string>('');
   const [getLoader, setLoader] = useState<boolean>(false);
   const [openMergeWordPopUp, setOpenMergeWordPopUp] = useState<boolean>(false);
+  const [getExistingWord, setExistingWord] = useState<WordByTitleItemsFragment | null>(null);
 
   const [createWordRequest] = useMutation(createWordRequestMutation);
 
-  const [getWordByTitle, { data, loading }] = useLazyQuery(getWordByTitleQuery);
+  const [getWordByTitle, { loading }] = useLazyQuery(getWordByTitleQuery);
   
   const form = useForm<WordInput>({
     defaultValues: {
@@ -103,6 +104,11 @@ const SearchResults = ({
           word.title && await getWordByTitle({
             variables: {
               title: word.title,
+            },
+            onCompleted: (res) => {
+              if (res) {
+                setExistingWord(res.getWordByTitle);
+              }
             },
             onError: (error) => {
               dispatchCurrentSnackBar({
@@ -439,7 +445,8 @@ const SearchResults = ({
       <MergeWordPopUp
         openMergeWordPopUp={openMergeWordPopUp}
         setOpenMergeWordPopUp={setOpenMergeWordPopUp}
-        existingWord={data?.getWordByTitle || null}
+        existingWord={getExistingWord}
+        setExistingWord={setExistingWord}
         loading={loading}
         form={form}
         getLoader={getLoader}

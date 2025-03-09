@@ -4,7 +4,6 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import { SessionProvider } from "next-auth/react";
 import { createContext, ReactNode, Suspense, useContext, useEffect, useMemo, useState } from "react";
 import NavigationBar from "../NavigationBar/NavigationBar";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { createTheme, CssBaseline, Theme, ThemeProvider, useMediaQuery } from "@mui/material";
 import { ApolloProvider } from "@apollo/client";
 import client from "@/app/lib/apolloClient";
@@ -21,7 +20,6 @@ export const ThemeContext = createContext<Theme | null>(null);
 export const useThemeContext = () => useContext(ThemeContext);
 
 const Providers = ({ children } : { children: ReactNode }) => {
-  const [queryClient] = useState(new QueryClient());
   const prefersMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [mode, setMode] = useState<'light' | 'dark'>('dark');
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
@@ -152,25 +150,23 @@ const Providers = ({ children } : { children: ReactNode }) => {
   return (
     <AppRouterCacheProvider>
       <SessionProvider>
-        <QueryClientProvider client={queryClient}>
-          <ApolloProvider client={client}>
-            <ColorModeContext.Provider value={colorMode}>
-              <ThemeProvider theme={theme}>
-                <ThemeContext.Provider value={theme}>
-                  <CssBaseline enableColorScheme />
-                  <Suspense fallback={null}>
-                    <SearchProvider searchResults={searchResults} setSearchResults={setSearchResults}>
-                      <SnackbarProvider>
-                        <NavigationBar theme={theme} setSearchResults={setSearchResults}/>
-                        {children}
-                      </SnackbarProvider>
-                    </SearchProvider>
-                  </Suspense>
-                </ThemeContext.Provider>
-              </ThemeProvider>
-            </ColorModeContext.Provider>
-          </ApolloProvider>
-        </QueryClientProvider>
+        <ApolloProvider client={client}>
+          <ColorModeContext.Provider value={colorMode}>
+            <ThemeProvider theme={theme}>
+              <ThemeContext.Provider value={theme}>
+                <CssBaseline enableColorScheme />
+                <Suspense fallback={null}>
+                  <SearchProvider searchResults={searchResults} setSearchResults={setSearchResults}>
+                    <SnackbarProvider>
+                      <NavigationBar theme={theme} setSearchResults={setSearchResults}/>
+                      {children}
+                    </SnackbarProvider>
+                  </SearchProvider>
+                </Suspense>
+              </ThemeContext.Provider>
+            </ThemeProvider>
+          </ColorModeContext.Provider>
+        </ApolloProvider>
       </SessionProvider>
     </AppRouterCacheProvider>
   );

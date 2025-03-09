@@ -67,7 +67,7 @@ export const wordTypeDefs = gql`
   type Mutation {
     createWordRequest(input: WordInput!): Word!
     duplicateWordRequest(input: WordInput!): Word!
-    updateWordRequest(input: WordInput!): Word!
+    updateWordRequest(id: ID!, input: WordInput!): Word!
     approveWordRequest(id: ID!): Boolean!
     approveDuplicatedWordRequest(id: ID!): Boolean!
     recoverWordRequest(id: ID!): Boolean!

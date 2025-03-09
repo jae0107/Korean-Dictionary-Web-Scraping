@@ -1,7 +1,7 @@
 import { MyWordRequestItemsFragment, WordInput } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, DialogContentText, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
 import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
@@ -25,10 +25,12 @@ const schema = z.object({
 });
 
 const MyRequestForm = ({
+  id,
   defaultValues,
   originalWord,
   refetch,
 } : {
+  id: string;
   defaultValues: WordInput;
   originalWord: MyWordRequestItemsFragment | null;
   refetch: () => void;
@@ -38,6 +40,7 @@ const MyRequestForm = ({
   const [getKorDic, setKorDic] = useState<string>('');
   const [getNaverDic, setNaverDic] = useState<string>('');
   const [getLoader, setLoader] = useState<boolean>(false);
+  const [getExistingWord, setExistingWord] = useState<MyWordRequestItemsFragment | null>(originalWord);
 
   const [updateWordRequest] = useMutation(updateWordRequestMutation);
   
@@ -59,17 +62,17 @@ const MyRequestForm = ({
   };
 
   const handleMerge = () => {
-    if (!originalWord) {
+    if (!getExistingWord) {
       return watch();
     }
 
     const input: WordInput = {
-      pages: [...(originalWord.pages || []).filter(page => page !== null), ...(watch('pages') || []).filter(page => page !== null)],
-      title: originalWord.title,
-      korDicResults: [...(originalWord.korDicResults || []), ...(watch('korDicResults') || [])],
-      naverDicResults: [...(originalWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
-      examples: mergeExamples(originalWord.examples || [], watch('examples') || []),
-      wordId: originalWord.id,
+      pages: [...(getExistingWord.pages || []).filter(page => page !== null), ...(watch('pages') || []).filter(page => page !== null)],
+      title: getExistingWord.title,
+      korDicResults: [...(getExistingWord.korDicResults || []), ...(watch('korDicResults') || [])],
+      naverDicResults: [...(getExistingWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
+      examples: mergeExamples(getExistingWord.examples || [], watch('examples') || []),
+      wordId: getExistingWord.id,
     }
 
     return input;
@@ -109,6 +112,7 @@ const MyRequestForm = ({
     setLoader(true);
     updateWordRequest({
       variables: {
+        updateWordRequestId: id,
         input: {
           ...handleMerge(),
           pages: (handleMerge().pages || []).filter((page) => page > 0),
@@ -157,20 +161,36 @@ const MyRequestForm = ({
   const getResults = (results: string[], dicType: string, isNew: boolean) => {
     return (
       <Box display={'flex'} flexDirection={'column'} width={'100%'}>
-        <List sx={{ width: '100%' }}>
+        <List sx={{ width: '100%', padding: 0 }}>
           {
             results.map((item, index) => (
               <ListItem key={index} sx={{ pl: 0, pr: 0, '&.MuiListItem-padding': { pt: 0 } }} dense>
-                <Typography variant={'body2'} color={isNew && originalWord? 'success': 'textPrimary'}>
-                  {results.length > 1 ? `${index+(originalWord && isNew ? originalWord[dicType === 'koDic' ? 'korDicResults' : 'naverDicResults'] || [] : []).length+1}. ${item}` : item}
+                <Typography variant={'body2'} color={isNew && getExistingWord? 'success': 'textPrimary'}>
+                  • {item}
                 </Typography>
                 {
-                  isNew &&
                   <IconButton 
                     color='error' 
                     onClick={() => {
                       const newResults = results.filter((_, i) => i !== index);
-                      setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults);
+                      if (isNew) {
+                        setValue(dicType === 'koDic' ? 'korDicResults' : 'naverDicResults', newResults)
+                      } else if (getExistingWord) {
+                        let tmp = getExistingWord;
+                        if (dicType === 'koDic') {
+                          tmp = {
+                            ...getExistingWord,
+                            korDicResults: newResults,
+                          };
+                        } else {
+                          tmp = {
+                            ...getExistingWord,
+                            naverDicResults: newResults,
+                          };
+                        }
+
+                        setExistingWord(tmp);
+                      }
                     }}
                     sx={{ 
                       padding: '4px',
@@ -282,7 +302,7 @@ const MyRequestForm = ({
     );
   };
 
-  const getPages = (pages: number[], isNew: boolean) => {
+  const getPages = (pages: number[]) => {
     return (
       <Stack spacing={2}>
         {
@@ -293,7 +313,6 @@ const MyRequestForm = ({
                 fullWidth={index > 0}
                 type='number'
                 value={page}
-                disabled={!isNew}
                 onChange={(e) => {
                   const value = Number(e.target.value);
                   setValue(`pages.${index}`, value);
@@ -313,7 +332,7 @@ const MyRequestForm = ({
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton disabled={!isNew} onClick={() => setValue(`pages.${index}`, 0)}>
+                        <IconButton onClick={() => setValue(`pages.${index}`, 0)}>
                           <Cancel sx={{ width: '15px', height: '15px' }}/>
                         </IconButton>
                       </InputAdornment>
@@ -322,7 +341,7 @@ const MyRequestForm = ({
                 }}
               />
               {
-                isNew && index > 0 &&
+                index > 0 &&
                 <Button
                   color='error'
                   variant="outlined"
@@ -342,15 +361,96 @@ const MyRequestForm = ({
             </Stack>
           ))
         }
-        {
-          isNew &&
-          <Button variant='outlined' onClick={handleAddPageOption}>
-            페이지 추가
-          </Button>
-        }
+        <Button variant='outlined' onClick={handleAddPageOption}>
+          페이지 추가
+        </Button>
       </Stack>
     );
   };
+
+  const getExistingPages = (pages: number[]) => {
+      return (
+        pages.map((page, index) => 
+          <DialogContentText key={index} display={'flex'} alignItems={'center'}>
+            • {page}
+            <IconButton 
+              color='error' 
+              onClick={() => {
+                const newResults = pages.filter((_, i) => i !== index);
+                if (getExistingWord) {
+                  const tmp = {
+                    ...getExistingWord,
+                    pages: newResults,
+                  }
+                  setExistingWord(tmp);
+                }
+              }}
+              sx={{ 
+                padding: '4px',
+                fontSize: '1.5rem',
+                '@media (max-width:500px)': {
+                  padding: '0 5px',
+                  fontSize: '1.125rem',
+                }
+              }}
+            >
+              <DeleteForever 
+                sx={{
+                  width: '20px', 
+                  height: '20px',
+                  '@media (max-width:500px)': {
+                    width: '1.25rem', 
+                    height: '1.25rem',
+                  }
+                }}
+              />
+            </IconButton>
+          </DialogContentText>
+        )
+      );
+    };
+  
+    const getExistingExamples = (examples: string[]) => {
+      return (
+        examples.map((example, index) => 
+          <DialogContentText key={index} display={'flex'} alignItems={'center'}>
+            • {example}
+            <IconButton 
+              color='error' 
+              onClick={() => {
+                const newResults = examples.filter((_, i) => i !== index);
+                if (getExistingWord) {
+                  const tmp = {
+                    ...getExistingWord,
+                    examples: newResults,
+                  }
+                  setExistingWord(tmp);
+                }
+              }}
+              sx={{ 
+                padding: '4px',
+                fontSize: '1.5rem',
+                '@media (max-width:500px)': {
+                  padding: '0 5px',
+                  fontSize: '1.125rem',
+                }
+              }}
+            >
+              <DeleteForever 
+                sx={{
+                  width: '20px', 
+                  height: '20px',
+                  '@media (max-width:500px)': {
+                    width: '1.25rem', 
+                    height: '1.25rem',
+                  }
+                }}
+              />
+            </IconButton>
+          </DialogContentText>
+        )
+      );
+    };
     
   return (
     <Stack spacing={2} mt={2} mb={2} maxWidth={'700px'}>
@@ -379,7 +479,7 @@ const MyRequestForm = ({
           </Typography>
         </Stack>
         <Box>
-          {originalWord && getResults(originalWord.korDicResults ?? [], 'koDic', false)}
+          {getExistingWord && getResults(getExistingWord.korDicResults ?? [], 'koDic', false)}
           {getResults(watch('korDicResults') ?? [], 'koDic', true)}
         </Box>
       </Stack>
@@ -397,32 +497,30 @@ const MyRequestForm = ({
           </Typography>
         </Stack>
         <Box>
-          {originalWord && getResults(originalWord.naverDicResults ?? [], 'naverDic', false)}
+          {getExistingWord && getResults(getExistingWord.naverDicResults ?? [], 'naverDic', false)}
           {getResults(watch('naverDicResults') ?? [], 'naverDic', true)}
         </Box>
       </Stack>
       <Divider/>
       <Stack spacing={2}>
-        {
-          originalWord &&
+        <Stack spacing={0.5}>
           <Typography variant="body1">
-            <b>기존 페이지: </b>{' '}{originalWord.pages?.join(', ') || '-'}
+            <b>기존 페이지: </b>{' '}{!getExistingWord ||(getExistingWord && getExistingWord.pages?.length === 0) && '-'}
           </Typography>
-        }
+          {getExistingPages((getExistingWord?.pages || []).filter((page): page is number => page !== null))}
+        </Stack>
         <Box display={'flex'} flexDirection={'column'}>
-          {getPages(watch('pages') ?? [], true)}
+          {getPages(watch('pages') ?? [])}
         </Box>
       </Stack>
       <Divider/>
       <Stack spacing={2}>
-        {
-          originalWord &&
-          <Stack spacing={0.5} direction={'row'}>
-            <Typography variant="body1">
-              <b>기존 예문: </b>{' '}{originalWord.examples || '-'}
-            </Typography>
-          </Stack>
-        }
+        <Stack spacing={0.5}>
+          <DialogContentText>
+            <b>기존 예문: </b>{' '}{!getExistingWord ||(getExistingWord && getExistingWord.examples?.length === 0) && '-'}
+          </DialogContentText>
+          {getExistingExamples(getExistingWord?.examples || [])}
+        </Stack>
         {
           watch('examples') && (watch('examples') || []).length > 0 && 
           <Stack spacing={2}>

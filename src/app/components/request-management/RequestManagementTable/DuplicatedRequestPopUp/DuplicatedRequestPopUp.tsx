@@ -126,35 +126,77 @@ const DuplicatedRequestPopUp = ({
     return <></>;
   }
 
-  const newKorDicResults = (getWordRequest.korDicResults || []).filter((item, index) => {
-    return !data?.getWord?.korDicResults?.some((existingItem, existingIndex) => 
-      existingItem === item && existingIndex === index
-    );
-  });
+  const getDifference = <T extends string | number>(existingArr: T[], newArr: T[]) => {
+    const countElements = (arr: T[]): Record<T, number> =>
+      arr.reduce((acc, value) => {
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      }, {} as Record<T, number>);
   
-  const newNaverDicResults = (getWordRequest.naverDicResults || []).filter((item, index) => {
-    return !data?.getWord?.naverDicResults?.some((existingItem, existingIndex) => 
-      existingItem === item && existingIndex === index
-    );
-  });
-
-  const newPages = (getWordRequest.pages || []).filter((item, index) => {
-    return !data?.getWord?.pages?.some((existingItem, existingIndex) =>
-      existingItem === item && existingIndex === index
-    );
-  });
-
-  const newExamples = (getWordRequest.examples || []).filter(example => !(data?.getWord.examples || []).includes(example));
+    const count1 = countElements(existingArr);
+    const count2 = countElements(newArr);
   
-  const getResults = (results: string[], dicType: string, isNew: boolean) => {
+    const deletedArr: T[] = Object.keys(count1)
+      .flatMap((key) =>
+        Array(Math.max(count1[key as T] - (count2[key as T] || 0), 0)).fill(key as T)
+      );
+  
+    const addedArr: T[] = Object.keys(count2)
+      .flatMap((key) =>
+        Array(Math.max(count2[key as T] - (count1[key as T] || 0), 0)).fill(key as T)
+      );
+  
+    const remainingArr: T[] = Object.keys(count1)
+      .filter((key) => count2[key as T])
+      .flatMap((key) =>
+        Array(Math.min(count1[key as T], count2[key as T])).fill(key as T)
+      );
+  
+    return { deletedArr, remainingArr, addedArr };
+  };
+
+  const { deletedArr: deletedKorDicResults, remainingArr: remainingKorDicResults, addedArr: addedKorDicResults } = getDifference(
+    data?.getWord?.korDicResults || [],
+    getWordRequest.korDicResults || []
+  );
+
+  const { deletedArr: deletedNaverDicResults, remainingArr: remainingNaverDicResults, addedArr: addedNaverDicResults } = getDifference(
+    data?.getWord?.naverDicResults || [],
+    getWordRequest.naverDicResults || []
+  );
+
+  const { deletedArr: deletedPages, remainingArr: remainingPages, addedArr: addedPages } = getDifference(
+    (data?.getWord?.pages || []).filter((page): page is number => page !== null),
+    (getWordRequest.pages || []).filter((page): page is number => page !== null)
+  );
+
+  const { deletedArr: deletedExamples, remainingArr: remainingExamples, addedArr: addedExamples } = getDifference(
+    data?.getWord?.examples || [],
+    getWordRequest.examples || []
+  );
+
+  const getColour = (status: 'NEW' | 'DELETED' | 'REMAINING') => {
+    switch (status) {
+      case 'NEW':
+        return 'success';
+      case 'DELETED':
+        return 'error';
+      case 'REMAINING':
+        return 'textPrimary';
+      default:
+        return 'textPrimary';
+    }
+  };
+  
+  const getResults = (results: string[] | number[], status: 'NEW' | 'DELETED' | 'REMAINING') => {
     return (
       <Box display={'flex'} flexDirection={'column'} width={'100%'}>
         <List sx={{ width: '100%', pt: 0, pb: 0 }}>
           {
             results.map((item, index) => (
               <ListItem key={index} sx={{ pl: 0, pr: 0, '&.MuiListItem-padding': { pt: 0 } }} dense>
-                <Typography variant={'body2'} color={isNew? 'success': 'textPrimary'}>
-                  {results.length > 1 ? `${index+(data && data.getWord && isNew ? data.getWord[dicType === 'koDic' ? 'korDicResults' : 'naverDicResults'] || [] : []).length+1}. ${item}` : item}
+                <Typography variant={'body2'} color={getColour(status)}>
+                  • {item}
                 </Typography>
               </ListItem>
             ))
@@ -165,7 +207,17 @@ const DuplicatedRequestPopUp = ({
   };
 
   const getExample = () => {
-    if (data?.getWord?.examples?.length === 0 && newExamples.length === 0) {
+    if (loading) {
+      return (
+        <Stack spacing={0.5} direction={'row'} display={'flex'} alignItems={'center'}>
+          <Box display={'flex'} alignItems={'center'} flexDirection={'row'}>
+            <Skeleton variant="rounded" width={34} height={19}/>
+            <b>:</b>
+          </Box>
+          <Skeleton variant="rounded" width={'70%'} height={24}/>
+        </Stack>
+      );
+    } else if (deletedExamples.length === 0 && remainingExamples.length === 0 && addedExamples.length === 0) {
       return (
         <Stack spacing={0.5} direction={'row'}>
           <DialogContentText>
@@ -174,52 +226,22 @@ const DuplicatedRequestPopUp = ({
           <DialogContentText>-</DialogContentText>
         </Stack>
       );
-    } else if (data?.getWord?.examples?.length === 0 && newExamples.length > 0) {
-      return (
-        <Stack spacing={0.5} direction={'row'}>
-          <DialogContentText>
-            <b>예문: </b>
-          </DialogContentText>
-          <DialogContentText color="success">
-            {newExamples.length === 1 ? newExamples[0] : newExamples.map((example, index) => `• ${example}`).join('\n')}
-          </DialogContentText>
-        </Stack>
-      );
-    } else if (data && data.getWord && data.getWord.examples && data.getWord.examples.length > 0 && newExamples.length === 0) {
-      return (
-        <Stack spacing={0.5} direction={'row'}>
-          <DialogContentText>
-            <b>예문: </b>
-          </DialogContentText>
-          <DialogContentText>
-            {data.getWord.examples.length === 1 ? data.getWord.examples[0] : data.getWord.examples.map((example, index) => `• ${example}`).join('\n')}
-          </DialogContentText>
-        </Stack>
-      );
-    } else if (data && data.getWord && data.getWord.examples && data.getWord.examples.length > 0 && newExamples.length > 0) {
+    } else if (remainingExamples.length > 0 || deletedExamples.length > 0 || addedExamples.length > 0) {
       return (
         <Stack spacing={0.5}>
           <DialogContentText>
             <b>예문: </b>
           </DialogContentText>
-          <DialogContentText whiteSpace={'pre-line'}>
-            {data.getWord.examples.map((example, index) => `• ${example}`).join('\n')}
-          </DialogContentText>
-          <DialogContentText color="success" whiteSpace={'pre-line'}>
-            {newExamples.map((example, index) => `• ${example}`).join('\n')}
-          </DialogContentText>
+          <Box>
+            {getResults(remainingExamples, 'REMAINING')}
+            {getResults(deletedExamples, 'DELETED')}
+            {getResults(addedExamples, 'NEW')}
+          </Box>
         </Stack>
       );
     }
-    return (
-      <Stack spacing={0.5} direction={'row'} display={'flex'} alignItems={'center'}>
-        <Box display={'flex'} alignItems={'center'} flexDirection={'row'}>
-          <Skeleton variant="rounded" width={34} height={19}/>
-          <b>:</b>
-        </Box>
-        <Skeleton variant="rounded" width={'70%'} height={24}/>
-      </Stack>
-    );
+
+    return <></>;
   };
       
   return (
@@ -303,8 +325,9 @@ const DuplicatedRequestPopUp = ({
                     <Skeleton variant="rounded" width={260} height={20}/>
                   </Stack> :
                   <>
-                    {getResults(data?.getWord?.korDicResults ?? [], 'koDic', false)}
-                    {getResults(newKorDicResults, 'koDic', true)}
+                    {getResults(remainingKorDicResults, 'REMAINING')}
+                    {getResults(deletedKorDicResults, 'DELETED')}
+                    {getResults(addedKorDicResults, 'NEW')}
                   </>
                 }
               </Box>
@@ -339,7 +362,7 @@ const DuplicatedRequestPopUp = ({
                 }
               </Stack>
               <Box>
-              {
+                {
                   loading ?
                   <Stack spacing={'4px'}>
                     <Skeleton variant="rounded" width={260} height={20}/>
@@ -348,8 +371,9 @@ const DuplicatedRequestPopUp = ({
                     <Skeleton variant="rounded" width={260} height={20}/>
                   </Stack> :
                   <>
-                    {getResults(data?.getWord?.naverDicResults ?? [], 'naverDic', false)}
-                    {getResults(newNaverDicResults, 'naverDic', true)}
+                    {getResults(remainingNaverDicResults, 'REMAINING')}
+                    {getResults(deletedNaverDicResults, 'DELETED')}
+                    {getResults(addedNaverDicResults, 'NEW')}
                   </>
                 }
               </Box>
@@ -373,18 +397,21 @@ const DuplicatedRequestPopUp = ({
                 </Stack> :
                 <>
                   {
-                    data?.getWord?.pages?.length === 0 && newPages.length === 0 && <DialogContentText>-</DialogContentText>
-                  }
-                  {
-                    data && data.getWord && data.getWord.pages && data.getWord.pages.length > 0 &&
+                    remainingPages.length > 0 &&
                     <DialogContentText>
-                      {data.getWord.pages.join(', ')}{ newPages.length > 0 && ', ' }
+                      {remainingPages.join(', ')}{ (deletedPages.length > 0 || addedPages.length > 0) && ', ' }
                     </DialogContentText>
                   }
                   {
-                    newPages.length > 0 &&
+                    deletedPages.length > 0 &&
+                    <DialogContentText color="error">
+                      {deletedPages.join(', ')}{ addedPages.length > 0 && ', ' }
+                    </DialogContentText>
+                  }
+                  {
+                    addedPages.length > 0 &&
                     <DialogContentText color="success">
-                      {newPages.join(', ')}
+                      {addedPages.join(', ')}
                     </DialogContentText>
                   }
                 </>

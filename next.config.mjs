@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  // experimental: {
-  //   appDir: true, // Ensures Next.js recognizes the `src/api` directory correctly
-  // },
   // Optional: Add rewrites if you want to simplify accessing the GraphQL endpoint
   async rewrites() {
     return [

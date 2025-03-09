@@ -200,17 +200,13 @@ async function duplicateWordRequest(
 
 async function updateWordRequest(
   root: any,
-  { input }: { input: WordInput },
+  { id, input }: { id: string; input: WordInput },
   { currentUser }: Context,
 ): Promise<Word> {
   return await transaction(async (t) => {
     if (!input.title) throw new Error('단어를 입력해주세요.');
 
-    const existingWord = await Word.findOne({
-      where: {
-        title: input.title, 
-      }
-    });
+    const existingWord = await Word.findByPk(id);
 
     if (!existingWord) throw new Error('단어가 존재하지 않습니다.');
 
@@ -223,8 +219,7 @@ async function updateWordRequest(
       examples: input.examples ?? [], 
       deniedReason: input.deniedReason ?? '', 
       title: input.title ?? "",
-      status: WordStatus.Pending,
-      previousStatus: existingWord.status,
+      status: input.status || existingWord.status,
       wordId: input.wordId || existingWord.wordId,
     };
 

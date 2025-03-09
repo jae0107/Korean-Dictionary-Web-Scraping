@@ -99,37 +99,74 @@ const SingleMyRequest = () => {
     );
   }
 
-  const originalWord: MyWordRequestItemsFragment | null = data?.getWord?.originalWord || null;
-
-  const newKorDicResults = (data?.getWord.korDicResults || []).filter((item, index) => {
-    return !(originalWord ? originalWord.korDicResults || [] : []).some((existingItem, existingIndex) => 
-      existingItem === item && existingIndex === index
-    );
-  });
+  const getDifference = <T extends string | number>(existingArr: T[], newArr: T[]) => {
+    const countElements = (arr: T[]): Record<T, number> =>
+      arr.reduce((acc, value) => {
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      }, {} as Record<T, number>);
   
-  const newNaverDicResults = (data?.getWord.naverDicResults || []).filter((item, index) => {
-    return !(originalWord ? originalWord.naverDicResults || [] : []).some((existingItem, existingIndex) => 
-      existingItem === item && existingIndex === index
-    );
-  });
-
-  const newPages = (data?.getWord.pages || []).filter((item, index) => {
-    return !(originalWord ? originalWord.pages || [] : []).some((existingItem, existingIndex) =>
-      existingItem === item && existingIndex === index
-    );
-  });
-
-  const newExamples = (data?.getWord.examples || []).filter(example => !(originalWord?.examples || []).includes(example));
-
-  const defaultValues: WordInput = {
-    title: data?.getWord.title || '',
-    pages: (newPages || []).filter((page): page is number => page !== null),
-    korDicResults: newKorDicResults || [],
-    naverDicResults: newNaverDicResults || [],
-    examples: newExamples || [],
-    wordId: data?.getWord?.originalWord?.id || '',
+    const count1 = countElements(existingArr);
+    const count2 = countElements(newArr);
+  
+    const deletedArr: T[] = Object.keys(count1)
+      .flatMap((key) =>
+        Array(Math.max(count1[key as T] - (count2[key as T] || 0), 0)).fill(key as T)
+      );
+  
+    const addedArr: T[] = Object.keys(count2)
+      .flatMap((key) =>
+        Array(Math.max(count2[key as T] - (count1[key as T] || 0), 0)).fill(key as T)
+      );
+  
+    const remainingArr: T[] = Object.keys(count1)
+      .filter((key) => count2[key as T])
+      .flatMap((key) =>
+        Array(Math.min(count1[key as T], count2[key as T])).fill(key as T)
+      );
+  
+    return { deletedArr, remainingArr, addedArr };
   };
 
+  const { deletedArr: deletedKorDicResults, remainingArr: remainingKorDicResults, addedArr: addedKorDicResults } = getDifference(
+    data?.getWord.originalWord ? data.getWord.originalWord.korDicResults || [] : [],
+    data?.getWord.korDicResults || []
+  );
+  
+  const { deletedArr: deletedNaverDicResults, remainingArr: remainingNaverDicResults, addedArr: addedNaverDicResults } = getDifference(
+    data?.getWord.originalWord ? data.getWord.originalWord.naverDicResults || [] : [],
+    data?.getWord.naverDicResults || []
+  );
+
+  const { deletedArr: deletedPages, remainingArr: remainingPages, addedArr: addedPages } = getDifference(
+    (data?.getWord.originalWord ? data.getWord.originalWord.pages || [] : []).filter((page): page is number => page !== null),
+    (data?.getWord.pages || []).filter((page): page is number => page !== null)
+  );
+
+  const { deletedArr: deletedExamples, remainingArr: remainingExamples, addedArr: addedExamples } = getDifference(
+    data?.getWord.originalWord ? data.getWord.originalWord?.examples || [] : [],
+    data?.getWord.examples || []
+  );
+
+  const getExistingWord: MyWordRequestItemsFragment | null = data?.getWord.originalWord ? {
+    ...data?.getWord.originalWord,
+    korDicResults: remainingKorDicResults,
+    naverDicResults: remainingNaverDicResults,
+    pages: remainingPages,
+    examples: remainingExamples,
+  } : null;
+  
+  const defaultValues: WordInput = {
+    title: data?.getWord.title || '',
+    pages: (addedPages || [])
+      .map((page) => (typeof page === 'string' ? Number(page) : page))
+      .filter((page): page is number => !isNaN(page)),
+    korDicResults: addedKorDicResults || [],
+    naverDicResults: addedNaverDicResults || [],
+    examples: addedExamples || [],
+    wordId: data?.getWord?.originalWord?.id || '',
+  };
+  
   return (
     <Box 
       width={'100%'} 
@@ -143,7 +180,15 @@ const SingleMyRequest = () => {
         }
       }}
     >
-      {!loading && <MyRequestForm defaultValues={defaultValues} originalWord={originalWord} refetch={refetch}/>}
+      {
+        !loading && 
+          <MyRequestForm 
+            id={id}
+            defaultValues={defaultValues} 
+            originalWord={getExistingWord} 
+            refetch={refetch}
+          />
+      }
     </Box>
   );
 }
