@@ -109,11 +109,6 @@ const SingleMyRequest = () => {
     const count1 = countElements(existingArr);
     const count2 = countElements(newArr);
   
-    const deletedArr: T[] = Object.keys(count1)
-      .flatMap((key) =>
-        Array(Math.max(count1[key as T] - (count2[key as T] || 0), 0)).fill(key as T)
-      );
-  
     const addedArr: T[] = Object.keys(count2)
       .flatMap((key) =>
         Array(Math.max(count2[key as T] - (count1[key as T] || 0), 0)).fill(key as T)
@@ -125,25 +120,25 @@ const SingleMyRequest = () => {
         Array(Math.min(count1[key as T], count2[key as T])).fill(key as T)
       );
   
-    return { deletedArr, remainingArr, addedArr };
+    return { remainingArr, addedArr };
   };
 
-  const { deletedArr: deletedKorDicResults, remainingArr: remainingKorDicResults, addedArr: addedKorDicResults } = getDifference(
+  const { remainingArr: remainingKorDicResults, addedArr: addedKorDicResults } = getDifference(
     data?.getWord.originalWord ? data.getWord.originalWord.korDicResults || [] : [],
     data?.getWord.korDicResults || []
   );
   
-  const { deletedArr: deletedNaverDicResults, remainingArr: remainingNaverDicResults, addedArr: addedNaverDicResults } = getDifference(
+  const { remainingArr: remainingNaverDicResults, addedArr: addedNaverDicResults } = getDifference(
     data?.getWord.originalWord ? data.getWord.originalWord.naverDicResults || [] : [],
     data?.getWord.naverDicResults || []
   );
 
-  const { deletedArr: deletedPages, remainingArr: remainingPages, addedArr: addedPages } = getDifference(
+  const { remainingArr: remainingPages, addedArr: addedPages } = getDifference(
     (data?.getWord.originalWord ? data.getWord.originalWord.pages || [] : []).filter((page): page is number => page !== null),
     (data?.getWord.pages || []).filter((page): page is number => page !== null)
   );
 
-  const { deletedArr: deletedExamples, remainingArr: remainingExamples, addedArr: addedExamples } = getDifference(
+  const { remainingArr: remainingExamples, addedArr: addedExamples } = getDifference(
     data?.getWord.originalWord ? data.getWord.originalWord?.examples || [] : [],
     data?.getWord.examples || []
   );
