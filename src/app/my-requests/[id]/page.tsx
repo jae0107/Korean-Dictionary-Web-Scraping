@@ -11,7 +11,7 @@ import { useSession } from 'next-auth/react';
 import { useCheckSessionVersion } from '@/app/hooks/useCheckSessionVersion';
 
 const SingleMyRequest = () => {
-  useCheckSessionVersion();
+  useCheckSessionVersion(true);
   const { data: session } = useSession();
   
   const params = useParams();

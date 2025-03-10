@@ -1,5 +1,5 @@
 import { createMyVocabCountLoaderByRequestor, createMyVocabularyLoader } from "./my-vocabulary";
-import { createUserLoader } from "./user";
+import { createTestResultLoader, createUserLoader } from "./user";
 import { createApprovedCountLoaderByRequestor, createWordLoaderById } from "./word";
 
 export const createDataLoaders = () => ({
@@ -8,4 +8,5 @@ export const createDataLoaders = () => ({
   myVocabulary: createMyVocabularyLoader(),
   approvedCountByRequestor: createApprovedCountLoaderByRequestor(),
   myVocabCount: createMyVocabCountLoaderByRequestor(),
+  testResult: createTestResultLoader(),
 });

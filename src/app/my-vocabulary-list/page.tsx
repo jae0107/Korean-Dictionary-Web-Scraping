@@ -12,7 +12,7 @@ import MyVocabTable from "../components/my-vocabulary-list/MyVocabTable/MyVocabT
 import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 
 const MyVocabularyList = () => {
-  useCheckSessionVersion();
+  useCheckSessionVersion(true);
   
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();

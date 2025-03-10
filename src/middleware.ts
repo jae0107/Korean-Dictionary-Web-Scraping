@@ -14,6 +14,8 @@ export const config = {
     "/password-setup",
     "/my-requests",
     "/user-stats",
+    "/mock-test",
+    "/test-venues",
     "/((?!signin|signup|password-reset-request|find-my-id|api|public).*)", // Protect all pages except these
   ],
 };

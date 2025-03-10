@@ -1,4 +1,4 @@
-import { AccountCircle, AdminPanelSettings, Assessment, Checklist, Logout, MenuBook, PersonAdd, Portrait, VpnKey } from '@mui/icons-material';
+import { AccountCircle, AdminPanelSettings, Assessment, Checklist, Logout, MenuBook, PersonAdd, Portrait, Quiz, VpnKey } from '@mui/icons-material';
 import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Skeleton, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MobileNavDrawer from './MobileNavDrawer/MobileNavDrawer';
 import { SearchResult } from '@/app/types/types';
 import DummyNavigationBar from './DummyNavigationBar/DummyNavigationBar';
+import { ExamIcon } from '../shared/icons/ExamIcon';
 
 const NavigationBar = ({
   theme,
@@ -22,10 +23,11 @@ const NavigationBar = ({
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const maxWidth620 = useMediaQuery('(max-width:620px)');
+  const maxWidth620 = useMediaQuery('(max-width:685px)');
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
+  const [anchorElTest, setAnchorElTest] = useState<null | HTMLElement>(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -45,7 +47,7 @@ const NavigationBar = ({
   
   if (status === 'loading') {
     return <DummyNavigationBar/>;
-  } else if (status === 'unauthenticated' || !session) {
+  } else if (status === 'unauthenticated' || !session || session.user.status !== 'APPROVED') {
     return <></>;
   }
 
@@ -107,7 +109,7 @@ const NavigationBar = ({
                   justifyContent: 'center',
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname === '/vocabulary-list' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                  '@media (max-width: 620px)': {
+                  '@media (max-width: 685px)': {
                     display: session.user.role === 'STUDENT' ? 'flex' : 'none',
                   }
                 }}
@@ -116,6 +118,73 @@ const NavigationBar = ({
               >
                 단어장
               </Button>
+              <Button
+                sx={{ 
+                  my: 2, 
+                  color: 'white', 
+                  borderRadius: '0px',
+                  borderBottom: `2px solid ${pathname.includes('/mock-test') || pathname.includes('/test-venues') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                  '@media (max-width: 685px)': {
+                    display: session.user.role === 'STUDENT' ? 'flex' : 'none',
+                  }
+                }}
+                onClick={(e) => setAnchorElTest(e.currentTarget)}
+              >
+                테스트
+              </Button>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElTest}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElTest)}
+                onClose={() => setAnchorElTest(null)}
+              >
+                <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/mock-test') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/mock-test')}
+                  component={Link}
+                  href={'/mock-test'}
+                >
+                  <Typography 
+                    sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    display={'flex'}
+                    alignItems={'center'}
+                  >
+                    <Quiz sx={{ mr: '4px' }}/>모의 테스트
+                  </Typography>
+                </MenuItem>
+                <MenuItem 
+                  sx={{ backgroundColor: pathname.includes('/test-venues') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}
+                  onClick={() => navigationUser('/test-venues')}
+                  component={Link}
+                  href={'/test-venues'}
+                >
+                  <Typography 
+                    sx={{ 
+                      textAlign: 'center', 
+                      color: 'inherit', 
+                      cursor: 'pointer',
+                    }} 
+                    display={'flex'}
+                    alignItems={'center'}
+                  >
+                    <ExamIcon style={{ height: '24px', width: '24px', marginRight: '4px' }}/>실전 테스트
+                  </Typography>
+                </MenuItem>
+              </Menu>
               {
                 (session.user.role !== 'STUDENT') &&
                 <Button
@@ -124,7 +193,7 @@ const NavigationBar = ({
                     color: 'white', 
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 620px)': {
+                    '@media (max-width: 685px)': {
                       display: 'none',
                     }
                   }}
@@ -142,7 +211,7 @@ const NavigationBar = ({
                     color: 'white', 
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') || pathname.includes('/user-stats') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 620px)': {
+                    '@media (max-width: 685px)': {
                       display: 'none',
                     }
                   }}
@@ -272,7 +341,7 @@ const NavigationBar = ({
                     color: 'white', 
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/password-reset-request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 620px)': {
+                    '@media (max-width: 685px)': {
                       display: 'none',
                     }
                   }}
@@ -312,7 +381,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:620px)': {
+                    '@media (max-width:685px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -338,7 +407,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/password-change' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:620px)': {
+                    '@media (max-width:685px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -364,7 +433,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/my-vocabulary-list' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:620px)': {
+                    '@media (max-width:685px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -390,7 +459,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:620px)': {
+                    '@media (max-width:685px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -418,7 +487,7 @@ const NavigationBar = ({
                   <MenuItem 
                     onClick={logOut}
                     sx={{
-                      '@media (max-width:620px)': {
+                      '@media (max-width:685px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',

@@ -6,7 +6,7 @@ import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
 import { RequestorSearch } from "./requestor-search";
-import { queryBuilder, QueryBuilder, sequelize } from "../initialisers";
+import { knex, queryBuilder, QueryBuilder, sequelize } from "../initialisers";
 import { Op, QueryTypes } from "sequelize";
 import * as bcrypt from 'bcrypt';
 
@@ -44,6 +44,9 @@ export const userResolvers = {
     async myVocabCount(user: User, _: any, { dataloaders }: Context) {
       return await dataloaders.myVocabCount.load(user.id);
     },
+    async testResults(user: User, _: any, { dataloaders }: Context) {
+      return await dataloaders.testResult.load(user.id);
+    },
   }
 };
 
@@ -52,12 +55,28 @@ async function getUsers(
   {
     paginationOptions,
     filterOptions,
-  }: { paginationOptions: OffsetPaginationOptions; filterOptions: UserFilterOptions },
+    isUserStat,
+  }: { paginationOptions: OffsetPaginationOptions; filterOptions: UserFilterOptions; isUserStat: boolean },
   { currentUser }: Context
 ): Promise<OffsetPaginationResponse<User>> {
   return await transaction(async (t) => {
     const searcher = new UserSearch({ ...paginationOptions }, { ...filterOptions });
     const offsetUsersResponse: OffsetPaginationResponse<User> = await searcher.process();
+
+    if (isUserStat) {
+      let query: QueryBuilder = queryBuilder('testVenues');
+      query = query.select(knex.raw("NULLIF(regexp_replace(title, '[^0-9]', '', 'g'), '')::INT AS maxNumber"))
+        .orderByRaw(knex.raw("maxNumber desc"))
+        .limit(1);
+      
+      const results = await sequelize.query(query.toString(), { type: QueryTypes.SELECT }) as { maxnumber: number }[];
+      
+      return {
+        ...offsetUsersResponse,
+        maxNumTest: results[0].maxnumber,
+      }
+    }
+
     return offsetUsersResponse;
   }).catch((e) => {
     throw new ApolloResponseError(e);

@@ -1,6 +1,6 @@
 import { UserStatItemsFragment } from "@/app/generated/gql/graphql";
-import { Box } from "@mui/material";
-import { DataGrid, GridColDef, GridPagination } from "@mui/x-data-grid";
+import { Box, Typography } from "@mui/material";
+import { DataGrid, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction } from "react";
 import CustomExportToolbar from "../../shared/CustomExportToolbar";
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
@@ -14,6 +14,7 @@ const UserStatTable = ({
   page,
   paginationModel,
   setPaginationModel,
+  maxNumTest,
 } : {
   loading: boolean;
   students: UserStatItemsFragment[];
@@ -27,7 +28,28 @@ const UserStatTable = ({
     page: number;
     pageSize: number;
   }>>;
+  maxNumTest: number;
 }) => {
+  const maxNumTestCols : GridColDef[] = Array.from({length: maxNumTest}, (_, i) => {
+    return {
+      field: `test${i+1}`,
+      headerName: `${i+1}차`,
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<UserStatItemsFragment>) => {
+        if (params.row.testResults && params.row.testResults.length > 0) {
+          const j = params.row.testResults.findIndex((test) => test.title === `${i+1}차`);
+          if (j !== -1) {
+            return params.row.testResults[j].testScore;
+          }
+          return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        }
+        return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+      }
+    }
+  });
+
   const columns: GridColDef[] = [
     { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
     { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
@@ -35,6 +57,7 @@ const UserStatTable = ({
     { field: 'number', headerName: '번호', flex: 1, filterable: false, sortable: false },
     { field: 'approvedCount', headerName: '승인된 단어', flex: 1, filterable: false, sortable: false },
     { field: 'myVocabCount', headerName: '내 단어장', flex: 1, filterable: false, sortable: false },
+    ...maxNumTestCols,
   ];
   
   return (

@@ -52,9 +52,12 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.sessionVersion = (user as User).sessionVersion; // 로그인 시 설정
+        token.sessionVersion = (user as User).sessionVersion;
+      }
+      if (trigger == "update") {
+        token.isInTestMode = session.user.isInTestMode;
       }
       return { ...token, ...user };
     },

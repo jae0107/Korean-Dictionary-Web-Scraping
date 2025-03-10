@@ -9,15 +9,20 @@ export const userStatFragment = gql(`
     number
     approvedCount
     myVocabCount
+    testResults {
+      title
+      testScore
+    }
   }
 `);
 
 export const getUserStatsQuery = gql(`
-  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {
-    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {
+  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!, $isUserStat: Boolean) {
+    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions, isUserStat: $isUserStat) {
       records {
         ...UserStatItems
       }
+      maxNumTest
       pageInfo {
         pageCount
         totalRowCount

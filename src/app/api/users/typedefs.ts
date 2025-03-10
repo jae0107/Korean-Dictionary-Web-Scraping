@@ -36,6 +36,11 @@ export const userTypeDefs = gql`
     userName: String
   }
 
+  type UserTestResult {
+    title: String
+    testScore: Int!
+  }
+
   type User {
     id: ID!
     name: String!
@@ -53,6 +58,7 @@ export const userTypeDefs = gql`
     myVocabCount: Int
     sessionVersion: Int
     createdAt: DateTime!
+    testResults: [UserTestResult!]
   }
 
   input UserInput {
@@ -87,6 +93,7 @@ export const userTypeDefs = gql`
   type UserOffsetPaginationResponse {
     records: [User!]!
     pageInfo: OffsetPaginationPageInfo!
+    maxNumTest: Int
   }
 
   type Query {
@@ -94,6 +101,7 @@ export const userTypeDefs = gql`
     getUsers(
       paginationOptions: OffsetPaginationOptions!
       filterOptions: UserFilterOptions!
+      isUserStat: Boolean
     ): UserOffsetPaginationResponse!
     getUser(id: ID!): User!
     findPassword(accountId: String!): String!

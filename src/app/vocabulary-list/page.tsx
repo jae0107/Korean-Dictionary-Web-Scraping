@@ -13,7 +13,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 
 const VocabularyList = () => {
-  useCheckSessionVersion();
+  useCheckSessionVersion(true);
   
   const { paginationModel, setPaginationModel } = usePaginationModel();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -52,7 +52,7 @@ const VocabularyList = () => {
         });
       },
     });
-      
+
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
       <Stack spacing={2}>

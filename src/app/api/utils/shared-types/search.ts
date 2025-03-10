@@ -11,6 +11,7 @@ export type OffsetPaginationOptions = { limit: number; pageNum: number };
 export type OffsetPaginationResponse<T> = {
   records: T[];
   pageInfo: OffsetPaginationPageInfo;
+  maxNumTest?: number;
 };
 export type OffsetPaginationPageInfo = {
   totalRowCount: number;

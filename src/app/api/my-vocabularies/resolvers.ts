@@ -5,6 +5,7 @@ import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { MyVocabularySearch } from "./my-vocabularies-search";
+import { sequelize } from "../initialisers";
 
 export const myVocabularyResolvers = {
   Query: {
@@ -12,6 +13,7 @@ export const myVocabularyResolvers = {
   },
   Mutation: {
     addMyVocabulary,
+    bulkAddMyVocabulary,
     removeMyVocabulary,
   },
   MyVocabulary: {
@@ -61,6 +63,31 @@ async function addMyVocabulary(
     const newWord = await MyVocabulary.create(newInput);
 
     return newWord;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function bulkAddMyVocabulary(
+  root: any,
+  { wordIds }: { wordIds: string[] },
+  { currentUser }: Context
+): Promise<boolean> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    await sequelize.query(`
+      INSERT INTO "myVocabularies" ("userId", "wordId", "createdAt", "updatedAt")
+      VALUES ${wordIds
+        .map(
+          (wordId) =>
+            `('${currentUser.id}', '${wordId}', NOW(), NOW())`
+        )
+        .join(', ')}
+      ON CONFLICT ("userId", "wordId") DO NOTHING;
+    `);
+
+    return true;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

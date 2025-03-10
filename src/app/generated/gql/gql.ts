@@ -26,6 +26,8 @@ const documents = {
     "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n  }\n": types.WordByTitleItemsFragmentDoc,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n": types.GetWordByTitleDocument,
+    "\n  mutation BulkAddMyVocabulary($wordIds: [ID!]!) {\n    bulkAddMyVocabulary(wordIds: $wordIds)\n  }\n": types.BulkAddMyVocabularyDocument,
+    "\n  mutation CreateTestResult($input: TestResultInput!) {\n    createTestResult(input: $input)\n  }\n": types.CreateTestResultDocument,
     "\n  mutation UpdateWordRequest($updateWordRequestId: ID!, $input: WordInput!) {\n    updateWordRequest(id: $updateWordRequestId, input: $input) {\n      id\n    }\n  }\n": types.UpdateWordRequestDocument,
     "\n  mutation ChangeCurrentPassword($changeCurrentPasswordId: ID!, $input: FindPasswordInput!) {\n    changeCurrentPassword(id: $changeCurrentPasswordId, input: $input) {\n      id\n    }\n  }\n": types.ChangeCurrentPasswordDocument,
     "\n  mutation BulkPasswordReset($ids: [ID!]!) {\n    bulkPasswordReset(ids: $ids)\n  }\n": types.BulkPasswordResetDocument,
@@ -47,6 +49,11 @@ const documents = {
     "\n  mutation RecoverWordRequest($recoverWordRequestId: ID!) {\n    recoverWordRequest(id: $recoverWordRequestId)\n  }\n": types.RecoverWordRequestDocument,
     "\n  mutation DeleteWordRequest($deleteWordRequestId: ID!) {\n    deleteWordRequest(id: $deleteWordRequestId)\n  }\n": types.DeleteWordRequestDocument,
     "\n  mutation UpdateDeniedReason($updateDeniedReasonId: ID!, $deniedReason: String) {\n    updateDeniedReason(id: $updateDeniedReasonId, deniedReason: $deniedReason) {\n      id\n      deniedReason\n    }\n  }\n": types.UpdateDeniedReasonDocument,
+    "\n  mutation CreateTestVenue($input: TestVenueInput!) {\n    createTestVenue(input: $input) {\n      id\n    }\n  }\n": types.CreateTestVenueDocument,
+    "\n  mutation UpdateTestVenue($updateTestVenueId: ID!, $input: TestVenueInput!) {\n    updateTestVenue(id: $updateTestVenueId, input: $input) {\n      id\n    }\n  }\n": types.UpdateTestVenueDocument,
+    "\n  mutation CloseTestVenue($closeTestVenueId: ID!) {\n    closeTestVenue(id: $closeTestVenueId)\n  }\n": types.CloseTestVenueDocument,
+    "\n  mutation DeleteTestVenue($deleteTestVenueId: ID!) {\n    deleteTestVenue(id: $deleteTestVenueId)\n  }\n": types.DeleteTestVenueDocument,
+    "\n  mutation RestoreTestVenue($restoreTestVenueId: ID!) {\n    restoreTestVenue(id: $restoreTestVenueId)\n  }\n": types.RestoreTestVenueDocument,
     "\n  mutation BulkApproveUsers($ids: [ID!]!) {\n    bulkApproveUsers(ids: $ids)\n  }\n": types.BulkApproveUsersDocument,
     "\n  mutation BulkDenyUsers($ids: [ID!]!) {\n    bulkDenyUsers(ids: $ids)\n  }\n": types.BulkDenyUsersDocument,
     "\n  mutation BulkRecoverUsers($ids: [ID!]!) {\n    bulkRecoverUsers(ids: $ids)\n  }\n": types.BulkRecoverUsersDocument,
@@ -63,6 +70,8 @@ const documents = {
     "\n  mutation AddMyVocabulary($input: MyVocabularyInput!) {\n    addMyVocabulary(input: $input) {\n      id\n    }\n  }\n": types.AddMyVocabularyDocument,
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
     "\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n": types.GetUserDocument,
+    "\n  fragment MiniTestItems on MiniTest {\n    id\n    correctAnswer\n    korDicResults\n    naverDicResults\n    options\n  }\n": types.MiniTestItemsFragmentDoc,
+    "\n  query GetMiniTests($filterOptions: MiniTestFilterOptions!) {\n    getMiniTests(filterOptions: $filterOptions) {\n      ...MiniTestItems\n    }\n  }\n": types.GetMiniTestsDocument,
     "\n  fragment MyWordRequestItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    originalWord {\n      id\n      pages\n      title\n      korDicResults\n      naverDicResults\n      examples\n    }\n  }\n": types.MyWordRequestItemsFragmentDoc,
     "\n  query GetMyWordRequest($getWordId: ID!) {\n    getWord(id: $getWordId) {\n      ...MyWordRequestItems\n      status\n      requestors {\n        id\n      }\n    }\n  }\n": types.GetMyWordRequestDocument,
     "\n  fragment MyRequestItems on Word {\n    id\n    korDicResults\n    naverDicResults\n    title\n    pages\n    examples\n    deniedReason\n    wordId\n  }\n": types.MyRequestItemsFragmentDoc,
@@ -87,8 +96,10 @@ const documents = {
     "\n  query GetTeacher($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleTeacherItems\n    }\n  }\n": types.GetTeacherDocument,
     "\n  fragment TeacherItems on User {\n    id\n    name\n    year\n    class\n    accountId\n    status\n    role\n    status\n  }\n": types.TeacherItemsFragmentDoc,
     "\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetTeachersDocument,
-    "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n  }\n": types.UserStatItemsFragmentDoc,
-    "\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserStatItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetUserStatsDocument,
+    "\n  fragment TestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n  }\n": types.TestVenueItemsFragmentDoc,
+    "\n  query GetTestVenues($paginationOptions: OffsetPaginationOptions!, $filterOptions: TestVenueFilterOptions) {\n    getTestVenues(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TestVenueItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetTestVenuesDocument,
+    "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n    testResults {\n      title\n      testScore\n    }\n  }\n": types.UserStatItemsFragmentDoc,
+    "\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!, $isUserStat: Boolean) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions, isUserStat: $isUserStat) {\n      records {\n        ...UserStatItems\n      }\n      maxNumTest\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetUserStatsDocument,
     "\n  fragment VocabularyItems on Word {\n    id\n    isMyVocabulary\n    korDicResults\n    naverDicResults\n    title\n    pages\n    examples\n  }\n": types.VocabularyItemsFragmentDoc,
     "\n  query GetVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...VocabularyItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetVocabulariesDocument,
 };
@@ -155,6 +166,14 @@ export function gql(source: "\n  mutation CreateWordRequest($input: WordInput!) 
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n"): (typeof documents)["\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkAddMyVocabulary($wordIds: [ID!]!) {\n    bulkAddMyVocabulary(wordIds: $wordIds)\n  }\n"): (typeof documents)["\n  mutation BulkAddMyVocabulary($wordIds: [ID!]!) {\n    bulkAddMyVocabulary(wordIds: $wordIds)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation CreateTestResult($input: TestResultInput!) {\n    createTestResult(input: $input)\n  }\n"): (typeof documents)["\n  mutation CreateTestResult($input: TestResultInput!) {\n    createTestResult(input: $input)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -242,6 +261,26 @@ export function gql(source: "\n  mutation UpdateDeniedReason($updateDeniedReason
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation CreateTestVenue($input: TestVenueInput!) {\n    createTestVenue(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateTestVenue($input: TestVenueInput!) {\n    createTestVenue(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateTestVenue($updateTestVenueId: ID!, $input: TestVenueInput!) {\n    updateTestVenue(id: $updateTestVenueId, input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTestVenue($updateTestVenueId: ID!, $input: TestVenueInput!) {\n    updateTestVenue(id: $updateTestVenueId, input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation CloseTestVenue($closeTestVenueId: ID!) {\n    closeTestVenue(id: $closeTestVenueId)\n  }\n"): (typeof documents)["\n  mutation CloseTestVenue($closeTestVenueId: ID!) {\n    closeTestVenue(id: $closeTestVenueId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation DeleteTestVenue($deleteTestVenueId: ID!) {\n    deleteTestVenue(id: $deleteTestVenueId)\n  }\n"): (typeof documents)["\n  mutation DeleteTestVenue($deleteTestVenueId: ID!) {\n    deleteTestVenue(id: $deleteTestVenueId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RestoreTestVenue($restoreTestVenueId: ID!) {\n    restoreTestVenue(id: $restoreTestVenueId)\n  }\n"): (typeof documents)["\n  mutation RestoreTestVenue($restoreTestVenueId: ID!) {\n    restoreTestVenue(id: $restoreTestVenueId)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  mutation BulkApproveUsers($ids: [ID!]!) {\n    bulkApproveUsers(ids: $ids)\n  }\n"): (typeof documents)["\n  mutation BulkApproveUsers($ids: [ID!]!) {\n    bulkApproveUsers(ids: $ids)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -303,6 +342,14 @@ export function gql(source: "\n  mutation RemoveMyVocabulary($input: MyVocabular
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n"): (typeof documents)["\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment MiniTestItems on MiniTest {\n    id\n    correctAnswer\n    korDicResults\n    naverDicResults\n    options\n  }\n"): (typeof documents)["\n  fragment MiniTestItems on MiniTest {\n    id\n    correctAnswer\n    korDicResults\n    naverDicResults\n    options\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetMiniTests($filterOptions: MiniTestFilterOptions!) {\n    getMiniTests(filterOptions: $filterOptions) {\n      ...MiniTestItems\n    }\n  }\n"): (typeof documents)["\n  query GetMiniTests($filterOptions: MiniTestFilterOptions!) {\n    getMiniTests(filterOptions: $filterOptions) {\n      ...MiniTestItems\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -402,11 +449,19 @@ export function gql(source: "\n  query GetTeachers($paginationOptions: OffsetPag
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n  }\n"): (typeof documents)["\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n  }\n"];
+export function gql(source: "\n  fragment TestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n  }\n"): (typeof documents)["\n  fragment TestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserStatItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...UserStatItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query GetTestVenues($paginationOptions: OffsetPaginationOptions!, $filterOptions: TestVenueFilterOptions) {\n    getTestVenues(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TestVenueItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetTestVenues($paginationOptions: OffsetPaginationOptions!, $filterOptions: TestVenueFilterOptions) {\n    getTestVenues(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TestVenueItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n    testResults {\n      title\n      testScore\n    }\n  }\n"): (typeof documents)["\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n    testResults {\n      title\n      testScore\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!, $isUserStat: Boolean) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions, isUserStat: $isUserStat) {\n      records {\n        ...UserStatItems\n      }\n      maxNumTest\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetUserStats($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!, $isUserStat: Boolean) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions, isUserStat: $isUserStat) {\n      records {\n        ...UserStatItems\n      }\n      maxNumTest\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

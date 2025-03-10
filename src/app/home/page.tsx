@@ -12,7 +12,8 @@ import './style.scss';
 import { useCheckSessionVersion } from '../hooks/useCheckSessionVersion';
 
 const Home = () => {
-  useCheckSessionVersion();
+  useCheckSessionVersion(true);
+
   const { searchResults, setSearchResults } = useSearch();
 
   const [isLoading, setIsLoading] = useState(false);

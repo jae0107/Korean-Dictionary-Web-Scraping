@@ -1,10 +1,11 @@
-import { NetworkStatus } from "@apollo/client";
-import { AdminPanelSettings, Chat, Groups, MenuBook, RestartAlt } from "@mui/icons-material";
-import { Box, CircularProgress, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Theme } from "@mui/material";
+import { AdminPanelSettings, Chat, Groups, MenuBook, Quiz, RestartAlt } from "@mui/icons-material";
+import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Theme } from "@mui/material";
 import { Session } from "next-auth";
 import Link from "next/link";
 import { StudentIcon } from "../../shared/icons/StudentIcon";
 import { TeacherIcon } from "../../shared/icons/TeacherIcon";
+import { ExamIcon } from "../../shared/icons/ExamIcon";
+import { TestIcon } from "../../shared/icons/TestIcon";
 
 const MobileNavDrawer = ({
   openDrawer,
@@ -42,6 +43,37 @@ const MobileNavDrawer = ({
               <ListItemText primary={'단어장'} />
             </ListItemButton>
           </ListItem>
+        </List>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton LinkComponent={Link} href={'/mock-test'}>
+              <ListItemIcon>
+                <TestIcon style={{ height: '24px', width: '24px' }}/>
+              </ListItemIcon>
+              <ListItemText primary={'테스트'} />
+            </ListItemButton>
+          </ListItem>
+          <List disablePadding>
+            <ListItem disablePadding sx={{backgroundColor: pathname.includes('/mock-test') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+              <ListItemButton LinkComponent={Link} href={'/mock-test'} sx={{ pl: '40px !important' }}>
+                <ListItemIcon>
+                  <Quiz/>
+                </ListItemIcon>
+                <ListItemText primary={'모의 테스트'} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+          <List disablePadding>
+            <ListItem disablePadding sx={{backgroundColor: pathname.includes('/test-venues') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+              <ListItemButton LinkComponent={Link} href={'/test-venues'} sx={{ pl: '40px !important' }}>
+                <ListItemIcon>
+                  <ExamIcon style={{ height: '26px', width: '26px' }}/>
+                </ListItemIcon>
+                <ListItemText primary={'실전 테스트'} />
+              </ListItemButton>
+            </ListItem>
+          </List>
         </List>
         <Divider />
         {

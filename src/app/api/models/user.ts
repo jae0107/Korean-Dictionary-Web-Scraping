@@ -5,6 +5,7 @@ import { isPresent } from "../utils/object-helpers";
 import { Word } from "./word";
 import * as bcrypt from 'bcrypt';
 import { MyVocabulary } from ".";
+import { UserTestResult } from "@/app/generated/gql/graphql";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<ID>;
@@ -22,6 +23,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare updatedAt: CreationOptional<Date>;
   declare accessToken?: string;
   declare sessionVersion?: number;
+  declare isInTestMode?: boolean;
+  declare testResults?: UserTestResult[];
 
   declare words?: Word[];
   declare getWords: HasManyGetAssociationsMixin<Word>;

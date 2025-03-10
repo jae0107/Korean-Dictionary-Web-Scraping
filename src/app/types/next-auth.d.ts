@@ -10,10 +10,14 @@ declare module "next-auth" {
       role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPERADMIN';
       accessToken: string;
       sessionVersion: number;
+      isInTestMode: boolean;
+      year: number;
+      class: string;
     };
   }
 
   interface JWT {
     sessionVersion: number;
+    isInTestMode: boolean;
   }
 }

@@ -35,6 +35,7 @@ export const myVocabularyTypeDefs = gql`
 
   type Mutation {
     addMyVocabulary(input: MyVocabularyInput!): MyVocabulary!
+    bulkAddMyVocabulary(wordIds: [ID!]!): Boolean!
     removeMyVocabulary(input: MyVocabularyInput!): Boolean!
   }
 `;

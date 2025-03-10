@@ -38,6 +38,7 @@ const UserStats = () => {
           statuses: [UserStatus.Approved],
           userName: debouncedUserNameKeyWord,
         },
+        isUserStat: true,
       },
       skip: session?.user.role === "STUDENT",
       onError: (error) => {
@@ -96,6 +97,7 @@ const UserStats = () => {
           page={paginationModel.page}
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
+          maxNumTest={data?.getUsers.maxNumTest || 0}
         />
       </Box>
     </Stack>

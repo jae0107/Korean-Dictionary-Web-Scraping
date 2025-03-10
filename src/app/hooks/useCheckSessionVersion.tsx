@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { getSession, signOut } from "next-auth/react";
 import { gql } from "../generated/gql";
 import { useLazyQuery } from "@apollo/client";
+import { useSnackbar } from "./useSnackbar";
 
 const getMySessionVersionQuery = gql(`
   query GetUser($getUserId: ID!) {
@@ -11,21 +12,31 @@ const getMySessionVersionQuery = gql(`
   }
 `);
 
-export function useCheckSessionVersion() {
+export function useCheckSessionVersion(checkTestMode = false) {
   const [getWordByTitle] = useLazyQuery(getMySessionVersionQuery);
+  const { dispatchCurrentSnackBar } = useSnackbar();
   
   useEffect(() => {
     async function fetchData() {
       const session = await getSession();
       if (!session) return;
-
+      
       const res = await getWordByTitle({ 
         variables: { 
           getUserId: session.user.id
         } 
       });
-      
-      if (!res.loading && res.data?.getUser?.sessionVersion !== session.user.sessionVersion) {
+
+      if (checkTestMode && session.user.isInTestMode) {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: '테스트 중엔 검색을 할 수 없습니다.',
+          },
+        });
+        signOut();
+      } else if (!res.loading && res.data?.getUser?.sessionVersion !== session.user.sessionVersion) {
         signOut(); 
       }
     }

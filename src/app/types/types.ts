@@ -1,3 +1,5 @@
+import { Session } from "next-auth";
+
 export interface RequestBody {
   name: string;
   accountId: string;
@@ -25,3 +27,5 @@ export interface Word {
   status: 'PENDING' | 'APPROVED' | 'DENIED';
   createdAt: Date;
 }
+
+export type UpdateSession = (data?: any) => Promise<Session | null>;

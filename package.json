@@ -8,7 +8,9 @@
     "start": "next start",
     "dev:codegen": "graphql-codegen --config codegen.ts --watch",
     "lint": "next lint",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "prisma:migrate:apply": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",

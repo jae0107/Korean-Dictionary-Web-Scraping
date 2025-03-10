@@ -27,6 +27,7 @@ model User {
   previousStatus        String?
   passwordResetRequests PasswordResetRequest[]
   myVocabularies        MyVocabulary[]
+  testResults           TestResult[]
   sessionVersion        Int     @default(1)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -74,4 +75,33 @@ model MyVocabulary {
 
   @@unique([userId, wordId])
   @@map("myVocabularies")
+}
+
+model TestVenue {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title     String?
+  year      Int
+  class     String
+  pageFrom  Int?
+  pageTo    Int?
+  status    String  @default("OPEN")
+  testResults           TestResult[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("testVenues")
+}
+
+model TestResult {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String    @db.Uuid
+  testVenue   TestVenue @relation(fields: [testVenueId], references: [id])
+  testVenueId String    @db.Uuid
+  testScore   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, testVenueId])
+  @@map("testResults")
 }
