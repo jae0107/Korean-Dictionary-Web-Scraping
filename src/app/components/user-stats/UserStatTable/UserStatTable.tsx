@@ -37,6 +37,16 @@ const UserStatTable = ({
       flex: 1, 
       filterable: false, 
       sortable: false,
+      valueGetter: (value, row: UserStatItemsFragment) => {
+        if (row.testResults && row.testResults.length > 0) {
+          const j = row.testResults.findIndex((test) => test.title === `${i+1}차`);
+          if (j !== -1) {
+            return row.testResults[j].testScore;
+          }
+          return '';
+        }
+        return '';
+      },
       renderCell: (params: GridRenderCellParams<UserStatItemsFragment>) => {
         if (params.row.testResults && params.row.testResults.length > 0) {
           const j = params.row.testResults.findIndex((test) => test.title === `${i+1}차`);
