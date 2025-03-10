@@ -6,6 +6,7 @@ export const testVenueTypeDefs = gql`
   enum TestVenueStatus {
     OPEN
     CLOSED
+    READY
   }
 
   type TestVenue {
@@ -15,6 +16,7 @@ export const testVenueTypeDefs = gql`
     pageFrom: Int
     pageTo: Int
     status: TestVenueStatus
+    previousStatus: TestVenueStatus
     createdAt: DateTime
   }
 
@@ -47,6 +49,7 @@ export const testVenueTypeDefs = gql`
   type Mutation {
     createTestVenue(input: TestVenueInput!): TestVenue!
     updateTestVenue(id: ID!, input: TestVenueInput!): TestVenue!
+    openTestVenue(id: ID!): Boolean!
     closeTestVenue(id: ID!): Boolean!
     restoreTestVenue(id: ID!): Boolean!
     deleteTestVenue(id: ID!): Boolean!

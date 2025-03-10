@@ -14,6 +14,7 @@ export const testVenueResolvers = {
   Mutation: {
     createTestVenue,
     updateTestVenue,
+    openTestVenue,
     closeTestVenue,
     restoreTestVenue,
     deleteTestVenue,
@@ -67,7 +68,7 @@ async function createTestVenue(
 
     const newInput = {
       ...input,
-      status: 'OPEN',
+      status: 'READY',
       year: input.year,
       class: input.class,
       pageFrom: input.pageFrom || undefined,
@@ -111,6 +112,26 @@ async function updateTestVenue(
   });
 }
 
+async function openTestVenue(
+  root: any,
+  { id }: { id: string; },
+  { currentUser }: Context
+): Promise<boolean> {
+  return await transaction(async (t) => {
+    if (!currentUser) throw new Error('No Current User Found');
+
+    const testVenue = await TestVenue.findByPk(id);
+
+    if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
+
+    await testVenue.update({ status: 'OPEN', previousStatus: testVenue.status });
+
+    return true;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
 async function closeTestVenue(
   root: any,
   { id }: { id: string; },
@@ -123,7 +144,7 @@ async function closeTestVenue(
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
 
-    await testVenue.update({ status: 'CLOSED' });
+    await testVenue.update({ status: 'CLOSED', previousStatus: testVenue.status });
 
     return true;
   }).catch((e) => {
@@ -143,7 +164,7 @@ async function restoreTestVenue(
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
 
-    await testVenue.update({ status: 'OPEN' });
+    await testVenue.update({ status: testVenue.previousStatus, previousStatus: testVenue.status });
 
     return true;
   }).catch((e) => {

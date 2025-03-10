@@ -60,6 +60,16 @@ const TestVenueFilter = ({
               }}
             />
             <Tab
+              label="대기"
+              value={TestVenueStatus.Ready}
+              {...a11yProps(TestVenueStatus.Ready)}
+              sx={{
+                '@media (max-width:420px)': {
+                  minWidth: 'unset',
+                }
+              }}
+            />
+            <Tab
               label="시험 끝"
               value={TestVenueStatus.Closed}
               {...a11yProps(TestVenueStatus.Closed)}

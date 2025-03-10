@@ -84,7 +84,8 @@ model TestVenue {
   class     String
   pageFrom  Int?
   pageTo    Int?
-  status    String  @default("OPEN")
+  status    String  @default("READY")
+  previousStatus String?
   testResults           TestResult[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -51,6 +51,7 @@ const documents = {
     "\n  mutation UpdateDeniedReason($updateDeniedReasonId: ID!, $deniedReason: String) {\n    updateDeniedReason(id: $updateDeniedReasonId, deniedReason: $deniedReason) {\n      id\n      deniedReason\n    }\n  }\n": types.UpdateDeniedReasonDocument,
     "\n  mutation CreateTestVenue($input: TestVenueInput!) {\n    createTestVenue(input: $input) {\n      id\n    }\n  }\n": types.CreateTestVenueDocument,
     "\n  mutation UpdateTestVenue($updateTestVenueId: ID!, $input: TestVenueInput!) {\n    updateTestVenue(id: $updateTestVenueId, input: $input) {\n      id\n    }\n  }\n": types.UpdateTestVenueDocument,
+    "\n  mutation OpenTestVenue($openTestVenueId: ID!) {\n    openTestVenue(id: $openTestVenueId)\n  }\n": types.OpenTestVenueDocument,
     "\n  mutation CloseTestVenue($closeTestVenueId: ID!) {\n    closeTestVenue(id: $closeTestVenueId)\n  }\n": types.CloseTestVenueDocument,
     "\n  mutation DeleteTestVenue($deleteTestVenueId: ID!) {\n    deleteTestVenue(id: $deleteTestVenueId)\n  }\n": types.DeleteTestVenueDocument,
     "\n  mutation RestoreTestVenue($restoreTestVenueId: ID!) {\n    restoreTestVenue(id: $restoreTestVenueId)\n  }\n": types.RestoreTestVenueDocument,
@@ -96,6 +97,8 @@ const documents = {
     "\n  query GetTeacher($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleTeacherItems\n    }\n  }\n": types.GetTeacherDocument,
     "\n  fragment TeacherItems on User {\n    id\n    name\n    year\n    class\n    accountId\n    status\n    role\n    status\n  }\n": types.TeacherItemsFragmentDoc,
     "\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetTeachersDocument,
+    "\n  fragment SingleTestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n    status\n  }\n": types.SingleTestVenueItemsFragmentDoc,
+    "\n  query GetTestVenue($getTestVenueId: ID!) {\n    getTestVenue(id: $getTestVenueId) {\n      ...SingleTestVenueItems\n    }\n  }\n": types.GetTestVenueDocument,
     "\n  fragment TestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n  }\n": types.TestVenueItemsFragmentDoc,
     "\n  query GetTestVenues($paginationOptions: OffsetPaginationOptions!, $filterOptions: TestVenueFilterOptions) {\n    getTestVenues(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TestVenueItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetTestVenuesDocument,
     "\n  fragment UserStatItems on User {\n    id\n    name\n    year\n    class\n    number\n    approvedCount\n    myVocabCount\n    testResults {\n      title\n      testScore\n    }\n  }\n": types.UserStatItemsFragmentDoc,
@@ -266,6 +269,10 @@ export function gql(source: "\n  mutation CreateTestVenue($input: TestVenueInput
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation UpdateTestVenue($updateTestVenueId: ID!, $input: TestVenueInput!) {\n    updateTestVenue(id: $updateTestVenueId, input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTestVenue($updateTestVenueId: ID!, $input: TestVenueInput!) {\n    updateTestVenue(id: $updateTestVenueId, input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation OpenTestVenue($openTestVenueId: ID!) {\n    openTestVenue(id: $openTestVenueId)\n  }\n"): (typeof documents)["\n  mutation OpenTestVenue($openTestVenueId: ID!) {\n    openTestVenue(id: $openTestVenueId)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -446,6 +453,14 @@ export function gql(source: "\n  fragment TeacherItems on User {\n    id\n    na
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetTeachers($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...TeacherItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment SingleTestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n    status\n  }\n"): (typeof documents)["\n  fragment SingleTestVenueItems on TestVenue {\n    id\n    year\n    class\n    pageFrom\n    pageTo\n    status\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetTestVenue($getTestVenueId: ID!) {\n    getTestVenue(id: $getTestVenueId) {\n      ...SingleTestVenueItems\n    }\n  }\n"): (typeof documents)["\n  query GetTestVenue($getTestVenueId: ID!) {\n    getTestVenue(id: $getTestVenueId) {\n      ...SingleTestVenueItems\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -4,9 +4,9 @@ import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
 import MuiPagination from '@mui/material/Pagination';
 import { TestVenueInput, TestVenueItemsFragment, TestVenueStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Cancel, DeleteForever, Edit, Login, Restore } from "@mui/icons-material";
+import { Cancel, DeleteForever, Edit, Login, Restore, Start } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
-import { closeTestVenueMutation, deleteTestVenueMutation, restoreTestVenueMutation, updateTestVenueMutation } from "./query";
+import { closeTestVenueMutation, deleteTestVenueMutation, openTestVenueMutation, restoreTestVenueMutation, updateTestVenueMutation } from "./query";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import ConfirmDialog from "../../shared/ConfirmDialog";
 import TestVenueUpdatePopUp from "../TestVenueUpdatePopUp/TestVenueUpdatePopUp";
@@ -50,6 +50,7 @@ const TestVenueTable = ({
   const [getTestVenue, setTestVenue] = useState<TestVenueItemsFragment | null>(null);
   const [selectedTestVenueId, setSelectedTestVenueId] = useState<string>('');
   const [getUpdateLoader, setUpdateLoader] = useState<{ [key: string]: boolean }>({});
+  const [getOpenLoader, setOpenLoader] = useState<{ [key: string]: boolean }>({});
   const [getCloseLoader, setCloseLoader] = useState<{ [key: string]: boolean }>({});
   const [getDeleteLoader, setDeleteLoader] = useState<{ [key: string]: boolean }>({});
   const [getRecoverLoader, setRecoverLoader] = useState<{ [key: string]: boolean }>({});
@@ -57,9 +58,40 @@ const TestVenueTable = ({
   const [openTestVenueUpdatePopUp, setOpenTestVenueUpdatePopUp] = useState<boolean>(false);
 
   const [updateTestVenue] = useMutation(updateTestVenueMutation);
+  const [openTestVenue] = useMutation(openTestVenueMutation);
   const [closeTestVenue] = useMutation(closeTestVenueMutation);
   const [restoreTestVenue] = useMutation(restoreTestVenueMutation);
   const [deleteTestVenue] = useMutation(deleteTestVenueMutation);
+
+  const onOpen = (id: string) => {
+    setOpenLoader({[id]: true});
+    openTestVenue({
+      variables: {
+        openTestVenueId: id,
+      },
+      onError: (error) => {
+        setOpenLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+      onCompleted: () => {
+        refetch();
+        setOpenLoader({[id]: false});
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'success',
+            message: '성공적으로 열렸습니다.',
+          },
+        });
+      },
+    });
+  }
 
   const onClose = (id: string) => {
     setCloseLoader({[id]: true});
@@ -207,6 +239,11 @@ const TestVenueTable = ({
         return 40;
       }
       return 80;
+    } else if (testVenueStatus === TestVenueStatus.Ready && myRole !== 'STUDENT') {
+      if (maxWidth490) {
+        return 40;
+      }
+      return 120;
     }
     return 0;
   }
@@ -230,11 +267,7 @@ const TestVenueTable = ({
             label="입장"
             disabled={params.row.year !== myYear || params.row.class !== myClass}
             showInMenu={false}
-            onClick={() => 
-              params.row.pageFrom && params.row.pageFrom > 0 && params.row.pageTo && params.row.pageTo > 0 ? 
-              router.push(`/test-venues/${params.row.id}?year=${params.row.year}&class=${params.row.class}&pageFrom=${params.row.pageFrom}&pageTo=${params.row.pageTo}`) :
-              router.push(`/test-venues/${params.row.id}?year=${params.row.year}&class=${params.row.class}`)
-            }
+            onClick={() => router.push(`/test-venues/${params.row.id}`)}
           />
         ] : [
           <GridActionsCellItem
@@ -246,11 +279,7 @@ const TestVenueTable = ({
             }
             label="입장"
             showInMenu={maxWidth490}
-            onClick={() => 
-              params.row.pageFrom && params.row.pageFrom > 0 && params.row.pageTo && params.row.pageTo > 0 ? 
-              router.push(`/test-venues/${params.row.id}?year=${params.row.year}&class=${params.row.class}&pageFrom=${params.row.pageFrom}&pageTo=${params.row.pageTo}`) :
-              router.push(`/test-venues/${params.row.id}?year=${params.row.year}&class=${params.row.class}`)
-            }
+            onClick={() => router.push(`/test-venues/${params.row.id}`)}
           />,
           <GridActionsCellItem
             key="edit"
@@ -319,6 +348,55 @@ const TestVenueTable = ({
             }}
           />,
         ];
+      } else if (testVenueStatus === TestVenueStatus.Ready && myRole !== 'STUDENT') {
+        return [
+          <GridActionsCellItem
+            key="open"
+            icon={
+              getOpenLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'열기'}>
+                <Start color='primary' />
+              </Tooltip>
+            }
+            label="열기"
+            showInMenu={maxWidth490}
+            onClick={() => onOpen(params.row.id)}
+          />,
+          <GridActionsCellItem
+            key="edit"
+            icon={
+              getUpdateLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'수정'}>
+                <Edit />
+              </Tooltip>
+            }
+            label="수정"
+            showInMenu={maxWidth490}
+            onClick={() => {
+              setSelectedTestVenueId(params.row.id);
+              setTestVenue(params.row);
+              setOpenTestVenueUpdatePopUp(true);
+            }}
+          />,
+          <GridActionsCellItem
+            key="close"
+            icon={
+              getCloseLoader[params.row.id] ?
+              <CircularProgress style={{ width: '20px', height: '20px' }}/>  
+              : 
+              <Tooltip title={'닫기'}>
+                <Cancel color="error" />
+              </Tooltip>
+            }
+            label="닫기"
+            showInMenu={maxWidth490}
+            onClick={() => onClose(params.row.id)}
+          />,
+        ];
       }
       return [];
     }
@@ -375,18 +453,6 @@ const TestVenueTable = ({
         columns={columns}
         rows={testVenues}
         pageSizeOptions={[10, 20, 50, 100]}
-        // columnVisibilityModel={columnVisibilityModel}
-        // onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-        // initialState={{
-        //   pagination: {
-        //     paginationModel: {
-        //       pageSize: 10,
-        //     },
-        //   },
-        //   columns: {
-        //     columnVisibilityModel: columnVisibilityModel,
-        //   }
-        // }}
         paginationModel={paginationModel}
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;

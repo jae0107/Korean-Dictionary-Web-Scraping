@@ -9,6 +9,7 @@ class TestVenue extends Model<InferAttributes<TestVenue>, InferCreationAttribute
   declare year: number;
   declare class: string;
   declare status: string;
+  declare previousStatus: CreationOptional<string>;
   declare pageFrom: CreationOptional<number>;
   declare pageTo: CreationOptional<number>;
   declare createdAt: CreationOptional<Date>;
@@ -32,6 +33,7 @@ TestVenue.init(
     pageFrom: DataTypes.INTEGER,
     pageTo: DataTypes.INTEGER,
     status: DataTypes.STRING,
+    previousStatus: DataTypes.STRING,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

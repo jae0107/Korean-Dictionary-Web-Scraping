@@ -6,40 +6,32 @@ import { ExamIcon } from "@/app/components/shared/icons/ExamIcon";
 import { useCheckSessionVersion } from "@/app/hooks/useCheckSessionVersion";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { getMiniTestsQuery } from "@/app/mock-test/query";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { getSingleTestVenueQuery } from "./query";
+import { TestVenueStatus } from "@/app/generated/gql/graphql";
 
 const TestVenue = () => {
   useCheckSessionVersion();
   const { data: session, update } = useSession();
 
   const params = useParams();
-  const searchParams = useSearchParams();
   const { dispatchCurrentSnackBar } = useSnackbar();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const isSkip = () => {
-    if (!searchParams.get('year') || !searchParams.get('class')) {
-      return true;
-    } if (session && session.user.role === 'STUDENT' && (session.user.year !== Number(searchParams.get('year')) || session.user.class !== searchParams.get('class'))) {
-      return true;
-    }
-    return false;
-  }
+  const [getMiniTests, { data, loading }] = useLazyQuery(getMiniTestsQuery);
 
-  const { data, loading } =
-    useQuery(getMiniTestsQuery, {
-      fetchPolicy: 'network-only',
+  const createMockTest = (pageFrom: number | null, pageTo: number | null) => {
+    getMiniTests({
       variables: {
         filterOptions: {
-          pageFrom: searchParams.get('pageFrom') ? Number(searchParams.get('pageFrom')) : null,
-          pageTo: searchParams.get('pageTo') ? Number(searchParams.get('pageTo')) : null,
+          pageFrom: pageFrom,
+          pageTo: pageTo,
         },
       },
-      skip: isSkip(),
       onCompleted: async (res) => {
         if (res.getMiniTests.length > 0) {
           await update({ user: { ...session?.user, isInTestMode: true } });
@@ -53,10 +45,33 @@ const TestVenue = () => {
             message: error.message,
           },
         });
+      }
+    });
+  }
+
+  const { data: testVenueData, loading: testVenueLoading } =
+    useQuery(getSingleTestVenueQuery, {
+      fetchPolicy: 'network-only',
+      variables: {
+        getTestVenueId: id,
+      },
+      onCompleted: async (res) => {
+        if (res.getTestVenue.status === TestVenueStatus.Open) {
+          createMockTest(res.getTestVenue.pageFrom || null, res.getTestVenue.pageTo || null);
+        }
+      },
+      onError: (error) => {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
       },
     });
 
-  if (loading) {
+  if (loading || testVenueLoading) {
     return (
       <Stack
         spacing={2}
@@ -88,7 +103,7 @@ const TestVenue = () => {
         <DummyTestCard/>
       </Stack>
     );
-  } else if (!searchParams.get('year') || !searchParams.get('class')) {
+  } else if (!testVenueData?.getTestVenue.year || !testVenueData?.getTestVenue.class) {
     return (
       <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'calc(100vh - 200px)'}>
         학년과 반 정보가 필요합니다.
@@ -100,10 +115,16 @@ const TestVenue = () => {
         로그인이 필요합니다.
       </Box>
     );
-  } else if (session.user.role === 'STUDENT' && (session.user.year !== Number(searchParams.get('year')) || session.user.class !== searchParams.get('class'))) {
+  } else if (session.user.role === 'STUDENT' && (session.user.year !== Number(testVenueData?.getTestVenue.year) || session.user.class !== testVenueData?.getTestVenue.class)) {
     return (
       <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'calc(100vh - 200px)'}>
         학년과 반 정보가 일치하지 않습니다.
+      </Box>
+    );
+  } else if (testVenueData.getTestVenue.status !== TestVenueStatus.Open) {
+    return (
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'calc(100vh - 200px)'}>
+        테스트가 열리지 않았습니다.
       </Box>
     );
   }

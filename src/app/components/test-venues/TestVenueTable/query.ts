@@ -8,6 +8,12 @@ export const updateTestVenueMutation = gql(`
   }
 `);
 
+export const openTestVenueMutation = gql(`
+  mutation OpenTestVenue($openTestVenueId: ID!) {
+    openTestVenue(id: $openTestVenueId)
+  }
+`);
+
 export const closeTestVenueMutation = gql(`
   mutation CloseTestVenue($closeTestVenueId: ID!) {
     closeTestVenue(id: $closeTestVenueId)
