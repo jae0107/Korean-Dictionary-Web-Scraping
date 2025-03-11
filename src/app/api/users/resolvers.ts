@@ -375,7 +375,6 @@ async function bulkApproveUsers(
   { currentUser }: Context,
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
     await sequelize.query(
       `
       UPDATE users

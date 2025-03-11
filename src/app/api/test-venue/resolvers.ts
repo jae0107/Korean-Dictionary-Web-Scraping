@@ -64,8 +64,6 @@ async function createTestVenue(
   { currentUser }: Context
 ): Promise<TestVenue> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const newInput = {
       ...input,
       status: 'READY',
@@ -89,8 +87,6 @@ async function updateTestVenue(
   { currentUser }: Context
 ): Promise<TestVenue> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const testVenue = await TestVenue.findByPk(id);
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
@@ -118,8 +114,6 @@ async function openTestVenue(
   { currentUser }: Context
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const testVenue = await TestVenue.findByPk(id);
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
@@ -138,8 +132,6 @@ async function closeTestVenue(
   { currentUser }: Context
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const testVenue = await TestVenue.findByPk(id);
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
@@ -158,8 +150,6 @@ async function restoreTestVenue(
   { currentUser }: Context
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const testVenue = await TestVenue.findByPk(id);
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
@@ -178,8 +168,6 @@ async function deleteTestVenue(
   { currentUser }: Context
 ): Promise<boolean> {
   return await transaction(async (t) => {
-    if (!currentUser) throw new Error('No Current User Found');
-
     const testVenue = await TestVenue.findByPk(id);
 
     if (!testVenue) throw new Error('테스트 장소를 찾을 수 없습니다.');
