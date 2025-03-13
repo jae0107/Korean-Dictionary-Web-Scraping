@@ -106,7 +106,7 @@ export const userTypeDefs = gql`
     getUser(id: ID!): User!
     findPassword(accountId: String!): String!
     getRequestors(
-      paginationOptions: OffsetPaginationOptions!
+      paginationOptions: OffsetPaginationOptions
       filterOptions: RequestorFilterOptions!
     ): UserOffsetPaginationResponse!
     accountIdCheck(accountId: String!): Boolean!

@@ -12,27 +12,6 @@ const config: IGraphQLConfig = {
         'src/**/*.{ts,tsx}',
         'app/**/*.{ts,tsx}',
       ],
-      // extensions: {
-      //   codegen: {
-      //     overwrite: true,
-      //     generates: {
-      //       'src/app/api/generated/graphql-types.ts': {
-      //         plugins: [
-      //           'typescript',
-      //           'typescript-resolvers',
-      //           'typescript-operations',
-      //         ],
-      //         presetConfig: {
-      //           gqlTagName: 'gql',
-      //           fragmentMasking: false,
-      //         },
-      //         config: {
-      //           nonOptionalTypename: true,
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       extensions: {
         codegen: {
           ignoreNoDocuments: true,

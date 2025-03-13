@@ -106,76 +106,51 @@ const WrongDataTable = ({
 
   return (
     <DataGrid
-        pagination
-        disableColumnMenu
-        disableRowSelectionOnClick
-        keepNonExistentRowsSelected
-        loading={loading}
-        columns={columns}
-        rows={getData}
-        pageSizeOptions={[10, 20, 50, 100]}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
+      pagination
+      disableColumnMenu
+      disableRowSelectionOnClick
+      keepNonExistentRowsSelected
+      loading={loading}
+      columns={columns}
+      rows={getData}
+      pageSizeOptions={[10, 20, 50, 100]}
+      initialState={{
+        pagination: {
+          paginationModel: {
+            pageSize: 10,
           },
-        }}
-        paginationModel={paginationModel}
-        onPaginationModelChange={(values, details) => {
-          if (!details.reason) return;
+        },
+      }}
+      paginationModel={paginationModel}
+      onPaginationModelChange={(values, details) => {
+        if (!details.reason) return;
           setPaginationModel(values);
-        }}
-        getRowHeight={() => 43}
-        slots={{
-          noRowsOverlay: CustomNoRowsOverlay,
-          // pagination: () => (
-          //   <GridPagination
-          //     ActionsComponent={({ className }) => (
-          //       <MuiPagination
-          //         className={className}
-          //         color="primary"
-          //         size="small"
-          //         defaultPage={6}
-          //         boundaryCount={2}
-          //         showFirstButton
-          //         showLastButton
-          //         count={pageCount}
-          //         page={page+1}
-          //         onChange={(event, page) => 
-          //           setPaginationModel((value) => {
-          //             return {
-          //               ...value,
-          //               page: page - 1,
-          //             };
-          //           })
-          //         }
-          //       />
-          //     )}
-          //   />
-          // ),
-        }}
-        localeText={{
-          footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
-          footerTotalRows: '총 행 수:',
-          MuiTablePagination: {
-            labelRowsPerPage: '페이지 당 행 수:',
+      }}
+      getRowHeight={() => 43}
+      slots={{
+        noRowsOverlay: CustomNoRowsOverlay,
+      }}
+      localeText={{
+        footerRowSelected: count => `${count.toLocaleString()}개 선택됨`,
+        footerTotalRows: '총 행 수:',
+        MuiTablePagination: {
+          labelRowsPerPage: '페이지 당 행 수:',
+        },
+        checkboxSelectionHeaderName: '선택',
+      }}
+      sx={{
+        '@media (max-width:750px)': {
+          '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-topContainer .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderDraggableContainer .MuiDataGrid-columnHeaderTitleContainer': {
+            display: 'flex',
+            justifyContent: 'center',
           },
-          checkboxSelectionHeaderName: '선택',
-        }}
-        sx={{
-          '@media (max-width:750px)': {
-            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-topContainer .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader .MuiDataGrid-columnHeaderDraggableContainer .MuiDataGrid-columnHeaderTitleContainer': {
-              display: 'flex',
-              justifyContent: 'center',
-            },
-            '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-virtualScrollerContent .MuiDataGrid-virtualScrollerRenderZone .MuiDataGrid-row .MuiDataGrid-cell': {
-              display: 'flex',
-              justifyContent: 'center',
-            }
-          },
-        }}
-      />
+          '&.MuiDataGrid-root .MuiDataGrid-main .MuiDataGrid-virtualScroller .MuiDataGrid-virtualScrollerContent .MuiDataGrid-virtualScrollerRenderZone .MuiDataGrid-row .MuiDataGrid-cell': {
+            display: 'flex',
+            justifyContent: 'center',
+          }
+        },
+      }}
+    />
   );
 }
 

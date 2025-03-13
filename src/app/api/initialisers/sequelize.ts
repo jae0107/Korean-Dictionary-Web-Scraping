@@ -20,16 +20,6 @@ function initSequelize(): Sequelize {
       max: parseInt(process.env.MAX_DATABASE_CONNECTIONS || '10', 10),
       acquire: 60000,
     },
-    // dialectOptions:
-    //   process.env.NODE_ENV !== 'unstable' && process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development'
-    //     ? {
-    //         ssl: {
-    //           require: true,
-    //           rejectUnauthorized: false,
-    //         },
-    //       }
-    //     : null,
-    // logging: process.env.NODE_ENV !== 'test',
   } as Options);
 
   return sequelize;

@@ -8,7 +8,6 @@ import { createDataLoaders } from "../dataloaders";
 import { User } from "../models";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
-// import { authOptions } from "../auth/[...nextauth]/route";
 
 export interface Context {
   req: NextApiRequest;
@@ -23,13 +22,7 @@ const apolloServer = new ApolloServer({
   introspection: process.env.NODE_ENV !== "production", // Disable in production
 });
 
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
 export const runtime = 'nodejs';
-// export const bodyParser = false;
 
 const handler = startServerAndCreateNextHandler(apolloServer, {
   context: async (req: NextApiRequest, res: NextApiResponse) => {

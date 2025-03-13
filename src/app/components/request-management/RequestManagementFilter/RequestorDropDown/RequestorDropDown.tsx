@@ -21,10 +21,6 @@ const RequestorDropDown = ({
     useQuery(getWordRequestsQuery, {
       fetchPolicy: 'network-only',
       variables: {
-        paginationOptions: {
-          limit: paginationModel.pageSize,
-          pageNum: paginationModel.page,
-        },
         filterOptions: {
           userName: nameKeyword,
         },
@@ -84,7 +80,6 @@ const RequestorDropDown = ({
       onChange={(event, value) => {
         setSelectedRequestors(value);
         setRequestorId(value?.id || '');
-        // setRequestorId(value.map((v) => v.id));
       }}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       renderOption={(props, option, state) => {

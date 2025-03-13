@@ -8,7 +8,7 @@ export const requestorFragment = gql(`
 `);
 
 export const getWordRequestsQuery = gql(`
-  query GetRequestorsDropDown($paginationOptions: OffsetPaginationOptions!, $filterOptions: RequestorFilterOptions!) {
+  query GetRequestorsDropDown($paginationOptions: OffsetPaginationOptions, $filterOptions: RequestorFilterOptions!) {
     getRequestors(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {
       records {
         ...RequestorDropDownItems

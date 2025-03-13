@@ -38,19 +38,32 @@ export class RequestorSearch {
         .where('users.name', 'ilike', `%${userName}%`);
     }
 
-    assert(!isPresent(limit) || limit > 0, 'Limit must be greater than 0');
-    assert(!isPresent(pageNum) || pageNum >= 0, 'Page number must be positive');
+    if (isPresent(limit)) {
+      assert(limit > 0, 'Limit must be greater than 0');
+    }
 
-    const countQuery = query.clone();
-    const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('users.id').toString())) as [
-      [{ count: string }],
-      unknown,
-    ];
-    const totalRowCount = parseInt(results[0].count, 10);
+    if (isPresent(pageNum)) {
+      assert(pageNum >= 0, 'Page number must be positive');
+    }
 
-    const pageCount = Math.ceil(totalRowCount / limit);
+    let totalRowCount = 0;
+    let pageCount = 0;
 
-    query = query.orderBy('users.name', 'asc');
+    if (isPresent(limit)) {
+      const countQuery = query.clone();
+      const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('users.id').toString())) as [
+        [{ count: string }],
+        unknown,
+      ];
+      totalRowCount = parseInt(results[0].count, 10);
+      pageCount = Math.ceil(totalRowCount / limit);
+
+      query = query.limit(limit);
+    }
+
+    if (isPresent(pageNum)) {
+      query = query.offset(pageNum * limit);
+    }
 
     query = query.limit(limit).offset(pageNum * limit);
 
