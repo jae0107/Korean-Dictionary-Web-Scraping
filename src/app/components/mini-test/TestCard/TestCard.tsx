@@ -276,7 +276,7 @@ const TestCard = ({
             variant='outlined'
             size="small"
             onClick={handleNext}
-            disabled={true}
+            disabled={isReal || activeStep === maxSteps - 1}
             endIcon={theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             sx={{
               '&.MuiButtonBase-root .MuiButton-endIcon': {
