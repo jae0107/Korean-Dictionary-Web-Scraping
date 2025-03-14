@@ -29,6 +29,8 @@ const koDic = async (userSearch: string) => {
 
     const meaning = await page.evaluate(() => {
       const elements = document.querySelectorAll('dl#article0 dd');
+
+      if (!elements.length) return [];
       
       return Array.from(elements).map(element => {
         let textContent = element.textContent ? element.textContent.trim() : '';
@@ -49,6 +51,7 @@ const koDic = async (userSearch: string) => {
 
     return meaning;
   } catch (error) {
+    console.log(`koDic: ${(error as Error).message}`);
     return { error: `An error occurred: ${(error as Error).message}` };
   } finally {
     if (browser) {
@@ -94,8 +97,9 @@ const naverDic = async (userSearch: string) => {
 			})
 			.get();
 		
-		return meaning;
+		return Array.isArray(meaning) ? meaning : [];;
 	} catch (error: any) {
+    console.log(`naverDic: ${(error as Error).message}`);
 		return NextResponse.json(
 			{ error: `An error occurred: ${error.message}` },
 			{ status: 200 }
@@ -132,7 +136,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     title: userSearch,
-    koDic: koDicRes,
-    naverDic: naverDicRes,
+    koDic: Array.isArray(koDicRes) ? koDicRes : [],
+    naverDic: Array.isArray(naverDicRes) ? naverDicRes : [],
   });
 }
