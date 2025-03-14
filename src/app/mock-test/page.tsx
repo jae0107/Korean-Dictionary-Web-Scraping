@@ -160,65 +160,9 @@ const MockTest = () => {
                 }}
               />
             </Stack>
-            <Stack
-              spacing={2}
-              direction="row"
-              flex={2}
-              sx={{
-                '@media (max-width:800px)': {
-                  '& > :not(style) + :not(style)': {
-                    ml: '8px !important',
-                  }
-                },
-                '@media (max-width:545px)': {
-                  '& > :not(style) + :not(style)': {
-                    ml: '4px !important',
-                  }
-                }
-              }}
-            >
-              <TextField
-                label="학년"
-                placeholder="학년을 입력하세요."
-                type='text'
-                fullWidth
-                onChange={(e) => setYear(e.target.value)}
-                value={getYear}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setYear('')}>
-                          <Cancel sx={{ width: '15px', height: '15px' }}/>
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              <TextField
-                label="반"
-                placeholder="반을 입력하세요."
-                type='text'
-                fullWidth
-                onChange={(e) => setClass(e.target.value)}
-                value={getClass}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setClass('')}>
-                          <Cancel sx={{ width: '15px', height: '15px' }}/>
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              <Button fullWidth variant="contained" sx={{ height: '56px' }} onClick={createMockTest} loading={loading}>
-                모의 테스트 시작
-              </Button>
-            </Stack>
+            <Button variant="contained" sx={{ height: '56px' }} onClick={createMockTest} loading={loading}>
+              모의 테스트 시작
+            </Button>
           </Stack>
           <Box 
             display={'flex'} 
