@@ -12,8 +12,7 @@
     "prisma:migrate:apply": "npx prisma migrate dev",
     "prisma:generate": "npx prisma generate",
     "puppeteer-install": "node node_modules/puppeteer/install.js",
-    "install-chrome": "npx puppeteer browsers install chrome",
-    "postinstall": "apt-get update && apt-get install -y wget && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -f"
+    "install-chrome": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",
