@@ -11,7 +11,7 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "prisma:migrate:apply": "npx prisma migrate dev",
     "prisma:generate": "npx prisma generate",
-    "postinstall": "apt-get update && apt-get install -y wget && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && dpkg -i google-chrome-stable_current_amd64.deb || { apt-get install -f && exit 1; } && rm -rf /var/cache/apt/archives/*"
+    "postinstall": "apt-get update && apt-get install -y wget && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && dpkg -i google-chrome-stable_current_amd64.deb || { apt-get install -f && exit 1; } && google-chrome --version && rm -rf /var/cache/apt/archives/*"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",
