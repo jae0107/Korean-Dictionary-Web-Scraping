@@ -10,7 +10,8 @@
     "lint": "next lint",
     "codegen": "graphql-codegen --config codegen.ts",
     "prisma:migrate:apply": "npx prisma migrate dev",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",
