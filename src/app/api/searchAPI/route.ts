@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-// import puppeteer, { Browser } from "puppeteer";
 import * as cheerio from "cheerio";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
@@ -11,137 +10,35 @@ interface NaverResponse {
       WORD: {
         query: string;
         items: {
+          entryId: string;
           meansCollector: {
             means: {
-              value: string
-            }[]
-          }[]
-        }[]
-      }
-    }
-  }
+              value: string;
+            }[];
+          }[];
+        }[];
+      };
+    };
+  };
 };
 
-// const koDic = async (userSearch: string) => {
-//   let browser: Browser | null = null;
-//   try {
-//     browser = await puppeteer.launch({
-//       headless: true,
-//       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-software-rasterizer'],
-//     });
-//     const page = await browser.newPage();
-
-//     const encodedSearch = userSearch.replace(/ /g, "+");
-//     const koDicUrl = `https://krdict.korean.go.kr/kor/dicMarinerSearch/search?nationCode=&ParaWordNo=&mainSearchWord=${encodedSearch}`;
-    
-//     await page.setRequestInterception(true);
-//     page.on('request', (request) => {
-//       if (['image', 'stylesheet', 'font', 'script'].includes(request.resourceType())) {
-//         request.abort();
-//       } else {
-//         request.continue();
-//       }
-//     });
-
-//     await page.goto(koDicUrl, { waitUntil: 'domcontentloaded' });
-
-//     const meaning = await page.evaluate(() => {
-//       const elements = document.querySelectorAll('dl#article0 dd');
-//       console.log("elements: ", elements);
-//       if (!elements.length) return [];
-      
-//       return Array.from(elements).map(element => {
-//         let textContent = element.textContent ? element.textContent.trim() : '';
-        
-//         // Remove any number followed by a period (e.g., "1.", "2.", etc.)
-//         textContent = textContent.replace(/^\d+\./, '').trim(); // Remove leading number + period
-
-//         // Clean up unwanted characters like \t, \n, \r, and extra spaces
-//         textContent = textContent.replace(/[\t\r\n]+/g, ' '); // Replace tabs, newlines, and carriage returns with a single space
-//         textContent = textContent.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
-
-//         // Updated regex to include punctuation and Korean characters
-//         const koreanAndPunctuation = textContent.match(/[\uac00-\ud7af\s.,!?…]+/g);
-        
-//         return koreanAndPunctuation ? koreanAndPunctuation.join('').trim() : '';
-//       });
-//     });
-
-//     return meaning;
-//   } catch (error) {
-//     console.log(`koDic: ${(error as Error).message}`);
-//     return { error: `An error occurred: ${(error as Error).message}` };
-//   } finally {
-//     if (browser) {
-//       await browser.close();
-//     }
-//   }
-// };
-
-// const naverDic = async (userSearch: string) => {
-// 	let browser: Browser | null = null;
-// 	try {
-// 		browser = await puppeteer.launch({
-//       headless: true,
-//       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-software-rasterizer'],
-//     });
-// 		const page = await browser.newPage();
-
-// 		const naverEncodedSearch = userSearch.replace(/ /g, "%20");
-// 		const naverDicUrl = `https://ko.dict.naver.com/#/search?query=${naverEncodedSearch}`;
-
-// 		await page.goto(naverDicUrl, { waitUntil: 'networkidle2' }); // Wait for network to be idle (2 requests or fewer)
-
-// 		// Wait for the <div id="content"> to have content
-// 		await page.waitForSelector('#content:not(:empty)', { timeout: 60000 }); // Adjust timeout if needed
-
-// 		const html = await page.content();
-
-// 		const $ = cheerio.load(html); //load the html content
-		
-// 		const meaning = $("div#searchPage_entry div.row:first-child li.mean_item p.mean")
-// 			.map((index, element) => {
-// 				// Clone the element to avoid modifying the original
-// 				const clonedElement = $(element).clone();
-//         console.log("clonedElement: ", clonedElement)
-// 				// Remove undesired span elements
-// 				clonedElement.find("span.word_class, span.mark").remove();
-
-// 				// Extract text and clean it
-// 				const koreanAndPunctuation = clonedElement.text().match(/[\uac00-\ud7af\s.,!?]+/g);
-//         console.log("koreanAndPunctuation: ", koreanAndPunctuation)
-// 				const cleanMeaning = koreanAndPunctuation ? koreanAndPunctuation.join('').trim() : '';
-
-// 				return cleanMeaning;
-// 			})
-// 			.get();
-		
-// 		return Array.isArray(meaning) ? meaning : [];;
-// 	} catch (error: any) {
-//     console.log(`naverDic: ${(error as Error).message}`);
-// 		return NextResponse.json(
-// 			{ error: `An error occurred: ${error.message}` },
-// 			{ status: 200 }
-// 		);
-// 	} finally {
-// 		if (browser) {
-// 			await browser.close();
-// 		}
-// 	}
-// }
+interface NaverSubResponse {
+  entry: {
+    means: {
+      origin_mean: string;
+    }[];
+  };
+};
 
 const koDic = async (userSearch: string) => {
   try {
     const encodedSearch = userSearch.replace(/ /g, "+");
     const koDicUrl = `https://krdict.korean.go.kr/kor/dicMarinerSearch/search?nationCode=&ParaWordNo=&mainSearchWord=${encodedSearch}`;
 
-    // Axios로 HTML 가져오기
     const { data } = await axios.get(koDicUrl);
 
-    // Cheerio로 HTML 파싱
     const $ = cheerio.load(data);
 
-    // 원하는 데이터 추출
     const meaning = $("dl#article0 dd")
       .map((index, element) => {
         let textContent = $(element).text().trim();
@@ -160,7 +57,6 @@ const koDic = async (userSearch: string) => {
 
     return meaning;
   } catch (error) {
-    console.log(`koDic: ${(error as Error).message}`);
     return { error: `An error occurred: ${(error as Error).message}` };
   }
 };
@@ -191,37 +87,50 @@ const naverDic = async (userSearch: string) => {
       "body": null,
       "method": "GET"
     });
+
     const data: NaverResponse = await naverRes.json();
     const meaningsWithHtml = data.searchResultMap.searchResultListMap.WORD.items[0].meansCollector[0].means.map((mean) => mean.value)
     const meanings = meaningsWithHtml.map((mean) => {
-      const $ = cheerio.load(mean); // cheerio로 HTML을 로드
-      return $.text().trim(); // 텍스트만 추출하여 반환
+      const $ = cheerio.load(mean); 
+      return $.text().trim();
     });
-    // Axios로 HTML 가져오기
-    // const response = await fetch(naverDicUrl);
-    // const html = await response.text();
-    // // console.log(html)
-    // // Cheerio로 HTML 파싱
-    // const $ = cheerio.load(html);
 
-    // // 원하는 데이터 추출
-    // const meaning = $("div#searchPage_entry div.row:first-child li.mean_item p.mean")
-    //   .map((index, element) => {
-    //     const clonedElement = $(element).clone();
-    //     console.log("clonedElement: ", clonedElement)
-    //     // 불필요한 span 요소 제거
-    //     clonedElement.find("span.word_class, span.mark").remove();
+    const isEndWithEllipsis = meanings.some((mean) => mean.endsWith('...'));
+    if (isEndWithEllipsis) {
+      const naverSubRes = await fetch(`https://ko.dict.naver.com/api/platform/koko/entry?entryId=${data.searchResultMap.searchResultListMap.WORD.items[0].entryId}&isConjsShowTTS=true&searchResult=false&hid=174202181249334940`, {
+        "headers": {
+          "accept": "text/html, */*; q=0.01",
+          "accept-language": "en-GB,en;q=0.7",
+          "alldict-locale": "en",
+          "priority": "u=1, i",
+          "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Brave\";v=\"134\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"macOS\"",
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "sec-gpc": "1",
+          "x-requested-with": "XMLHttpRequest",
+          "cookie": "NNB=EIUDPN2LUYFGO; NAC=DuOhBYAI7rZ3; nid_inf=158752215; NID_JKL=Gd7PjHT3lN8Bq+qmOQ28kAwla3zjK62tsu7Ba1asMv8=; page_uid=i8x9rsqps8wssijqUG8ssssstbK-507855; ba.uuid=963a84a2-6b26-4369-a1f6-23853dae71b6; JSESSIONID=C672B4C565D701688CA820DA3FC20F84; BUC=eqbPhf6BsazIwkaXp_A8ijWWwnpZq2Sbxjpug-URQHc=",
+          "Referer": "https://ko.dict.naver.com/",
+          "Referrer-Policy": "unsafe-url"
+        },
+        "body": null,
+        "method": "GET"
+      });
+      
+      const subData: NaverSubResponse = await naverSubRes.json();
+      const originMeaningsWithHtml = subData.entry.means.map((mean) => mean.origin_mean);
+      const originMeanings = originMeaningsWithHtml.map((mean) => {
+        const $ = cheerio.load(mean); 
+        return $.text().trim();
+      });
 
-    //     // 텍스트 추출 및 정리
-    //     const koreanAndPunctuation = clonedElement.text().match(/[\uac00-\ud7af\s.,!?]+/g);
-
-    //     return koreanAndPunctuation ? koreanAndPunctuation.join('').trim() : '';
-    //   })
-    //   .get();
-
+      return originMeanings;
+    }
+    
     return meanings;
   } catch (error: any) {
-    console.log(`naverDic: ${(error as Error).message}`);
     return { error: `An error occurred: ${error.message}` };
   }
 };

@@ -46,7 +46,6 @@ async function createTestResult(
 
     return true;
   }).catch((e) => {
-    console.log("Error: ", e);
     throw new ApolloResponseError(e);
   });
 }
