@@ -16,13 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "말모이: 우리들이 만드는 사전",
     description: "학생들의 어휘력을 향상 시키기 위한 웹 어플리케이션",
-    images: [
-      {
-        url: 'https://github.com/user-attachments/assets/aea63b71-0029-49a7-a8d9-62cc51f79604',
-        width: 1507,
-        height: 630,
-      },
-    ],
+    images: 'https://github.com/user-attachments/assets/aea63b71-0029-49a7-a8d9-62cc51f79604',
   },
 };
 
