@@ -1,4 +1,4 @@
-import { FormControlLabel, styled, Switch, Tooltip, useMediaQuery } from '@mui/material';
+import { FormControlLabel, styled, Switch, Theme, Tooltip, useMediaQuery } from '@mui/material';
 import { useColorModeContext, useThemeContext } from '../Providers/Providers';
 
 const MaterialUISwitch = styled(Switch, {
@@ -21,15 +21,12 @@ const MaterialUISwitch = styled(Switch, {
       },
       '& + .MuiSwitch-track': {
         opacity: 1,
-        backgroundColor: '#aab4be',
-        ...theme.applyStyles('dark', {
-          backgroundColor: '#8796A5',
-        }),
+        backgroundColor: theme.palette.mode === 'light' ? '#aab4be' : '#8796A5',
       },
     },
   },
   '& .MuiSwitch-thumb': {
-    backgroundColor: '#001e3c',
+    backgroundColor: theme.palette.mode === 'light' ? '#001e3c' : '#003892',
     width: smaller ? 22 : 32,
     height: smaller ? 22 : 32,
     '&::before': {
@@ -45,17 +42,11 @@ const MaterialUISwitch = styled(Switch, {
         '#fff',
       )}" d="M9.305 1.667V3.75h1.389V1.667h-1.39zm-4.707 1.95l-.982.982L5.09 6.072l.982-.982-1.473-1.473zm10.802 0L13.927 5.09l.982.982 1.473-1.473-.982-.982zM10 5.139a4.872 4.872 0 00-4.862 4.86A4.872 4.872 0 0010 14.862 4.872 4.872 0 0014.86 10 4.872 4.872 0 0010 5.139zm0 1.389A3.462 3.462 0 0113.471 10a3.462 3.462 0 01-3.473 3.472A3.462 3.462 0 016.527 10 3.462 3.462 0 0110 6.528zM1.665 9.305v1.39h2.083v-1.39H1.666zm14.583 0v1.39h2.084v-1.39h-2.084zM5.09 13.928L3.616 15.4l.982.982 1.473-1.473-.982-.982zm9.82 0l-.982.982 1.473 1.473.982-.982-1.473-1.473zM9.305 16.25v2.083h1.389V16.25h-1.39z"/></svg>')`,
     },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#003892',
-    }),
   },
   '& .MuiSwitch-track': {
     opacity: 1,
-    backgroundColor: '#aab4be',
+    backgroundColor: theme.palette.mode === 'light' ? '#aab4be' : '#8796A5',
     borderRadius: 20 / 2,
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#8796A5',
-    }),
   },
 }));
 
@@ -63,12 +54,13 @@ const ColourModeSwitch = ({ margin } : { margin?: string }) => {
   const theme = useThemeContext();
   const { toggleColorMode } = useColorModeContext();
   const maxWidth600 = useMediaQuery('(max-width:600px)');
-  
-  if (!theme) return <></>;
 
+  if (!theme) return <></>;
+  
   return (
     <Tooltip title={theme.palette.mode === 'dark' ? '라이트 모드' : '다크 모드'}>
       <FormControlLabel
+        checked={theme.palette.mode !== 'dark'}
         control={<MaterialUISwitch onChange={toggleColorMode} smaller={Boolean(maxWidth600)}/>}
         label={''}
         sx={{ margin: margin || 0 }}

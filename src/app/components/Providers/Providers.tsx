@@ -11,8 +11,8 @@ import type {} from '@mui/x-data-grid/themeAugmentation';
 import { SnackbarProvider } from "@/app/hooks/useSnackbar";
 import { SearchResult } from "@/app/types/types";
 import SearchProvider from "./SearchProvider";
+import ColorModeProvider, { ColorModeContext } from "./ColourModeProvider";
 
-const ColorModeContext = createContext({ toggleColorMode: () => {} });
 export const useColorModeContext = () => useContext(ColorModeContext);
 
 export const ThemeContext = createContext<Theme | null>(null);
@@ -27,15 +27,6 @@ const Providers = ({ children } : { children: ReactNode }) => {
   useEffect(() => {
     setMode(prefersMode ? 'dark' : 'light');
   }, [prefersMode]);
-
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-      },
-    }),
-    [],
-  );
 
   const theme = useMemo(
     () =>
@@ -151,7 +142,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
     <AppRouterCacheProvider>
       <SessionProvider>
         <ApolloProvider client={client}>
-          <ColorModeContext.Provider value={colorMode}>
+          <ColorModeProvider mode={mode} setMode={setMode}>
             <ThemeProvider theme={theme}>
               <ThemeContext.Provider value={theme}>
                 <CssBaseline enableColorScheme />
@@ -165,7 +156,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 </Suspense>
               </ThemeContext.Provider>
             </ThemeProvider>
-          </ColorModeContext.Provider>
+          </ColorModeProvider>
         </ApolloProvider>
       </SessionProvider>
     </AppRouterCacheProvider>

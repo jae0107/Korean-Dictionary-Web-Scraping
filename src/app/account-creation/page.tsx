@@ -1,6 +1,6 @@
 'use client'
 
-import { Backdrop, Box, CircularProgress, InputLabel, Skeleton, Stack, Typography } from "@mui/material";
+import { Backdrop, Box, Button, CircularProgress, InputLabel, Link, Skeleton, Stack, Typography } from "@mui/material";
 import AccessDenied from "../components/shared/AccessDenied";
 import {useDropzone} from 'react-dropzone';
 import { FileUpload, PersonAdd } from "@mui/icons-material";
@@ -118,8 +118,8 @@ const AccountCreation = () => {
         }
       }
 
-      const accountId = item.accountId ? item.accountId : `YH${currentYear.toString()}${item.year}${String(item.class).padStart(2, '0')}${String(item.number).padStart(2, '0')}`;
-      const password = item.password ? item.password : `${item.year}${String(item.class).padStart(2, '0')}${String(item.number).padStart(2, '0')}`;
+      const accountId = `YH${currentYear.toString()}${item.year}${String(item.class).padStart(2, '0')}${String(item.number).padStart(2, '0')}`;
+      const password = `${item.year}${String(item.class).padStart(2, '0')}${String(item.number).padStart(2, '0')}`;
       const isDuplicate = data?.getUsers.records.some((record) => record.accountId === accountId) || false; 
 
       if (isDuplicate) {
@@ -181,7 +181,7 @@ const AccountCreation = () => {
               skipEmptyLines: true,  // Skip completely empty rows
               complete: (result) => {
                 let rows: string[][] = result.data as string[][];
-                console.log("rows: ", rows)
+
                 const filteredRows = rows
                   .filter((row) => row.some((cell) => cell !== ""))
                   .map((row) => row.filter((cell, index, arr) => {
@@ -190,7 +190,7 @@ const AccountCreation = () => {
                     }
                     return cell !== "";
                   }));
-                  console.log("filteredRows: ", filteredRows)
+                  
                 // If rows are present and at least one header exists
                 if (filteredRows.length > 1) {
                   const headers = filteredRows[0]; // First row as headers
@@ -216,7 +216,7 @@ const AccountCreation = () => {
                       password: obj['비밀번호'],
                     };
                   });
-                  console.log("jsonData: ", jsonData)
+                  
                   getJsonData(jsonData);
                 }
                 setLoader(false);
@@ -316,7 +316,36 @@ const AccountCreation = () => {
           <Typography variant={'h5'}>학생 계정 생성</Typography>
         </Stack>
         <Box>
-          <InputLabel sx={{ marginBottom: 1 }} required>CSV 혹은 엑셀 파일을 업로드하세요.</InputLabel>
+          <Box 
+            display={'flex'} 
+            flexDirection={'row'} 
+            alignItems={'center'} 
+            justifyContent={'space-between'}
+            sx={{
+              '@media (max-width:415px)': {
+                alignItems: 'flex-end',
+              }
+            }}
+          >
+            <InputLabel sx={{ marginBottom: 1 }} required>CSV 혹은 엑셀 파일을 업로드하세요.</InputLabel>
+            <Stack 
+              direction={'row'} 
+              mb={1}
+              sx={{
+                '@media (max-width:415px)': {
+                  flexDirection: 'column',
+                  marginBottom: '0px',
+                }
+              }}
+            >
+              <Button component={Link} href="/files/excel-sample.xlsx" variant='text' download>
+                엑셀 양식
+              </Button>
+              <Button component={Link} href="/files/csv-sample.csv" variant='text' download>
+                CSV 양식
+              </Button>
+            </Stack>
+          </Box>
           {
             loading ? 
             <Skeleton variant="rounded" height={120} width={451.36}/> :

@@ -4,7 +4,7 @@ import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
 import { Word } from "./word";
 import * as bcrypt from 'bcrypt';
-import { MyVocabulary } from ".";
+import { MyVocabulary, TestResult } from ".";
 import { UserTestResult } from "@/app/generated/gql/graphql";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -127,6 +127,12 @@ User.addHook('beforeBulkCreate', 'bulkHashPassword', async (users: User[]) => {
 });
 
 User.addHook('beforeDestroy', 'delete my vocabularies', async (user: User) => {
+  await TestResult.destroy({
+    where: {
+      userId: user.id,
+    },
+  });
+
   await MyVocabulary.destroy({
     where: {
       userId: user.id,
@@ -136,6 +142,15 @@ User.addHook('beforeDestroy', 'delete my vocabularies', async (user: User) => {
 
 User.addHook('beforeBulkDestroy', 'bulk delete my vocabularies', async (options: DestroyOptions<InferAttributes<User>>) => {
   const users = await User.findAll({ where: options.where });
+
+  await TestResult.destroy({
+    where: {
+      userId: {
+        [Op.in]: users.map(user => user.id),
+      },
+    },
+  });
+  
   await MyVocabulary.destroy({
     where: {
       userId: {

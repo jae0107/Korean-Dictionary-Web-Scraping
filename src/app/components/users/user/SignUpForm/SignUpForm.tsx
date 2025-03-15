@@ -218,7 +218,12 @@ const SignUpForm = () => {
 
   const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isChecked) {
+    if (getRole === UserRole.Student) {
+      const currentYear = new Date().getFullYear();
+      const accountId = `YH${currentYear.toString()}${watch('year')}${String(watch('class')).padStart(2, '0')}${String(watch('number')).padStart(2, '0')}`;
+      setValue('accountId', accountId);
+    }
+    if (!isChecked && getRole !== UserRole.Student) {
       dispatchCurrentSnackBar({
         payload: {
           open: true,
@@ -236,7 +241,7 @@ const SignUpForm = () => {
         },
       });
     }
-    isChecked && passwordCheck === watch('password') && handleSubmit(onSubmit, onError)();
+    (isChecked || getRole === UserRole.Student) && passwordCheck === watch('password') && handleSubmit(onSubmit, onError)();
   }
 
   const getIcon = (condition: { regex: RegExp, message: string }, type: 'accountId' | 'password') => {
@@ -291,7 +296,6 @@ const SignUpForm = () => {
           </Box>
           <Box width={'100%'}>
             <InputLabel 
-              required 
               sx={{ 
                 marginBottom: 1, 
                 fontSize: '1rem',
@@ -299,63 +303,155 @@ const SignUpForm = () => {
                   fontSize: '0.8rem',
                 }
               }}
+              required
             >
-              아이디
+              역할
             </InputLabel>
-            <Stack spacing={1} direction={'row'} alignItems={'center'}>
-              <TextField
-                placeholder="아이디를 입력하세요."
-                type='text'
-                error={!!errors.accountId}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setValue('accountId', '')}>
-                          <Cancel sx={{ width: '15px', height: '15px' }}/>
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                  htmlInput: {
-                    sx: {
-                      '@media (max-width:530px)': {
-                        fontSize: '0.8rem',
-                      }
+            <Controller
+              control={control}
+              name='role'
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  label="역할"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    setRole && setRole(e.target.value as UserRole);
+                  }}
+                  fullWidth
+                  error={!!errors.role}
+                  sx={{
+                    '@media (max-width:530px)': {
+                      fontSize: '0.8rem'
                     },
-                  },
-                }}
-                sx={{ flex: 1 }}
-                value={watch('accountId')}
-                onChange={(e) => {
-                  setValue('accountId', e.target.value);
-                  setIsChecked(false);
-                }}
-              />
-              <Button variant='outlined' loading={accountIdCheckLoading} onClick={onAccountIdCheck} sx={{ height: '56px' }}>
-                중복 확인
-              </Button>
-            </Stack>
-            {
-              watch('accountId') !== '' &&
-              <Stack spacing={0.5} mt={1}>
-                {accountIdConditions.map((condition, index) => {
-                  return (
-                    <Typography
-                      key={index}
-                      variant='body2'
-                      fontSize={'0.80rem'}
-                      display={'flex'}
-                      alignItems={'center'}
-                      color={watch('accountId') === '' ? 'textSecondary' : condition.regex.test(watch('accountId')) ? 'success' : 'error'}
-                    >
-                      {getIcon(condition, 'accountId')}{condition.message}
-                    </Typography>
-                  );
-                })}
-              </Stack>
-            }
+                  }}
+                >
+                  <MenuItem 
+                    value={''} 
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    <em>-</em>
+                  </MenuItem>
+                  <MenuItem 
+                    value={UserRole.Student}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    학생
+                  </MenuItem>
+                  <MenuItem 
+                    value={UserRole.Teacher}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    교사
+                  </MenuItem>
+                  <MenuItem 
+                    value={UserRole.Admin}
+                    sx={{
+                      '@media (max-width:530px)': {
+                        fontSize: '0.875rem',
+                        pt: '4px',
+                        pb: '4px',
+                        minHeight: '32px'
+                      }
+                    }}
+                  >
+                    관리자
+                  </MenuItem>
+                </Select>
+              )}
+            />
           </Box>
+          {
+            getRole !== UserRole.Student &&
+            <Box width={'100%'}>
+              <InputLabel 
+                required 
+                sx={{ 
+                  marginBottom: 1, 
+                  fontSize: '1rem',
+                  '@media (max-width:530px)': {
+                    fontSize: '0.8rem',
+                  }
+                }}
+              >
+                아이디
+              </InputLabel>
+              <Stack spacing={1} direction={'row'} alignItems={'center'}>
+                <TextField
+                  placeholder="아이디를 입력하세요."
+                  type='text'
+                  error={!!errors.accountId}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setValue('accountId', '')}>
+                            <Cancel sx={{ width: '15px', height: '15px' }}/>
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                    htmlInput: {
+                      sx: {
+                        '@media (max-width:530px)': {
+                          fontSize: '0.8rem',
+                        }
+                      },
+                    },
+                  }}
+                  sx={{ flex: 1 }}
+                  value={watch('accountId')}
+                  onChange={(e) => {
+                    setValue('accountId', e.target.value);
+                    setIsChecked(false);
+                  }}
+                />
+                <Button variant='outlined' loading={accountIdCheckLoading} onClick={onAccountIdCheck} sx={{ height: '56px' }}>
+                  중복 확인
+                </Button>
+              </Stack>
+              {
+                watch('accountId') !== '' &&
+                <Stack spacing={0.5} mt={1}>
+                  {accountIdConditions.map((condition, index) => {
+                    return (
+                      <Typography
+                        key={index}
+                        variant='body2'
+                        fontSize={'0.80rem'}
+                        display={'flex'}
+                        alignItems={'center'}
+                        color={watch('accountId') === '' ? 'textSecondary' : condition.regex.test(watch('accountId')) ? 'success' : 'error'}
+                      >
+                        {getIcon(condition, 'accountId')}{condition.message}
+                      </Typography>
+                    );
+                  })}
+                </Stack>
+              }
+            </Box>
+          }
           <Box width={'100%'}>
             <InputLabel 
               required 
@@ -498,94 +594,6 @@ const SignUpForm = () => {
                   },
                 },
               }}
-            />
-          </Box>
-          <Box width={'100%'}>
-            <InputLabel 
-              sx={{ 
-                marginBottom: 1, 
-                fontSize: '1rem',
-                '@media (max-width:530px)': {
-                  fontSize: '0.8rem',
-                }
-              }}
-              required
-            >
-              역할
-            </InputLabel>
-            <Controller
-              control={control}
-              name='role'
-              render={({ field }) => (
-                <Select
-                  value={field.value}
-                  label="역할"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setRole && setRole(e.target.value as UserRole);
-                  }}
-                  fullWidth
-                  error={!!errors.role}
-                  sx={{
-                    '@media (max-width:530px)': {
-                      fontSize: '0.8rem'
-                    },
-                  }}
-                >
-                  <MenuItem 
-                    value={''} 
-                    sx={{
-                      '@media (max-width:530px)': {
-                        fontSize: '0.875rem',
-                        pt: '4px',
-                        pb: '4px',
-                        minHeight: '32px'
-                      }
-                    }}
-                  >
-                    <em>-</em>
-                  </MenuItem>
-                  <MenuItem 
-                    value={UserRole.Student}
-                    sx={{
-                      '@media (max-width:530px)': {
-                        fontSize: '0.875rem',
-                        pt: '4px',
-                        pb: '4px',
-                        minHeight: '32px'
-                      }
-                    }}
-                  >
-                    학생
-                  </MenuItem>
-                  <MenuItem 
-                    value={UserRole.Teacher}
-                    sx={{
-                      '@media (max-width:530px)': {
-                        fontSize: '0.875rem',
-                        pt: '4px',
-                        pb: '4px',
-                        minHeight: '32px'
-                      }
-                    }}
-                  >
-                    교사
-                  </MenuItem>
-                  <MenuItem 
-                    value={UserRole.Admin}
-                    sx={{
-                      '@media (max-width:530px)': {
-                        fontSize: '0.875rem',
-                        pt: '4px',
-                        pb: '4px',
-                        minHeight: '32px'
-                      }
-                    }}
-                  >
-                    관리자
-                  </MenuItem>
-                </Select>
-              )}
             />
           </Box>
           <Box width={'100%'}>

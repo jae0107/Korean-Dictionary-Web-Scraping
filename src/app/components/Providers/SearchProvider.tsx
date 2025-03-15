@@ -1,5 +1,5 @@
 import { SearchResult } from "@/app/types/types";
-import { createContext, Dispatch, ReactNode, useContext } from "react";
+import { createContext, Dispatch, ReactNode } from "react";
 
 interface SearchContextType {
   searchResults: SearchResult | null;
