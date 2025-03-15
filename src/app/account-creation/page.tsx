@@ -181,7 +181,7 @@ const AccountCreation = () => {
               skipEmptyLines: true,  // Skip completely empty rows
               complete: (result) => {
                 let rows: string[][] = result.data as string[][];
-
+                console.log("rows: ", rows)
                 const filteredRows = rows
                   .filter((row) => row.some((cell) => cell !== ""))
                   .map((row) => row.filter((cell, index, arr) => {
@@ -190,6 +190,7 @@ const AccountCreation = () => {
                     }
                     return cell !== "";
                   }));
+                  console.log("filteredRows: ", filteredRows)
                 // If rows are present and at least one header exists
                 if (filteredRows.length > 1) {
                   const headers = filteredRows[0]; // First row as headers
@@ -215,6 +216,7 @@ const AccountCreation = () => {
                       password: obj['비밀번호'],
                     };
                   });
+                  console.log("jsonData: ", jsonData)
                   getJsonData(jsonData);
                 }
                 setLoader(false);
