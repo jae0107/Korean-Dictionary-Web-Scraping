@@ -19,6 +19,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '<img width="1507" alt="Screenshot 2025-03-16 at 2 27 32 am" src="https://github.com/user-attachments/assets/aea63b71-0029-49a7-a8d9-62cc51f79604" />',
+        width: 1507,
+        height: 630,
       },
     ],
   },
