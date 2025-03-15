@@ -10,8 +10,7 @@
     "lint": "next lint",
     "codegen": "graphql-codegen --config codegen.ts",
     "prisma:migrate:apply": "npx prisma migrate dev",
-    "prisma:generate": "npx prisma generate",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
     "@apollo/client": "^3.12.6",
@@ -60,6 +59,7 @@
     "pg-hstore": "^2.3.4",
     "pg-query-stream": "^4.7.1",
     "puppeteer": "^22.15.0",
+    "puppeteer-core": "^24.4.0",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.3.6",
