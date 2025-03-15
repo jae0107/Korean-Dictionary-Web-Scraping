@@ -9,7 +9,6 @@ const koDic = async (userSearch: string) => {
   try {
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/root/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-software-rasterizer'],
     });
     const page = await browser.newPage();
@@ -66,7 +65,6 @@ const naverDic = async (userSearch: string) => {
 	try {
 		browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/root/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-software-rasterizer'],
     });
 		const page = await browser.newPage();
