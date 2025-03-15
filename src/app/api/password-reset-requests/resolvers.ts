@@ -69,6 +69,10 @@ async function createPasswordResetRequest(
 
     if (input.role !== user.role) throw new Error('입력한 정보와 일치하는 사용자를 찾을 수 없습니다.');
 
+    if (user.status === UserStatus.Denied) {
+      throw new Error('거절된 사용자는 비밀번호 재설정을 요청할 수 없습니다.');
+    }
+
     const newPasswordRequest: PasswordResetRequest = await PasswordResetRequest.create({ requestorId: user.id });
 
     return newPasswordRequest;
