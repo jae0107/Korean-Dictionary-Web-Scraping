@@ -65,8 +65,7 @@ const koDic = async (userSearch: string) => {
 const naverDic = async (userSearch: string) => {
   try {
     const naverEncodedSearch = userSearch.replace(/ /g, "%20");
-    const naverDicUrl = `https://ko.dict.naver.com/#/search?query=${naverEncodedSearch}`;
-    const naverRes = await fetch(`https://ko.dict.naver.com/api3/koko/search?query=${naverEncodedSearch}=pc&lang=en&hid=174201844545441630`, {
+    const naverRes = await fetch(`https://ko.dict.naver.com/api3/koko/search?query=${naverEncodedSearch}=&range=all&lang=ko&hid=174202349183224740`, {
       "headers": {
         "accept": "text/html, */*; q=0.01",
         "accept-language": "en-GB,en;q=0.7",
@@ -89,6 +88,7 @@ const naverDic = async (userSearch: string) => {
     });
 
     const data: NaverResponse = await naverRes.json();
+    console.log(data.searchResultMap.searchResultListMap.WORD)
     const meaningsWithHtml = data.searchResultMap.searchResultListMap.WORD.items[0].meansCollector[0].means.map((mean) => mean.value)
     const meanings = meaningsWithHtml.map((mean) => {
       const $ = cheerio.load(mean); 
