@@ -110,8 +110,8 @@ const DataMigration = () => {
                     return {
                       pages: [Number(obj['쪽'])],
                       title: obj['단어'],
-                      naverDicResults: obj['뜻'] ? obj['뜻'].split('. ').map((item) => item.trim() + '.').filter(Boolean) : [],
-                      examples: obj['예문'] ? obj['예문'].split('. ').map((item) => item.trim() + '.').filter(Boolean) : [],
+                      naverDicResults: obj['뜻'] ? obj['뜻'].split(/(?<=\.)/).map(item => item.trim()).filter(Boolean) : [],
+                      examples: obj['예문'] ? obj['예문'].split(/(?<=\.)/).map(item => item.trim()).filter(Boolean) : [],
                     };
                   });
 
@@ -148,8 +148,8 @@ const DataMigration = () => {
                 return {
                   pages: [Number(obj['쪽'])],
                   title: obj['단어'],
-                  naverDicResults: obj['뜻'] ? obj['뜻'].split('. ').map((item) => item.trim() + '.').filter(Boolean) : [],
-                  examples: obj['예문'] ? obj['예문'].split('. ').map((item) => item.trim() + '.').filter(Boolean) : [],
+                  naverDicResults: obj['뜻'] ? obj['뜻'].split(/(?<=\.)/).map(item => item.trim()).filter(Boolean) : [],
+                  examples: obj['예문'] ? obj['예문'].split(/(?<=\.)/).map(item => item.trim()).filter(Boolean) : [],
                 };
               });
 

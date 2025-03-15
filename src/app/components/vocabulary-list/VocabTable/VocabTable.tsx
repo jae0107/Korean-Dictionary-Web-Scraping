@@ -283,6 +283,7 @@ const VocabTable = ({
       display={'flex'} 
       flexDirection={'column'} 
       width={'90%'}
+      mb={2}
       sx={{
         '@media (max-width:545px)': {
           width: '95% !important',
