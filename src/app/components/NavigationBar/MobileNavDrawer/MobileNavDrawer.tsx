@@ -1,4 +1,4 @@
-import { AdminPanelSettings, Chat, Groups, MenuBook, Quiz, RestartAlt } from "@mui/icons-material";
+import { AdminPanelSettings, Chat, Groups, MenuBook, Quiz, RestartAlt, Storage } from "@mui/icons-material";
 import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Theme } from "@mui/material";
 import { Session } from "next-auth";
 import Link from "next/link";
@@ -26,11 +26,23 @@ const MobileNavDrawer = ({
       onClose={() => setOpenDrawer(false)} 
       sx={{ 
         marginTop: '56px',
-        '& .MuiDrawer-paper': { marginTop: '56px' },
+        '& .MuiDrawer-paper': { 
+          marginTop: '56px' 
+        },
         '& .MuiModal-backdrop': {
           opacity: '0 !important',
           marginTop: '56px',  
         },
+        '@media (max-width: 815px)': {
+          '& .MuiDrawer-paper': { 
+            marginTop: '64px' 
+          }
+        },
+        '@media (max-width: 599px)': {
+          '& .MuiDrawer-paper': { 
+            marginTop: '56px' 
+          }
+        }
       }}
     >
       <Box role="presentation" onClick={() => setOpenDrawer(false)}>
@@ -140,6 +152,17 @@ const MobileNavDrawer = ({
                     <RestartAlt/>
                   </ListItemIcon>
                   <ListItemText primary={'비밀번호 재설정 요청 관리'} />
+                </ListItemButton>
+              </ListItem>
+            </List>
+            <Divider />
+            <List>
+              <ListItem disablePadding sx={{ backgroundColor: pathname === '/data-migration' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                <ListItemButton LinkComponent={Link} href={'/data-migration'}>
+                  <ListItemIcon>
+                    <Storage/>
+                  </ListItemIcon>
+                  <ListItemText primary={'데이터 마이그레이션'} />
                 </ListItemButton>
               </ListItem>
             </List>

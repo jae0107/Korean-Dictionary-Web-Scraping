@@ -288,98 +288,98 @@ const AccountCreation = () => {
 
   return (
     <>
-    <Backdrop
-      sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
-      open={getMutationLoading}
-      onClick={() => setMutationLoading(false)}
-    >
-      <CircularProgress color="inherit" />
-    </Backdrop>
-    <Box 
-      width={'100%'} 
-      display={'flex'} 
-      justifyContent={'center'} 
-      alignItems={'center'} 
-      flexDirection={'column'}
-    >
-      <Stack 
-        mt={2} 
-        spacing={4}
-        sx={{
-          '@media (max-width:475px)': {
-            width: '95%',
-          }
-        }}
+      <Backdrop
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        open={getMutationLoading}
+        onClick={() => setMutationLoading(false)}
       >
-        <Stack spacing={1} direction={'row'} alignItems={'center'}>
-          <PersonAdd color='info' sx={{ width: '40px', height: '40px' }}/>
-          <Typography variant={'h5'}>학생 계정 생성</Typography>
-        </Stack>
-        <Box>
-          <Box 
-            display={'flex'} 
-            flexDirection={'row'} 
-            alignItems={'center'} 
-            justifyContent={'space-between'}
-            sx={{
-              '@media (max-width:415px)': {
-                alignItems: 'flex-end',
-              }
-            }}
-          >
-            <InputLabel sx={{ marginBottom: 1 }} required>CSV 혹은 엑셀 파일을 업로드하세요.</InputLabel>
-            <Stack 
-              direction={'row'} 
-              mb={1}
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Box 
+        width={'100%'} 
+        display={'flex'} 
+        justifyContent={'center'} 
+        alignItems={'center'} 
+        flexDirection={'column'}
+      >
+        <Stack 
+          mt={2} 
+          spacing={4}
+          sx={{
+            '@media (max-width:475px)': {
+              width: '95%',
+            }
+          }}
+        >
+          <Stack spacing={1} direction={'row'} alignItems={'center'}>
+            <PersonAdd color='info' sx={{ width: '40px', height: '40px' }}/>
+            <Typography variant={'h5'}>학생 계정 생성</Typography>
+          </Stack>
+          <Box>
+            <Box 
+              display={'flex'} 
+              flexDirection={'row'} 
+              alignItems={'center'} 
+              justifyContent={'space-between'}
               sx={{
                 '@media (max-width:415px)': {
-                  flexDirection: 'column',
-                  marginBottom: '0px',
+                  alignItems: 'flex-end',
                 }
               }}
             >
-              <Button component={Link} href="/files/excel-sample.xlsx" variant='text' download>
-                엑셀 양식
-              </Button>
-              <Button component={Link} href="/files/csv-sample.csv" variant='text' download>
-                CSV 양식
-              </Button>
-            </Stack>
-          </Box>
-          {
-            loading ? 
-            <Skeleton variant="rounded" height={120} width={451.36}/> :
-            <Box 
-              {...getRootProps()} 
-              border={'2px dotted #888888'} 
-              borderRadius={'5px'}
-              height={'120px'} 
-              p={5} 
-              display={'flex'} 
-              justifyContent={'center'} 
-              alignItems={'center'}
-              bgcolor={'#8888881c'}
-            >
-              <input {...getInputProps()} onClick={() => setProgress(0)}/>
-              <Typography display={'flex'} alignItems={'center'} justifyContent={'center'}>
-                <FileUpload sx={{ mr: 1 }}/>드래그 앤 드롭하거나 클릭하여 파일을 업로드하세요.
-              </Typography>
+              <InputLabel sx={{ marginBottom: 1 }} required>CSV 혹은 엑셀 파일을 업로드하세요.</InputLabel>
+              <Stack 
+                direction={'row'} 
+                mb={1}
+                sx={{
+                  '@media (max-width:415px)': {
+                    flexDirection: 'column',
+                    marginBottom: '0px',
+                  }
+                }}
+              >
+                <Button component={Link} href="/files/excel-sample.xlsx" variant='text' download>
+                  엑셀 양식
+                </Button>
+                <Button component={Link} href="/files/csv-sample.csv" variant='text' download>
+                  CSV 양식
+                </Button>
+              </Stack>
             </Box>
-          }
-          <LinearProgressWithLabel value={progress} />
-        </Box>
-      </Stack>
-    </Box>
-    {
-      showContainer &&
-      <Box width={'100%'} alignItems={'center'} display={'flex'} flexDirection={'column'} mt={2}>
-        <AccountCreationContainer
-          loading={getLoader}
-          getDuplicateAccounts={getDuplicateAccounts}
-          getWrongData={getWrongData}
-        />
+            {
+              loading ? 
+              <Skeleton variant="rounded" height={120} width={451.36}/> :
+              <Box 
+                {...getRootProps()} 
+                border={'2px dotted #888888'} 
+                borderRadius={'5px'}
+                height={'120px'} 
+                p={5} 
+                display={'flex'} 
+                justifyContent={'center'} 
+                alignItems={'center'}
+                bgcolor={'#8888881c'}
+              >
+                <input {...getInputProps()} onClick={() => setProgress(0)}/>
+                <Typography display={'flex'} alignItems={'center'} justifyContent={'center'}>
+                  <FileUpload sx={{ mr: 1 }}/>드래그 앤 드롭하거나 클릭하여 파일을 업로드하세요.
+                </Typography>
+              </Box>
+            }
+            <LinearProgressWithLabel value={progress} />
+          </Box>
+        </Stack>
       </Box>
-    }
+      {
+        showContainer &&
+        <Box width={'100%'} alignItems={'center'} display={'flex'} flexDirection={'column'} mt={2}>
+          <AccountCreationContainer
+            loading={getLoader}
+            getDuplicateAccounts={getDuplicateAccounts}
+            getWrongData={getWrongData}
+          />
+        </Box>
+      }
     </>
   );
 }

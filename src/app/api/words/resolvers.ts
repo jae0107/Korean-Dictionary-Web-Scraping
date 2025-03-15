@@ -17,6 +17,7 @@ export const wordResolvers = {
   },
   Mutation: {
     createWordRequest,
+    bulkMigrationWords,
     duplicateWordRequest,
     updateWordRequest,
     approveWordRequest,
@@ -148,6 +149,33 @@ async function createWordRequest(
     const newWord: Word = await Word.create(newInput);
 
     return newWord;
+  }).catch((e) => {
+    throw new ApolloResponseError(e);
+  });
+}
+
+async function bulkMigrationWords(
+  root: any,
+  { inputs }: { inputs: WordInput[]; },
+): Promise<Word[]> {
+  return await transaction(async (t) => {
+    const words = await Word.bulkCreate(
+      inputs.map((input) => ({
+        ...input,
+        requestorIds: [],
+        korDicResults: input.korDicResults ?? [],
+        naverDicResults: input.naverDicResults ?? [],
+        pages: input.pages ?? [], 
+        examples: input.examples ?? [], 
+        deniedReason: input.deniedReason ?? undefined, 
+        title: input.title ?? "",
+        status: WordStatus.Approved,
+        wordId: undefined,
+      })),
+      { individualHooks: true }
+    );
+
+    return words;
   }).catch((e) => {
     throw new ApolloResponseError(e);
   });

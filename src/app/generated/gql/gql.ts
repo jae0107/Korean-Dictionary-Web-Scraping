@@ -70,6 +70,7 @@ const documents = {
     "\n  mutation UpdateUser($updateUserId: ID!, $input: UserInput!) {\n    updateUser(id: $updateUserId, input: $input) {\n      id\n    }\n  }\n": types.UpdateUserDocument,
     "\n  mutation AddMyVocabulary($input: MyVocabularyInput!) {\n    addMyVocabulary(input: $input) {\n      id\n    }\n  }\n": types.AddMyVocabularyDocument,
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
+    "\n  mutation BulkMigrationWords($inputs: [WordInput!]!) {\n    bulkMigrationWords(inputs: $inputs) {\n      id\n    }\n  }\n": types.BulkMigrationWordsDocument,
     "\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n": types.GetUserDocument,
     "\n  fragment MiniTestItems on MiniTest {\n    id\n    correctAnswer\n    korDicResults\n    naverDicResults\n    options\n  }\n": types.MiniTestItemsFragmentDoc,
     "\n  query GetMiniTests($filterOptions: MiniTestFilterOptions!) {\n    getMiniTests(filterOptions: $filterOptions) {\n      ...MiniTestItems\n    }\n  }\n": types.GetMiniTestsDocument,
@@ -345,6 +346,10 @@ export function gql(source: "\n  mutation AddMyVocabulary($input: MyVocabularyIn
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n"): (typeof documents)["\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation BulkMigrationWords($inputs: [WordInput!]!) {\n    bulkMigrationWords(inputs: $inputs) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation BulkMigrationWords($inputs: [WordInput!]!) {\n    bulkMigrationWords(inputs: $inputs) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

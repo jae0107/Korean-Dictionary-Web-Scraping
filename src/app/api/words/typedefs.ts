@@ -66,6 +66,7 @@ export const wordTypeDefs = gql`
 
   type Mutation {
     createWordRequest(input: WordInput!): Word!
+    bulkMigrationWords(inputs: [WordInput!]!): [Word!]!
     duplicateWordRequest(input: WordInput!): Word!
     updateWordRequest(id: ID!, input: WordInput!): Word!
     approveWordRequest(id: ID!): Boolean!

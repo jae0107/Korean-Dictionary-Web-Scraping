@@ -1,5 +1,5 @@
 import { AccountCircle, AdminPanelSettings, Assessment, Checklist, Logout, MenuBook, PersonAdd, Portrait, Quiz, VpnKey } from '@mui/icons-material';
-import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Skeleton, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Button, CircularProgress, Container, IconButton, Menu, MenuItem, Theme, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,7 +23,9 @@ const NavigationBar = ({
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const maxWidth620 = useMediaQuery('(max-width:685px)');
+
+  const maxWidth720 = useMediaQuery('(max-width:720px)');
+  const maxWidth815 = useMediaQuery('(max-width:815px)');
   
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElUserManagement, setAnchorElUserManagement] = useState<null | HTMLElement>(null);
@@ -32,8 +34,8 @@ const NavigationBar = ({
   const [openDrawer, setOpenDrawer] = useState(false);
 
   useEffect(() => {
-    !maxWidth620 && setOpenDrawer(false);
-  }, [maxWidth620]);
+    (!maxWidth720 || (session?.user.role === 'SUPERADMIN' && !maxWidth815)) && setOpenDrawer(false);
+  }, [maxWidth720, maxWidth815]);
 
   const navigationUser = (url: string) => {
     router.push(url);
@@ -64,7 +66,7 @@ const NavigationBar = ({
         <Container sx={{ maxWidth: 'unset !important' }}>
           <Toolbar disableGutters>
             {
-              maxWidth620 && session.user.role !== 'STUDENT' &&
+              (maxWidth720 || (session?.user.role === 'SUPERADMIN' && maxWidth815)) && session.user.role !== 'STUDENT' &&
               <IconButton
                 size="large"
                 edge="start"
@@ -109,7 +111,7 @@ const NavigationBar = ({
                   justifyContent: 'center',
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname === '/vocabulary-list' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                  '@media (max-width: 685px)': {
+                  [`@media (max-width: ${session.user.role === "SUPERADMIN" ? '815px' : '720px'})`]: {
                     display: session.user.role === 'STUDENT' ? 'flex' : 'none',
                   }
                 }}
@@ -124,7 +126,7 @@ const NavigationBar = ({
                   color: 'white', 
                   borderRadius: '0px',
                   borderBottom: `2px solid ${pathname.includes('/mock-test') || pathname.includes('/test-venues') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                  '@media (max-width: 685px)': {
+                  [`@media (max-width: ${session.user.role === "SUPERADMIN" ? '815px' : '720px'})`]: {
                     display: session.user.role === 'STUDENT' ? 'flex' : 'none',
                   }
                 }}
@@ -193,7 +195,7 @@ const NavigationBar = ({
                     color: 'white', 
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 685px)': {
+                    [`@media (max-width: ${session.user.role === "SUPERADMIN" ? '815px' : '720px'})`]: {
                       display: 'none',
                     }
                   }}
@@ -211,7 +213,7 @@ const NavigationBar = ({
                     color: 'white', 
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname.includes('/students') || pathname.includes('/teachers') || pathname.includes('/admins') || pathname.includes('/user-stats') ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 685px)': {
+                    [`@media (max-width: ${session.user.role === "SUPERADMIN" ? '815px' : '720px'})`]: {
                       display: 'none',
                     }
                   }}
@@ -341,7 +343,7 @@ const NavigationBar = ({
                     color: 'white', 
                     borderRadius: '0px',
                     borderBottom: `2px solid ${pathname === '/password-reset-request-management' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
-                    '@media (max-width: 685px)': {
+                    [`@media (max-width: ${session.user.role === "SUPERADMIN" ? '815px' : '720px'})`]: {
                       display: 'none',
                     }
                   }}
@@ -349,6 +351,24 @@ const NavigationBar = ({
                   href={'/password-reset-request-management'}
                 >
                   비밀번호 재설정 요청 관리
+                </Button>
+              }
+              {
+                session.user.role === "SUPERADMIN" &&
+                <Button
+                  sx={{ 
+                    my: 2, 
+                    color: 'white', 
+                    borderRadius: '0px',
+                    borderBottom: `2px solid ${pathname === '/data-migration' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'}`,
+                    [`@media (max-width: ${session.user.role === "SUPERADMIN" ? '815px' : '720px'})`]: {
+                      display: 'none',
+                    }
+                  }}
+                  component={Link}
+                  href={'/data-migration'}
+                >
+                  데이터 마이그레이션
                 </Button>
               }
             </Box>
@@ -381,7 +401,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/profile' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:685px)': {
+                    '@media (max-width:720px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -407,7 +427,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/password-change' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:685px)': {
+                    '@media (max-width:720px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -433,7 +453,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/my-vocabulary-list' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:685px)': {
+                    '@media (max-width:720px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -459,7 +479,7 @@ const NavigationBar = ({
                 <MenuItem 
                   sx={{ 
                     backgroundColor: pathname === '/my-requests' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent',
-                    '@media (max-width:685px)': {
+                    '@media (max-width:720px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -487,7 +507,7 @@ const NavigationBar = ({
                   <MenuItem 
                     onClick={logOut}
                     sx={{
-                      '@media (max-width:685px)': {
+                      '@media (max-width:720px)': {
                       fontSize: '0.875rem',
                       pt: '4px',
                       pb: '4px',
@@ -514,7 +534,7 @@ const NavigationBar = ({
         </Container>
       </AppBar>
       {
-        maxWidth620 && 
+        (maxWidth720 || maxWidth815) && 
         <MobileNavDrawer 
           openDrawer={openDrawer} 
           setOpenDrawer={setOpenDrawer} 
