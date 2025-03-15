@@ -5,6 +5,23 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
 import axios from "axios";
 
+interface NaverResponse {
+  searchResultMap: {
+    searchResultListMap: {
+      WORD: {
+        query: string;
+        items: {
+          meansCollector: {
+            means: {
+              value: string
+            }[]
+          }[]
+        }[]
+      }
+    }
+  }
+};
+
 // const koDic = async (userSearch: string) => {
 //   let browser: Browser | null = null;
 //   try {
@@ -174,7 +191,7 @@ const naverDic = async (userSearch: string) => {
       "body": null,
       "method": "GET"
     });
-    const data = await naverRes.json();
+    const data: NaverResponse = await naverRes.json();
     const meaningsWithHtml = data.searchResultMap.searchResultListMap.WORD.items[0].meansCollector[0].means.map((mean) => mean.value)
     const meanings = meaningsWithHtml.map((mean) => {
       const $ = cheerio.load(mean); // cheerio로 HTML을 로드
