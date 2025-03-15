@@ -48,18 +48,18 @@ const MobileNavDrawer = ({
       <Box role="presentation" onClick={() => setOpenDrawer(false)}>
         <List>
           <ListItem disablePadding sx={{ backgroundColor: pathname === '/vocabulary-list' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-            <ListItemButton LinkComponent={Link} href={'/vocabulary-list'}>
+            <ListItemButton LinkComponent={Link} href={'/vocabulary-list'} sx={{ pb: '2px', pt: '2px' }}>
               <ListItemIcon>
                 <MenuBook/>
               </ListItemIcon>
-              <ListItemText primary={'단어장'} />
+              <ListItemText primary={'단어장'}/>
             </ListItemButton>
           </ListItem>
         </List>
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton LinkComponent={Link} href={'/mock-test'}>
+            <ListItemButton LinkComponent={Link} href={'/mock-test'} sx={{ pb: '2px', pt: '2px' }}>
               <ListItemIcon>
                 <TestIcon style={{ height: '24px', width: '24px' }}/>
               </ListItemIcon>
@@ -68,7 +68,7 @@ const MobileNavDrawer = ({
           </ListItem>
           <List disablePadding>
             <ListItem disablePadding sx={{backgroundColor: pathname.includes('/mock-test') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-              <ListItemButton LinkComponent={Link} href={'/mock-test'} sx={{ pl: '40px !important' }}>
+              <ListItemButton LinkComponent={Link} href={'/mock-test'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
                 <ListItemIcon>
                   <Quiz/>
                 </ListItemIcon>
@@ -78,7 +78,7 @@ const MobileNavDrawer = ({
           </List>
           <List disablePadding>
             <ListItem disablePadding sx={{backgroundColor: pathname.includes('/test-venues') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-              <ListItemButton LinkComponent={Link} href={'/test-venues'} sx={{ pl: '40px !important' }}>
+              <ListItemButton LinkComponent={Link} href={'/test-venues'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
                 <ListItemIcon>
                   <ExamIcon style={{ height: '26px', width: '26px' }}/>
                 </ListItemIcon>
@@ -93,7 +93,7 @@ const MobileNavDrawer = ({
           <>
             <List>
               <ListItem disablePadding sx={{ backgroundColor: pathname === '/request-management' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <ListItemButton LinkComponent={Link} href={'/request-management'}>
+                <ListItemButton LinkComponent={Link} href={'/request-management'} sx={{ pb: '2px', pt: '2px' }}>
                   <ListItemIcon>
                     <Chat/>
                   </ListItemIcon>
@@ -104,7 +104,7 @@ const MobileNavDrawer = ({
             <Divider />
             <List>
               <ListItem disablePadding>
-                <ListItemButton LinkComponent={Link} href={'/students'}>
+                <ListItemButton LinkComponent={Link} href={'/students'} sx={{ pb: '2px', pt: '2px' }}>
                   <ListItemIcon>
                     <Groups/>
                   </ListItemIcon>
@@ -113,7 +113,7 @@ const MobileNavDrawer = ({
               </ListItem>
               <List disablePadding>
                 <ListItem disablePadding sx={{backgroundColor: pathname.includes('/students') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                  <ListItemButton LinkComponent={Link} href={'/students'} sx={{ pl: '40px !important' }}>
+                  <ListItemButton LinkComponent={Link} href={'/students'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
                     <ListItemIcon>
                       <StudentIcon style={{ height: '24px', width: '24px' }}/>
                     </ListItemIcon>
@@ -123,7 +123,7 @@ const MobileNavDrawer = ({
                 {
                   (session.user.role === 'SUPERADMIN' || session.user.role === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/teachers') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                    <ListItemButton LinkComponent={Link} href={'/teachers'} sx={{ pl: '40px !important' }}>
+                    <ListItemButton LinkComponent={Link} href={'/teachers'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
                       <ListItemIcon>
                         <TeacherIcon style={{ height: '24px', width: '24px' }}/>
                       </ListItemIcon>
@@ -134,7 +134,7 @@ const MobileNavDrawer = ({
                { 
                   (session.user.role === 'SUPERADMIN' || session.user.role === 'ADMIN') &&
                   <ListItem disablePadding sx={{ backgroundColor: pathname.includes('/admins') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                    <ListItemButton LinkComponent={Link} href={'/admins'} sx={{ pl: '40px !important' }}>
+                    <ListItemButton LinkComponent={Link} href={'/admins'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
                       <ListItemIcon>
                         <AdminPanelSettings style={{ height: '24px', width: '24px' }}/>
                       </ListItemIcon>
@@ -147,7 +147,7 @@ const MobileNavDrawer = ({
             <Divider />
             <List>
               <ListItem disablePadding sx={{ backgroundColor: pathname === '/password-reset-request-management' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <ListItemButton LinkComponent={Link} href={'/password-reset-request-management'}>
+                <ListItemButton LinkComponent={Link} href={'/password-reset-request-management'} sx={{ pb: '2px', pt: '2px' }}>
                   <ListItemIcon>
                     <RestartAlt/>
                   </ListItemIcon>
@@ -158,7 +158,7 @@ const MobileNavDrawer = ({
             <Divider />
             <List>
               <ListItem disablePadding sx={{ backgroundColor: pathname === '/data-migration' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <ListItemButton LinkComponent={Link} href={'/data-migration'}>
+                <ListItemButton LinkComponent={Link} href={'/data-migration'} sx={{ pb: '2px', pt: '2px' }}>
                   <ListItemIcon>
                     <Storage/>
                   </ListItemIcon>

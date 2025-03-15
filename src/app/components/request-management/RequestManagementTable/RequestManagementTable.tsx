@@ -662,6 +662,7 @@ const RequestManagementTable = ({
       <DataGrid
         pagination
         disableColumnMenu
+        hideFooterSelectedRowCount
         checkboxSelection={wordRequestStatus !== WordStatus.Duplicated}
         keepNonExistentRowsSelected={wordRequestStatus !== WordStatus.Duplicated}
         onRowSelectionModelChange={(newRowSelectionModel) => {
@@ -702,13 +703,14 @@ const RequestManagementTable = ({
                   color="primary"
                   size="small"
                   defaultPage={6}
-                  boundaryCount={2}
+                  siblingCount={1}
                   showFirstButton
                   showLastButton
                   count={pageCount}
                   page={page+1}
                   onChange={(event, page) => 
                     setPaginationModel((value) => {
+                      setSelectedRequests([]);
                       return {
                         ...value,
                         page: page - 1,

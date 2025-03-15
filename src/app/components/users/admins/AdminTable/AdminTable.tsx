@@ -484,13 +484,14 @@ const AdminTable = ({
                   color="primary"
                   size="small"
                   defaultPage={6}
-                  boundaryCount={2}
+                  siblingCount={1}
                   showFirstButton
                   showLastButton
                   count={pageCount}
                   page={page+1}
                   onChange={(event, page) => 
                     setPaginationModel((value) => {
+                      setSelectedAdmins([]);
                       return {
                         ...value,
                         page: page - 1,

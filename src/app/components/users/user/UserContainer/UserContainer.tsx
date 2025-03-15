@@ -698,13 +698,14 @@ const UserContainer = ({
                       color="primary"
                       size="small"
                       defaultPage={6}
-                      boundaryCount={2}
+                      siblingCount={1}
                       showFirstButton
                       showLastButton
                       count={pageInfo.pageCount || 0}
                       page={paginationModel.page+1}
                       onChange={(event, page) => 
                         setPaginationModel((value) => {
+                          setSelectedRequests([]);
                           return {
                             ...value,
                             page: page - 1,

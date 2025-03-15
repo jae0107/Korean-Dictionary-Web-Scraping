@@ -371,7 +371,7 @@ const MyRequestTable = ({
                   color="primary"
                   size="small"
                   defaultPage={6}
-                  boundaryCount={2}
+                  siblingCount={1}
                   showFirstButton
                   showLastButton
                   count={pageCount}

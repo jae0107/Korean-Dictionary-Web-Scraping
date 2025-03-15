@@ -162,6 +162,7 @@ const PasswordResetRequestManagementTable = ({
           disableColumnMenu
           checkboxSelection
           keepNonExistentRowsSelected
+          hideFooterSelectedRowCount
           onRowSelectionModelChange={(newRowSelectionModel) => {
             setSelectedPasswordResetRequests(newRowSelectionModel as string[]);
           }}
@@ -194,13 +195,14 @@ const PasswordResetRequestManagementTable = ({
                     color="primary"
                     size="small"
                     defaultPage={6}
-                    boundaryCount={2}
+                    siblingCount={1}
                     showFirstButton
                     showLastButton
                     count={pageCount}
                     page={page+1}
                     onChange={(event, page) => 
                       setPaginationModel((value) => {
+                        setSelectedPasswordResetRequests([]);
                         return {
                           ...value,
                           page: page - 1,

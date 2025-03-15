@@ -85,6 +85,9 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 '& .MuiDataGrid-columnSeparator': {
                   color: mode === 'light' ? '#b4b4b4' : '#515151',
                 },
+                '& .MuiTablePagination-displayedRows': {
+                  display: 'none',
+                }
               },
             }
           },
