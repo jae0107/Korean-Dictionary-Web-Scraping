@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import puppeteer, { Browser,executablePath } from "puppeteer-core";
+import puppeteer, { Browser } from "puppeteer";
 import * as cheerio from "cheerio";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
@@ -8,8 +8,8 @@ const koDic = async (userSearch: string) => {
   let browser: Browser | null = null;
   try {
     browser = await puppeteer.launch({
-      headless: true,
-      executablePath: executablePath('chrome'),
+      headless: false,
+      // executablePath: executablePath('chrome'),
       args: [
         '--no-sandbox', 
         '--disable-setuid-sandbox', 
@@ -72,8 +72,8 @@ const naverDic = async (userSearch: string) => {
 	let browser: Browser | null = null;
 	try {
 		browser = await puppeteer.launch({
-      headless: true,
-      executablePath: executablePath('chrome'),
+      headless: false,
+      // executablePath: executablePath('chrome'),
       args: [
         '--no-sandbox', 
         '--disable-setuid-sandbox', 
