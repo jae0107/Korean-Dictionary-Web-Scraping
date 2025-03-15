@@ -37,7 +37,7 @@ const koDic = async (userSearch: string) => {
 
     const meaning = await page.evaluate(() => {
       const elements = document.querySelectorAll('dl#article0 dd');
-
+      console.log("elements: ", elements);
       if (!elements.length) return [];
       
       return Array.from(elements).map(element => {
@@ -59,6 +59,7 @@ const koDic = async (userSearch: string) => {
 
     return meaning;
   } catch (error) {
+    console.log(`koDic: ${(error as Error).message}`);
     return { error: `An error occurred: ${(error as Error).message}` };
   } finally {
     if (browser) {
@@ -100,12 +101,13 @@ const naverDic = async (userSearch: string) => {
 			.map((index, element) => {
 				// Clone the element to avoid modifying the original
 				const clonedElement = $(element).clone();
+        console.log("clonedElement: ", clonedElement)
 				// Remove undesired span elements
 				clonedElement.find("span.word_class, span.mark").remove();
 
 				// Extract text and clean it
 				const koreanAndPunctuation = clonedElement.text().match(/[\uac00-\ud7af\s.,!?]+/g);
-
+        console.log("koreanAndPunctuation: ", koreanAndPunctuation)
 				const cleanMeaning = koreanAndPunctuation ? koreanAndPunctuation.join('').trim() : '';
 
 				return cleanMeaning;
@@ -114,6 +116,7 @@ const naverDic = async (userSearch: string) => {
 		
 		return Array.isArray(meaning) ? meaning : [];;
 	} catch (error: any) {
+    console.log(`naverDic: ${(error as Error).message}`);
 		return NextResponse.json(
 			{ error: `An error occurred: ${error.message}` },
 			{ status: 200 }
