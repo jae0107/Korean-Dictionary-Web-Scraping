@@ -153,29 +153,56 @@ const naverDic = async (userSearch: string) => {
   try {
     const naverEncodedSearch = userSearch.replace(/ /g, "%20");
     const naverDicUrl = `https://ko.dict.naver.com/#/search?query=${naverEncodedSearch}`;
-
+    const naverRes = await fetch(`https://ko.dict.naver.com/api3/koko/search?query=${naverEncodedSearch}=pc&lang=en&hid=174201844545441630`, {
+      "headers": {
+        "accept": "text/html, */*; q=0.01",
+        "accept-language": "en-GB,en;q=0.7",
+        "alldict-locale": "en",
+        "priority": "u=1, i",
+        "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Brave\";v=\"134\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "sec-gpc": "1",
+        "x-requested-with": "XMLHttpRequest",
+        "cookie": "NNB=EIUDPN2LUYFGO; NAC=DuOhBYAI7rZ3; nid_inf=158752215; NID_JKL=Gd7PjHT3lN8Bq+qmOQ28kAwla3zjK62tsu7Ba1asMv8=; page_uid=i8x9rsqps8wssijqUG8ssssstbK-507855; ba.uuid=963a84a2-6b26-4369-a1f6-23853dae71b6; BUC=mc5H_7MGn8irGBPC6zz8SSEH4nY_2JByjt66YWD6jpk=; JSESSIONID=D57118271705E31D6EAD9ED22E95F1CA",
+        "Referer": "https://ko.dict.naver.com/",
+        "Referrer-Policy": "unsafe-url"
+      },
+      "body": null,
+      "method": "GET"
+    });
+    const data = await naverRes.json();
+    const meaningsWithHtml = data.searchResultMap.searchResultListMap.WORD.items[0].meansCollector[0].means.map((mean) => mean.value)
+    const meanings = meaningsWithHtml.map((mean) => {
+      const $ = cheerio.load(mean); // cheerio로 HTML을 로드
+      return $.text().trim(); // 텍스트만 추출하여 반환
+    });
     // Axios로 HTML 가져오기
-    const { data } = await axios.get(naverDicUrl);
-    console.log("data: ", data)
-    // Cheerio로 HTML 파싱
-    const $ = cheerio.load(data);
+    // const response = await fetch(naverDicUrl);
+    // const html = await response.text();
+    // // console.log(html)
+    // // Cheerio로 HTML 파싱
+    // const $ = cheerio.load(html);
 
-    // 원하는 데이터 추출
-    const meaning = $("div#searchPage_entry div.row:first-child li.mean_item p.mean")
-      .map((index, element) => {
-        const clonedElement = $(element).clone();
-        console.log("clonedElement: ", clonedElement)
-        // 불필요한 span 요소 제거
-        clonedElement.find("span.word_class, span.mark").remove();
+    // // 원하는 데이터 추출
+    // const meaning = $("div#searchPage_entry div.row:first-child li.mean_item p.mean")
+    //   .map((index, element) => {
+    //     const clonedElement = $(element).clone();
+    //     console.log("clonedElement: ", clonedElement)
+    //     // 불필요한 span 요소 제거
+    //     clonedElement.find("span.word_class, span.mark").remove();
 
-        // 텍스트 추출 및 정리
-        const koreanAndPunctuation = clonedElement.text().match(/[\uac00-\ud7af\s.,!?]+/g);
+    //     // 텍스트 추출 및 정리
+    //     const koreanAndPunctuation = clonedElement.text().match(/[\uac00-\ud7af\s.,!?]+/g);
 
-        return koreanAndPunctuation ? koreanAndPunctuation.join('').trim() : '';
-      })
-      .get();
+    //     return koreanAndPunctuation ? koreanAndPunctuation.join('').trim() : '';
+    //   })
+    //   .get();
 
-    return meaning;
+    return meanings;
   } catch (error: any) {
     console.log(`naverDic: ${(error as Error).message}`);
     return { error: `An error occurred: ${error.message}` };
