@@ -229,7 +229,7 @@ const UserForm = ({
             >
               <MenuItem value={''}><em>-</em></MenuItem>
               <MenuItem value={'STUDENT'}>학생</MenuItem>
-              {(session?.user.role === 'SUPERADMIN' || session?.user.role === 'ADMIN' || session?.user.role === 'TEACHER') && <MenuItem value={'TEACHER'}>교사</MenuItem>}
+              {(session?.user.role === 'SUPERADMIN' || session?.user.role === 'ADMIN' || session?.user.role === 'TEACHER') && <MenuItem value={'TEACHER'}>선생님</MenuItem>}
               {(session?.user.role === 'SUPERADMIN' || session?.user.role === 'ADMIN') && <MenuItem value={'ADMIN'}>관리자</MenuItem>}
               {session?.user.role === 'SUPERADMIN' && <MenuItem value={'SUPERADMIN'}>최고 관리자</MenuItem>}
             </Select>

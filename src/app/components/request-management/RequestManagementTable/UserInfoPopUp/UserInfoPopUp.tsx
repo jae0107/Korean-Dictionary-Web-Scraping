@@ -23,7 +23,7 @@ const UserInfoPopUp = ({
     if (getRequestor?.role === 'STUDENT') {
       return '학생';
     } else if (getRequestor?.role === 'TEACHER') {
-      return '교사';
+      return '선생님';
     } else if (getRequestor?.role === 'ADMIN' || getRequestor?.role === 'SUPERADMIN') {
       return '관리자';
     }

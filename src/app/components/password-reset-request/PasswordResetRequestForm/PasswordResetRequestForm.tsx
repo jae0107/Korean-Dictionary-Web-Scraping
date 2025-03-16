@@ -331,7 +331,7 @@ const PasswordResetRequestForm = () => {
                       }
                     }}
                   >
-                    교사
+                    선생님
                   </MenuItem>
                   <MenuItem 
                     value={UserRole.Admin}
