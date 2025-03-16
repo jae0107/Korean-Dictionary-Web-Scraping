@@ -101,6 +101,7 @@ const TestCard = ({
                   message: '테스트 결과가 제출되었습니다.',
                 },
               });
+              setOpenFeedback(true);
             },
           });
         } else {

@@ -38,6 +38,13 @@ const UserInfo = ({
                 <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.password || ''}</TableCell>
               </TableRow>
             }
+            {
+              user.importedStatus &&
+              <TableRow>
+                <TableCell sx={{ minWidth: 70 }} component="th" scope="row">등록 방식</TableCell>
+                <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.importedStatus === 'IMPORTED' ? '일괄 등록' : '수동 등록'}</TableCell>
+              </TableRow>
+            }
           </TableBody>
         </Table>
       </DialogContent>

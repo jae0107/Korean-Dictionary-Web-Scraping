@@ -39,9 +39,9 @@ async function getMiniTests(
       .select(
         knex.raw(`
           ARRAY(
-            SELECT rt.title
-            FROM random_titles rt
-            WHERE rt.title != words.title
+            SELECT title FROM words AS w
+            WHERE w.title != words.title
+            ORDER BY RANDOM()
             LIMIT 3
           ) || words.title AS options
         `)

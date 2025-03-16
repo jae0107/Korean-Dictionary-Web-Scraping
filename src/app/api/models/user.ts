@@ -16,6 +16,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare role: string;
   declare status: string;
   declare previousStatus?: string;
+  declare importedStatus?: string;
   declare year?: CreationOptional<number>;
   declare class?: CreationOptional<string>;
   declare number?: CreationOptional<number>;
@@ -54,6 +55,7 @@ User.init(
     role: DataTypes.ENUM('ADMIN', 'STUDENT', 'TEACHER'),
     status: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
     previousStatus: DataTypes.ENUM('APPROVED', 'DENIED', 'PENDING'),
+    importedStatus: DataTypes.ENUM('IMPORTED', 'NOT_IMPORTED'),
     year: DataTypes.INTEGER,
     class: DataTypes.STRING,
     number: DataTypes.INTEGER,

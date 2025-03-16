@@ -18,7 +18,7 @@ export class UserSearch {
 
   async process(): Promise<OffsetPaginationResponse<User>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { statuses, roles, userName } = this.filterOptions;
+    const { statuses, roles, userName, importedStatus } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('users');
 
@@ -27,6 +27,10 @@ export class UserSearch {
 
     if (isPresent(statuses) && Array.isArray(statuses) && statuses.length > 0) {
       query = query.andWhere('users.status', 'in', statuses);
+    }
+
+    if (isPresent(importedStatus) && importedStatus) {
+      query = query.andWhere('users.importedStatus', '=', importedStatus);
     }
 
     if (isPresent(roles)) {

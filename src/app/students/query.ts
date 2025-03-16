@@ -11,6 +11,7 @@ export const studentFragment = gql(`
     status
     role
     status
+    importedStatus
   }
 `);
 

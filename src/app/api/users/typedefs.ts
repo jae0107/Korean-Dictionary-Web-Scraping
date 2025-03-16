@@ -16,6 +16,11 @@ export const userTypeDefs = gql`
     SUPERADMIN
   }
 
+  enum UserImportedStatus {
+    IMPORTED
+    NOT_IMPORTED
+  }
+
   type OffsetPaginationPageInfo {
     totalRowCount: Int!
     pageCount: Int!
@@ -30,6 +35,7 @@ export const userTypeDefs = gql`
     statuses: [UserStatus!]
     roles: [UserRole!]!
     userName: String
+    importedStatus: UserImportedStatus
   }
 
   input RequestorFilterOptions {
@@ -53,6 +59,7 @@ export const userTypeDefs = gql`
     role: UserRole!
     status: UserStatus!
     previousStatus: UserStatus
+    importedStatus: UserImportedStatus
     words: [Word!]
     approvedCount: Int
     myVocabCount: Int

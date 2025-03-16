@@ -24,6 +24,7 @@ const AccountDetailPopUp = ({
     accountId: selectedData.accountId || '',
     role: selectedData.role || 'STUDENT',
     password: selectedData.password || '',
+    importedStatus: 'IMPORTED',
   };
 
   const handleClose = (id?: string) => {

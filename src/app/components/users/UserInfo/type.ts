@@ -6,5 +6,6 @@ export interface UserInfoProps {
   accountId: string;
   role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPERADMIN';
   status?: 'APPROVED' | 'PENDING' | 'DENIED';
+  importedStatus?: 'IMPORTED' | 'NOT_IMPORTED';
   password?: string;
 }

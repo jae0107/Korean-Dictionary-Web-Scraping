@@ -340,6 +340,7 @@ const StudentTable = ({
                 accountId: params.row.accountId,
                 role: params.row.role,
                 status: params.row.status,
+                importedStatus: params.row.importedStatus ? params.row.importedStatus : undefined,
               });
               setOpenStudentDetailPopUp(true);
             }}
@@ -351,11 +352,21 @@ const StudentTable = ({
     },
     actions
   ] : [
-    { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
-    { field: 'accountId', headerName: '아이디', flex: 3, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: 1, filterable: false, sortable: false },
+    { field: 'accountId', headerName: '아이디', flex: 1.5, filterable: false, sortable: false },
     { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
     { field: 'class', headerName: '반', flex: 1, filterable: false, sortable: false },
     { field: 'number', headerName: '번호', flex: 1, filterable: false, sortable: false },
+    { 
+      field: 'importedStatus', 
+      headerName: '등록 방식', 
+      flex: 1, 
+      filterable: false, 
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<StudentItemsFragment>) => {
+        return params.row.importedStatus === 'IMPORTED' ? '일괄 등록' : '수동 등록';
+      }
+    },
     actions,
   ];
 

@@ -92,7 +92,7 @@ const documents = {
     "\n  query GetWordRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...WordRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetWordRequestsDocument,
     "\n  fragment SingleStudentItems on User {\n    accountId\n    name\n    year\n    class\n    number\n    role\n  }\n": types.SingleStudentItemsFragmentDoc,
     "\n  query GetStudent($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleStudentItems\n    }\n  }\n": types.GetStudentDocument,
-    "\n  fragment StudentItems on User {\n    id\n    name\n    year\n    class\n    number\n    accountId\n    status\n    role\n    status\n  }\n": types.StudentItemsFragmentDoc,
+    "\n  fragment StudentItems on User {\n    id\n    name\n    year\n    class\n    number\n    accountId\n    status\n    role\n    status\n    importedStatus\n  }\n": types.StudentItemsFragmentDoc,
     "\n  query GetStudents($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...StudentItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetStudentsDocument,
     "\n  fragment SingleTeacherItems on User {\n    accountId\n    name\n    year\n    class\n    role\n  }\n": types.SingleTeacherItemsFragmentDoc,
     "\n  query GetTeacher($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      ...SingleTeacherItems\n    }\n  }\n": types.GetTeacherDocument,
@@ -437,7 +437,7 @@ export function gql(source: "\n  query GetStudent($getUserId: ID!) {\n    getUse
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment StudentItems on User {\n    id\n    name\n    year\n    class\n    number\n    accountId\n    status\n    role\n    status\n  }\n"): (typeof documents)["\n  fragment StudentItems on User {\n    id\n    name\n    year\n    class\n    number\n    accountId\n    status\n    role\n    status\n  }\n"];
+export function gql(source: "\n  fragment StudentItems on User {\n    id\n    name\n    year\n    class\n    number\n    accountId\n    status\n    role\n    status\n    importedStatus\n  }\n"): (typeof documents)["\n  fragment StudentItems on User {\n    id\n    name\n    year\n    class\n    number\n    accountId\n    status\n    role\n    status\n    importedStatus\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

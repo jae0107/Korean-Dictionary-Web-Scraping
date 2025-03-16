@@ -146,6 +146,7 @@ async function createUser(
       password: input.password || '',
       status: UserStatus.Pending,
       email: input.email || undefined,
+      importedStatus: 'NOT_IMPORTED',
     });
 
     return user;
@@ -169,6 +170,7 @@ async function bulkCreateUsers(
         role: user.role || '',
         password: user.password || '',
         status: UserStatus.Pending,
+        importedStatus: 'IMPORTED',
       })),
       { individualHooks: true }
     );

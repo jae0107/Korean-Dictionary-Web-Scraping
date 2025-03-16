@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { getStudentsQuery } from "./query";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
-import { UserRole, UserStatus } from "../generated/gql/graphql";
+import { UserImportedStatus, UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Box } from "@mui/material";
@@ -26,6 +26,7 @@ const StudentManagement = () => {
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [studentImportedStatus, setStudentImportedStatus] = useState<UserImportedStatus | null>(null);
 
   const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
@@ -41,6 +42,7 @@ const StudentManagement = () => {
           roles: [UserRole.Student],
           statuses: [studentStatus],
           userName: debouncedUserNameKeyWord,
+          importedStatus: studentImportedStatus,
         },
       },
       skip: session?.user.role === "STUDENT",
@@ -68,6 +70,8 @@ const StudentManagement = () => {
           studentStatus={studentStatus}
           setStudentStatus={setStudentStatus}
           setSelectedStudents={setSelectedStudents}
+          studentImportedStatus={studentImportedStatus}
+          setStudentImportedStatus={setStudentImportedStatus}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>

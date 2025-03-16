@@ -7,6 +7,8 @@ import { useMutation } from '@apollo/client';
 import { bulkAddMyVocabularyMutation } from './query';
 import { useState } from 'react';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
+import ConfirmDialog from '@/app/components/shared/ConfirmDialog';
+import { useRouter } from 'next/navigation';
 
 const FeedbackPopUp = ({
   openFeedback,
@@ -24,8 +26,10 @@ const FeedbackPopUp = ({
   isReal: boolean;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
+  const router = useRouter();
   
   const [getLoader, setLoader] = useState<boolean>(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
   
   const [bulkAddMyVocabulary] = useMutation(bulkAddMyVocabularyMutation);
 
@@ -46,7 +50,6 @@ const FeedbackPopUp = ({
         });
       },
       onCompleted: () => {
-        setOpenFeedback(false);
         setLoader(false);
         dispatchCurrentSnackBar({
           payload: {
@@ -77,103 +80,121 @@ const FeedbackPopUp = ({
     );
   };
 
+  const handleClose = (isConfirm: boolean) => {
+    if (isConfirm) {
+      setOpenConfirmDialog(false);
+      setOpenFeedback(false);
+      isReal ? router.push('/test-venues') : router.push('/');
+    } else {
+      setOpenConfirmDialog(false);
+    }
+  };
+
   return (
-    <Dialog
-      open={openFeedback}
-      onClose={() => setOpenFeedback(false)}
-      sx={{
-        '@media (max-width: 750px)': {
-          '& .MuiDialog-container': {
-            '& .MuiPaper-root': {
-               margin: 1,
+    <>
+      <ConfirmDialog
+        open={openConfirmDialog}
+        handleClose={handleClose}
+        title={'주의'}
+        content={`정말 닫으시겠습니까? 닫으시면 ${isReal ? '테스트 목록' : '홈'} 페이지로 이동하며, 피드백을 다시 확인할 수 없습니다.`}
+      />
+      <Dialog
+        open={openFeedback}
+        onClose={() => setOpenConfirmDialog(true)}
+        sx={{
+          '@media (max-width: 750px)': {
+            '& .MuiDialog-container': {
+              '& .MuiPaper-root': {
+                margin: 1,
+              }
             }
-          }
-        },
-      }}
-    >
-      <Box display={'flex'} justifyContent={'flex-end'}>
-        <IconButton onClick={() => setOpenFeedback(false)}>
-          <Close/>
-        </IconButton>
-      </Box>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0, pb: 2 }}>
-        모의 테스트 결과
-      </DialogTitle>
-      <DialogContent>
-        <Stack spacing={2}>
-          <DialogContentText>
-            {`점수: ${score}/${numOfTests}`}
-          </DialogContentText>
-          <Divider/>
-          {
-            getWrongWords.map((test, index) => (
-              <Stack spacing={2} key={index}>
-                <Stack spacing={1}>
-                  <DialogContentText>
-                    <b>단어:</b>{` ${test.correctAnswer}`}
-                  </DialogContentText>
+          },
+        }}
+      >
+        <Box display={'flex'} justifyContent={'flex-end'}>
+          <IconButton onClick={() => setOpenConfirmDialog(true)}>
+            <Close/>
+          </IconButton>
+        </Box>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0, pb: 2 }}>
+          모의 테스트 결과
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <DialogContentText>
+              {`점수: ${score}/${numOfTests}`}
+            </DialogContentText>
+            <Divider/>
+            {
+              getWrongWords.map((test, index) => (
+                <Stack spacing={2} key={index}>
+                  <Stack spacing={1}>
+                    <DialogContentText>
+                      <b>단어:</b>{` ${test.correctAnswer}`}
+                    </DialogContentText>
+                  </Stack>
+                  {
+                    test.korDicResults && test.korDicResults.length > 0 &&
+                    <>
+                      <Stack spacing={1} direction={'row'} alignItems={'center'}>
+                        <img 
+                          src={korDicLogo.src}
+                          style={{ 
+                            width: '2rem', 
+                            height: '2rem', 
+                            background: 'white',
+                            borderRadius: '50%',
+                            border: '1px solid #807c7c87',
+                          }}
+                        />
+                        <DialogContentText fontWeight={'bold'}>
+                          국립국어원
+                        </DialogContentText>
+                      </Stack>
+                      <Box>
+                        {getResults(test.korDicResults)}
+                      </Box>
+                    </>
+                  }
+                  {
+                    test.naverDicResults && test.naverDicResults.length > 0 &&
+                    <>
+                      <Stack spacing={1} direction={'row'} alignItems={'center'}>
+                        <img 
+                          src={naverLogo.src}
+                          style={{ 
+                            width: '2rem', 
+                            height: '2rem', 
+                            background: 'white',
+                            borderRadius: '50%',
+                            border: '1px solid #807c7c87',
+                          }}
+                        />
+                        <DialogContentText fontWeight={'bold'}>
+                          네이버
+                        </DialogContentText>
+                      </Stack>
+                      <Box>
+                        {getResults(test.naverDicResults)}
+                      </Box>
+                    </>
+                  }
+                  <Divider/>
                 </Stack>
-                {
-                  test.korDicResults && test.korDicResults.length > 0 &&
-                  <>
-                    <Stack spacing={1} direction={'row'} alignItems={'center'}>
-                      <img 
-                        src={korDicLogo.src}
-                        style={{ 
-                          width: '2rem', 
-                          height: '2rem', 
-                          background: 'white',
-                          borderRadius: '50%',
-                          border: '1px solid #807c7c87',
-                        }}
-                      />
-                      <DialogContentText fontWeight={'bold'}>
-                        국립국어원
-                      </DialogContentText>
-                    </Stack>
-                    <Box>
-                      {getResults(test.korDicResults)}
-                    </Box>
-                  </>
-                }
-                {
-                  test.naverDicResults && test.naverDicResults.length > 0 &&
-                  <>
-                    <Stack spacing={1} direction={'row'} alignItems={'center'}>
-                      <img 
-                        src={naverLogo.src}
-                        style={{ 
-                          width: '2rem', 
-                          height: '2rem', 
-                          background: 'white',
-                          borderRadius: '50%',
-                          border: '1px solid #807c7c87',
-                        }}
-                      />
-                      <DialogContentText fontWeight={'bold'}>
-                        네이버
-                      </DialogContentText>
-                    </Stack>
-                    <Box>
-                      {getResults(test.naverDicResults)}
-                    </Box>
-                  </>
-                }
-                <Divider/>
-              </Stack>
-            ))
+              ))
+            }
+          </Stack>
+        </DialogContent>
+        {
+          getWrongWords.length > 0 &&
+          <DialogActions sx={{ pr: 3, pb: 3 }}>
+            <Button variant="contained" onClick={onSubmit} loading={getLoader}>
+              단어장에 추가
+            </Button>
+          </DialogActions>
           }
-        </Stack>
-      </DialogContent>
-      {
-        getWrongWords.length > 0 &&
-        <DialogActions sx={{ pr: 3, pb: 3 }}>
-          <Button variant="contained" onClick={onSubmit} loading={getLoader}>
-            단어장에 추가
-          </Button>
-        </DialogActions>
-        }
-    </Dialog>
+      </Dialog>
+    </>
   );
 }
 
