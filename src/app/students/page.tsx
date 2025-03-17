@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { getStudentsQuery } from "./query";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
-import { UserImportedStatus, UserRole, UserStatus } from "../generated/gql/graphql";
+import { SortOptions, UserImportedStatus, UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Box } from "@mui/material";
@@ -27,6 +27,9 @@ const StudentManagement = () => {
   const [studentStatus, setStudentStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [studentImportedStatus, setStudentImportedStatus] = useState<UserImportedStatus | null>(null);
+  const [getNameSort, setNameSort] = useState<SortOptions | null>(null);
+  const [getYear, setYear] = useState<string>('');
+  const [getClass, setClass] = useState<string>('');
 
   const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
@@ -43,6 +46,9 @@ const StudentManagement = () => {
           statuses: [studentStatus],
           userName: debouncedUserNameKeyWord,
           importedStatus: studentImportedStatus,
+          nameSort: getNameSort,
+          year: parseInt(getYear),
+          class: getClass.toString(),
         },
       },
       skip: session?.user.role === "STUDENT",
@@ -72,6 +78,10 @@ const StudentManagement = () => {
           setSelectedStudents={setSelectedStudents}
           studentImportedStatus={studentImportedStatus}
           setStudentImportedStatus={setStudentImportedStatus}
+          getYear={getYear}
+          setYear={setYear}
+          getClass={getClass}
+          setClass={setClass}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
@@ -86,6 +96,7 @@ const StudentManagement = () => {
           refetch={refetch}
           selectedStudents={selectedStudents}
           setSelectedStudents={setSelectedStudents}
+          setNameSort={setNameSort}
         />
       </Box>
     </Box>

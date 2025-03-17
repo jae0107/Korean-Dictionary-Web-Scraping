@@ -3,7 +3,7 @@ import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, G
 import MuiPagination from '@mui/material/Pagination';
 import CustomNoRowsOverlay from "../../shared/CustomNoRowsOverlay";
 import { CheckCircleOutline, Create, DeleteForever, Groups, HighlightOff, Remove, Restore, Search } from "@mui/icons-material";
-import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
+import { RequestorItemsFragment, SortOptions, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
@@ -30,6 +30,7 @@ const RequestManagementTable = ({
   refetch,
   selectedRequests,
   setSelectedRequests,
+  setTitleSort,
 } : {
   loading: boolean;
   words: WordRequestItemsFragment[];
@@ -47,6 +48,7 @@ const RequestManagementTable = ({
   refetch: () => void;
   selectedRequests: string[];
   setSelectedRequests: (value: string[]) => void;
+  setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const maxWidth360 = useMediaQuery('(max-width:360px)');
@@ -393,7 +395,6 @@ const RequestManagementTable = ({
       headerName: '단어', 
       width: 120, 
       filterable: false, 
-      sortable: false,
       flex: maxWidth750 ? 1 : 0,
     },
     { 
@@ -449,7 +450,6 @@ const RequestManagementTable = ({
       headerName: '단어', 
       width: 120, 
       filterable: false, 
-      sortable: false,
     },
     { 
       field: 'korDicResults', 
@@ -690,6 +690,13 @@ const RequestManagementTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setTitleSort(null);
+          } else if (newSortModel[0].field === 'title') {
+            setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

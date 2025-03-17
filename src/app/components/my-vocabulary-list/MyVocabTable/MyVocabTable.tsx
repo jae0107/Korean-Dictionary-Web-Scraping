@@ -1,4 +1,4 @@
-import { MyVocabularyItemsFragment } from "@/app/generated/gql/graphql";
+import { MyVocabularyItemsFragment, SortOptions } from "@/app/generated/gql/graphql";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -16,6 +16,7 @@ const MyVocabTable = ({
   page,
   paginationModel,
   setPaginationModel,
+  setTitleSort,
 }: {
   loading: boolean;
   words: MyVocabularyItemsFragment[];
@@ -29,6 +30,7 @@ const MyVocabTable = ({
     page: number;
     pageSize: number;
   }>>;
+  setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const maxWidth750 = useMediaQuery('(max-width:750px)');
   const maxWidth475 = useMediaQuery('(max-width:475px)');
@@ -80,7 +82,7 @@ const MyVocabTable = ({
         return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
-    { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
+    { field: 'title', headerName: '단어', width: 120, filterable: false },
     { 
       field: 'korDicResults', 
       headerClassName: 'korDic-header',
@@ -209,6 +211,13 @@ const MyVocabTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setTitleSort(null);
+          } else if (newSortModel[0].field === 'title') {
+            setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

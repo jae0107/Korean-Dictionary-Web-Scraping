@@ -1,4 +1,4 @@
-import { StudentItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
+import { SortOptions, StudentItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Restore, Visibility } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Tooltip, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
@@ -25,6 +25,7 @@ const StudentTable = ({
   refetch,
   selectedStudents,
   setSelectedStudents,
+  setNameSort,
 }: {
   loading: boolean;
   students: StudentItemsFragment[];
@@ -42,6 +43,7 @@ const StudentTable = ({
   refetch: () => void;
   selectedStudents: string[];
   setSelectedStudents: (value: string[]) => void;
+  setNameSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -317,7 +319,7 @@ const StudentTable = ({
   };
   
   const columns: GridColDef[] = maxWidth750 ? [
-    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false, sortable: false, },
+    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false },
     { 
       field: 'detail', 
       headerName: '더보기', 
@@ -352,7 +354,7 @@ const StudentTable = ({
     },
     actions
   ] : [
-    { field: 'name', headerName: '이름', flex: 1, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: 1, filterable: false },
     { field: 'accountId', headerName: '아이디', flex: 1.5, filterable: false, sortable: false },
     { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
     { field: 'class', headerName: '반', flex: 1, filterable: false, sortable: false },
@@ -456,6 +458,13 @@ const StudentTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setNameSort(null);
+          } else if (newSortModel[0].field === 'name') {
+            setNameSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

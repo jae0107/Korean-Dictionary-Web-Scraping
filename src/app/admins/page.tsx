@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
 import { useState } from "react";
-import { UserRole, UserStatus } from "../generated/gql/graphql";
+import { SortOptions, UserRole, UserStatus } from "../generated/gql/graphql";
 import { Box } from "@mui/material";
 import { useQuery } from "@apollo/client";
 import { getAdminsQuery } from "./query";
@@ -26,6 +26,7 @@ const AdminManagement = () => {
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [adminStatus, setAdminStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
+  const [getNameSort, setNameSort] = useState<SortOptions | null>(null);
 
   const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
@@ -41,6 +42,7 @@ const AdminManagement = () => {
           roles: [UserRole.Admin, UserRole.Superadmin],
           statuses: [adminStatus],
           userName: debouncedUserNameKeyWord,
+          nameSort: getNameSort,
         },
       },
       skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
@@ -83,6 +85,7 @@ const AdminManagement = () => {
           selectedAdmins={selectedAdmins}
           setSelectedAdmins={setSelectedAdmins}
           myRole={session?.user.role}
+          setNameSort={setNameSort}
         />
       </Box>
     </Box>

@@ -1,4 +1,4 @@
-import { UserRequestItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
+import { SortOptions, UserRequestItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const UserContainer = ({
   userRequests,
   pageInfo,
   loading,
+  setTitleSort,
 } : {
   wordRequestStatus: WordStatus;
   setWordRequestStatus: (value: WordStatus) => void;
@@ -53,6 +54,7 @@ const UserContainer = ({
     pageCount: number,
   };
   loading: boolean;
+  setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -373,7 +375,6 @@ const UserContainer = ({
       headerName: '단어', 
       width: 120, 
       filterable: false, 
-      sortable: false,
       flex: maxWidth750 ? 1 : 0,
     },
     { 
@@ -422,7 +423,7 @@ const UserContainer = ({
         return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
-    { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
+    { field: 'title', headerName: '단어', width: 120, filterable: false },
     { 
       field: 'korDicResults', 
       headerName: '국립국어원', 
@@ -685,6 +686,13 @@ const UserContainer = ({
             onPaginationModelChange={(values, details) => {
               if (!details.reason) return;
               setPaginationModel(values);
+            }}
+            onSortModelChange={(newSortModel) => {
+              if (newSortModel.length === 0) {
+                setTitleSort(null);
+              } else if (newSortModel[0].field === 'title') {
+                setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+              }
             }}
             getRowHeight={() => 'auto'}
             slots={{

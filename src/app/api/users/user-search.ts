@@ -1,4 +1,4 @@
-import { OffsetPaginationOptions, UserFilterOptions } from "../../generated/gql/graphql";
+import { OffsetPaginationOptions, SortOptions, UserFilterOptions } from "../../generated/gql/graphql";
 import { User } from "../models";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { QueryBuilder, queryBuilder, sequelize } from "../initialisers";
@@ -18,7 +18,7 @@ export class UserSearch {
 
   async process(): Promise<OffsetPaginationResponse<User>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { statuses, roles, userName, importedStatus } = this.filterOptions;
+    const { statuses, roles, userName, importedStatus, nameSort, year, class: className } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('users');
 
@@ -35,6 +35,14 @@ export class UserSearch {
 
     if (isPresent(roles)) {
       query = query.andWhere('users.role', 'in', roles);
+    }
+
+    if (isPresent(year) && year) {
+      query = query.andWhere('users.year', '=', year);
+    }
+
+    if (isPresent(className) && className) {
+      query = query.andWhere('users.class', '=', className);
     }
 
     if (isPresent(userName)) {
@@ -63,6 +71,14 @@ export class UserSearch {
     query = query.orderBy('createdAt', 'desc');
 
     query = query.orderBy('users.createdAt', 'asc');
+
+    if (isPresent(nameSort) && nameSort) {
+      if (nameSort === SortOptions.Asc) {
+        query = query.orderBy('users.name', 'asc');
+      } else if (nameSort === SortOptions.Desc) {
+        query = query.orderBy('users.name', 'desc');
+      }
+    }
 
     query = query.limit(limit).offset(pageNum * limit);
 

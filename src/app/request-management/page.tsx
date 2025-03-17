@@ -5,7 +5,7 @@ import { getWordRequestsQuery } from "./query";
 import { useQuery } from "@apollo/client";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useState } from "react";
-import { WordStatus } from "../generated/gql/graphql";
+import { SortOptions, WordStatus } from "../generated/gql/graphql";
 import { useSnackbar } from "../hooks/useSnackbar";
 import RequestManagementTable from "../components/request-management/RequestManagementTable/RequestManagementTable";
 import RequestManagementFilter from "../components/request-management/RequestManagementFilter/RequestManagementFilter";
@@ -29,6 +29,7 @@ const RequestManagement = () => {
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
+  const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   
@@ -46,6 +47,7 @@ const RequestManagement = () => {
           requestorId: getRequestorId,
           year: parseInt(getYear),
           class: getClass.toString(),
+          titleSort: getTitleSort,
         },
       },
       skip: session?.user.role === "STUDENT",
@@ -92,6 +94,7 @@ const RequestManagement = () => {
           refetch={refetch}
           selectedRequests={selectedRequests}
           setSelectedRequests={setSelectedRequests}
+          setTitleSort={setTitleSort}
         />
       </Box>
     </Box>

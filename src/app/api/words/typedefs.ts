@@ -8,6 +8,11 @@ export const wordTypeDefs = gql`
     DENIED
   }
 
+  enum SortOptions {
+    ASC
+    DESC
+  }
+
   input WordFilterOptions {
     status: WordStatus!
     word: String
@@ -15,6 +20,7 @@ export const wordTypeDefs = gql`
     year: Int
     class: String
     page: Int
+    titleSort: SortOptions
   }
 
   type Word {

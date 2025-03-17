@@ -1,4 +1,4 @@
-import { TeacherItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
+import { SortOptions, TeacherItemsFragment, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Restore, Visibility } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
@@ -25,6 +25,7 @@ const TeacherTable = ({
   refetch,
   selectedTeachers,
   setSelectedTeachers,
+  setNameSort,
 }: {
   loading: boolean;
   teachers: TeacherItemsFragment[];
@@ -42,6 +43,7 @@ const TeacherTable = ({
   refetch: () => void;
   selectedTeachers: string[];
   setSelectedTeachers: (value: string[]) => void;
+  setNameSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -317,7 +319,7 @@ const TeacherTable = ({
   };
   
   const columns: GridColDef[] = maxWidth750 ? [
-    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false },
     { 
       field: 'detail', 
       headerName: '더보기', 
@@ -350,7 +352,7 @@ const TeacherTable = ({
     },
     actions
   ] : [
-    { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: 2, filterable: false },
     { field: 'accountId', headerName: '아이디', flex: 3, filterable: false, sortable: false },
     { 
       field: 'year', 
@@ -369,7 +371,7 @@ const TeacherTable = ({
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<TeacherItemsFragment>) => {
-        return params.row.class ? params.row.class : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        return params.row.class && params.row.class !== '0' ? params.row.class : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
       },
     },
     actions,
@@ -461,6 +463,13 @@ const TeacherTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setNameSort(null);
+          } else if (newSortModel[0].field === 'name') {
+            setNameSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

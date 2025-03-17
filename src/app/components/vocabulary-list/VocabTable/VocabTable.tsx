@@ -1,4 +1,4 @@
-import { VocabularyItemsFragment } from "@/app/generated/gql/graphql";
+import { SortOptions, VocabularyItemsFragment } from "@/app/generated/gql/graphql";
 import { DataGrid, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import korDicLogo from "../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../assets/images/naverLogo.png";
@@ -21,6 +21,7 @@ const VocabTable = ({
   paginationModel,
   setPaginationModel,
   refetch,
+  setTitleSort,
 }: {
   loading: boolean;
   words: VocabularyItemsFragment[];
@@ -35,6 +36,7 @@ const VocabTable = ({
     pageSize: number;
   }>>;
   refetch: () => void;
+  setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const maxWidth750 = useMediaQuery('(max-width:750px)');
@@ -184,7 +186,7 @@ const VocabTable = ({
         return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
-    { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
+    { field: 'title', headerName: '단어', width: 120, filterable: false },
     { 
       field: 'korDicResults', 
       headerClassName: 'korDic-header',
@@ -314,6 +316,13 @@ const VocabTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setTitleSort(null);
+          } else if (newSortModel[0].field === 'title') {
+            setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

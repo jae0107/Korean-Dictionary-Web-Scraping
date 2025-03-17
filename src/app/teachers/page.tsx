@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
 import { use, useState } from "react";
-import { UserRole, UserStatus } from "../generated/gql/graphql";
+import { SortOptions, UserRole, UserStatus } from "../generated/gql/graphql";
 import { useQuery } from "@apollo/client";
 import { getTeachersQuery } from "./query";
 import { Box } from "@mui/material";
@@ -26,6 +26,7 @@ const TeacherManagement = () => {
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
   const [teacherStatus, setTeacherStatus] = useState<UserStatus>(searchParams.get('status') as UserStatus || UserStatus.Approved);
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+  const [getNameSort, setNameSort] = useState<SortOptions | null>(null);
 
   const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
@@ -41,6 +42,7 @@ const TeacherManagement = () => {
           roles: [UserRole.Teacher],
           statuses: [teacherStatus],
           userName: debouncedUserNameKeyWord,
+          nameSort: getNameSort,
         },
       },
       skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
@@ -82,6 +84,7 @@ const TeacherManagement = () => {
           refetch={refetch}
           selectedTeachers={selectedTeachers}
           setSelectedTeachers={setSelectedTeachers}
+          setNameSort={setNameSort}
         />
       </Box>
     </Box>

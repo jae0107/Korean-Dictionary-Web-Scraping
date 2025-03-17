@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
 import { getUserStatsQuery } from "./query";
-import { UserRole, UserStatus } from "../generated/gql/graphql";
+import { SortOptions, UserRole, UserStatus } from "../generated/gql/graphql";
 import { useState } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import AccessDenied from "../components/shared/AccessDenied";
@@ -13,6 +13,7 @@ import { Cancel } from "@mui/icons-material";
 import UserStatTable from "../components/user-stats/UserStatTable/UserStatTable";
 import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 import { useSession } from "next-auth/react";
+import UserStatFilter from "../components/user-stats/UserStatFilter/UserStatFilter";
 
 const UserStats = () => {
   useCheckSessionVersion();
@@ -22,6 +23,9 @@ const UserStats = () => {
   const { dispatchCurrentSnackBar } = useSnackbar();
 
   const [userNameKeyword, setUserNameKeyword] = useState<string>('');
+  const [getNameSort, setNameSort] = useState<SortOptions | null>(null);
+  const [getYear, setYear] = useState<string>('');
+  const [getClass, setClass] = useState<string>('');
 
   const debouncedUserNameKeyWord = useDebounce(userNameKeyword, 500);
 
@@ -37,6 +41,9 @@ const UserStats = () => {
           roles: [UserRole.Student],
           statuses: [UserStatus.Approved],
           userName: debouncedUserNameKeyWord,
+          nameSort: getNameSort,
+          year: parseInt(getYear),
+          class: getClass.toString(),
         },
         isUserStat: true,
       },
@@ -58,35 +65,14 @@ const UserStats = () => {
 
   return (
     <Stack spacing={2} width={'100%'} display={'flex'} justifyContent={'center'} flexDirection={'column'} alignItems={'center'}>
-      <Box width={'90%'}>
-        <TextField
-          label="이름 검색"
-          value={userNameKeyword}
-          onChange={(e) => setUserNameKeyword(e.target.value)}
-          sx={{ 
-            width: '250px',
-            '@media (max-width:600px)': {
-              width: '100%',
-            }
-          }}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setUserNameKeyword('')}>
-                    <Cancel sx={{ width: '15px', height: '15px' }}/>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-            htmlInput: {
-              sx: {
-                '@media (max-width:600px)': {
-                  fontSize: '0.8rem',
-                }
-              },
-            },
-          }}
+      <Box display={'flex'} justifyContent={'center'}  width={'100%'}>
+        <UserStatFilter
+          userNameKeyword={userNameKeyword}
+          setUserNameKeyword={setUserNameKeyword}
+          getYear={getYear}
+          setYear={setYear}
+          getClass={getClass}
+          setClass={setClass}
         />
       </Box>
       <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'} mb={2}>
@@ -98,6 +84,7 @@ const UserStats = () => {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           maxNumTest={data?.getUsers.maxNumTest || 0}
+          setNameSort={setNameSort}
         />
       </Box>
     </Stack>

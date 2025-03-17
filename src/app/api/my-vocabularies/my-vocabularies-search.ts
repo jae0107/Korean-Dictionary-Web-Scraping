@@ -1,4 +1,4 @@
-import { OffsetPaginationOptions, MyVocabularyFilterOptions } from "../../generated/gql/graphql";
+import { OffsetPaginationOptions, MyVocabularyFilterOptions, SortOptions } from "../../generated/gql/graphql";
 import { MyVocabulary } from "../models";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { QueryBuilder, queryBuilder, sequelize } from "../initialisers";
@@ -18,7 +18,7 @@ export class MyVocabularySearch {
 
   async process(): Promise<OffsetPaginationResponse<MyVocabulary>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { word, userId, page } = this.filterOptions;
+    const { word, userId, page, titleSort } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('myVocabularies');
 
@@ -61,6 +61,14 @@ export class MyVocabularySearch {
     const pageCount = Math.ceil(totalRowCount / limit);
 
     query = query.orderBy('myVocabularies.createdAt', 'desc');
+
+    if (isPresent(titleSort) && titleSort) {
+      if (titleSort === SortOptions.Asc) {
+        query = query.orderBy('words.title', 'asc');
+      } else if (titleSort === SortOptions.Desc) {
+        query = query.orderBy('words.title', 'desc');
+      }
+    }
 
     query = query.limit(limit).offset(pageNum * limit);
 

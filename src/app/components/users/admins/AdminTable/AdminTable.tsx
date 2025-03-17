@@ -1,4 +1,4 @@
-import { AdminItemsFragment, UserRole, UserStatus } from "@/app/generated/gql/graphql";
+import { AdminItemsFragment, SortOptions, UserRole, UserStatus } from "@/app/generated/gql/graphql";
 import { CheckCircleOutline, DeleteForever, HighlightOff, Restore, Visibility } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridPagination, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
@@ -26,6 +26,7 @@ const AdminTable = ({
   selectedAdmins,
   setSelectedAdmins,
   myRole,
+  setNameSort,
 }: {
   loading: boolean;
   admins: AdminItemsFragment[];
@@ -44,6 +45,7 @@ const AdminTable = ({
   selectedAdmins: string[];
   setSelectedAdmins: (value: string[]) => void;
   myRole: string | undefined;
+  setNameSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const router = useRouter();
   const { dispatchCurrentSnackBar } = useSnackbar();
@@ -327,7 +329,7 @@ const AdminTable = ({
   };
   
   const columns: GridColDef[] = maxWidth750 ? [
-    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: maxWidth750 ? 1 : 2, filterable: false },
     { 
       field: 'detail', 
       headerName: '더보기', 
@@ -360,7 +362,7 @@ const AdminTable = ({
     },
     actions,
   ] : [
-    { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: 2, filterable: false },
     { field: 'accountId', headerName: '아이디', flex: 3, filterable: false, sortable: false },
     { 
       field: 'year', 
@@ -379,7 +381,7 @@ const AdminTable = ({
       filterable: false, 
       sortable: false,
       renderCell: (params: GridRenderCellParams<AdminItemsFragment>) => {
-        return params.row.class ? params.row.class : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
+        return params.row.class && params.row.class !== '0' ? params.row.class : <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
       },
     },
     actions,
@@ -472,6 +474,13 @@ const AdminTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setNameSort(null);
+          } else if (newSortModel[0].field === 'name') {
+            setNameSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

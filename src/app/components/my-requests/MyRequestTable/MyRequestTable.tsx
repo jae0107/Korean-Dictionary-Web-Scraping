@@ -1,4 +1,4 @@
-import { MyRequestItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
+import { MyRequestItemsFragment, SortOptions, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
 import { Cancel, Edit, Search } from "@mui/icons-material";
 import { Box, Button, CircularProgress, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridColumnVisibilityModel, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
@@ -28,6 +28,7 @@ const MyRequestTable = ({
   refetch,
   selectedRequests,
   setSelectedRequests,
+  setTitleSort,
 }: {
   loading: boolean;
   words: MyRequestItemsFragment[];
@@ -45,6 +46,7 @@ const MyRequestTable = ({
   refetch: () => void;
   selectedRequests: string[];
   setSelectedRequests: (value: string[]) => void;
+  setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const router = useRouter();
@@ -95,7 +97,7 @@ const MyRequestTable = ({
         return params.row.pages.map((page) => `• ${page}\n`);
       }
     },
-    { field: 'title', headerName: '단어', width: 120, filterable: false, sortable: false },
+    { field: 'title', headerName: '단어', width: 120, filterable: false },
     { 
       field: 'korDicResults', 
       headerName: '국립국어원', 
@@ -358,6 +360,13 @@ const MyRequestTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setTitleSort(null);
+          } else if (newSortModel[0].field === 'title') {
+            setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 'auto'}
         slots={{

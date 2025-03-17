@@ -10,6 +10,7 @@ import { Box, Stack } from "@mui/material";
 import MyVocabFilter from "../components/my-vocabulary-list/MyVocabFilter/MyVocabFilter";
 import MyVocabTable from "../components/my-vocabulary-list/MyVocabTable/MyVocabTable";
 import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
+import { SortOptions } from "../generated/gql/graphql";
 
 const MyVocabularyList = () => {
   useCheckSessionVersion(true);
@@ -19,6 +20,7 @@ const MyVocabularyList = () => {
 
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [getPage, setPage] = useState<number | null>(null);
+  const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   const debouncedPage = useDebounce(getPage, 500);
@@ -34,6 +36,7 @@ const MyVocabularyList = () => {
         filterOptions: {
           page: debouncedPage,
           word: debouncedWordKeyWord,
+          titleSort: getTitleSort,
         },
       },
       onError: (error) => {
@@ -66,6 +69,7 @@ const MyVocabularyList = () => {
             page={paginationModel.page}
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
+            setTitleSort={setTitleSort}
           />
         </Box>
       </Stack>

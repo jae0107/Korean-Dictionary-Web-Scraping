@@ -1,4 +1,4 @@
-import { OffsetPaginationOptions, WordFilterOptions } from "../../generated/gql/graphql";
+import { OffsetPaginationOptions, SortOptions, WordFilterOptions } from "../../generated/gql/graphql";
 import { Word } from "../models";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { knex, QueryBuilder, queryBuilder, sequelize } from "../initialisers";
@@ -18,7 +18,7 @@ export class WordSearch {
 
   async process(): Promise<OffsetPaginationResponse<Word>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { status, word, requestorId, year, class: className, page } = this.filterOptions;
+    const { status, word, requestorId, year, class: className, page, titleSort } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('words');
 
@@ -92,6 +92,14 @@ export class WordSearch {
       { column: 'words.createdAt', order: 'desc' },
       { column: 'words.title', order: 'asc' }
     ]);
+
+    if (isPresent(titleSort) && titleSort) {
+      if (titleSort === SortOptions.Asc) {
+        query = query.orderBy('words.title', 'asc');
+      } else if (titleSort === SortOptions.Desc) {
+        query = query.orderBy('words.title', 'desc');
+      }
+    }
 
     query = query.limit(limit).offset(pageNum * limit);
 

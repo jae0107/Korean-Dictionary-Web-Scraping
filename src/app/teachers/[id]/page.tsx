@@ -1,6 +1,6 @@
 'use client'
 
-import { UserInput, UserRole, WordStatus } from '@/app/generated/gql/graphql';
+import { SortOptions, UserInput, UserRole, WordStatus } from '@/app/generated/gql/graphql';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
 import { useQuery } from '@apollo/client';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -28,6 +28,7 @@ const SingleTeacher = () => {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
+  const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
 
   const { data, loading, refetch } = useQuery(getTeacherQuery, {
     fetchPolicy: 'network-only',
@@ -65,6 +66,7 @@ const SingleTeacher = () => {
         filterOptions: {
           status: wordRequestStatus,
           requestorId: id,
+          titleSort: getTitleSort,
         },
       },
       skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
@@ -111,6 +113,7 @@ const SingleTeacher = () => {
         userRequests={userRequestData ? userRequestData.getWords.records : []}
         pageInfo={userRequestData ? userRequestData.getWords.pageInfo : { totalRowCount:0, pageCount: 0 }}
         loading={userRequestLoading}
+        setTitleSort={setTitleSort}
       />
     </Box>
   );

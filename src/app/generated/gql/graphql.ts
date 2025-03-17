@@ -319,6 +319,7 @@ export type MyVocabulary = {
 
 export type MyVocabularyFilterOptions = {
   page?: InputMaybe<Scalars['Int']['input']>;
+  titleSort?: InputMaybe<SortOptions>;
   userId?: InputMaybe<Scalars['ID']['input']>;
   word?: InputMaybe<Scalars['String']['input']>;
 };
@@ -489,6 +490,11 @@ export type RequestorFilterOptions = {
   userName?: InputMaybe<Scalars['String']['input']>;
 };
 
+export enum SortOptions {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
+
 export type TestResult = {
   __typename: 'TestResult';
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -563,10 +569,13 @@ export type User = {
 };
 
 export type UserFilterOptions = {
+  class?: InputMaybe<Scalars['String']['input']>;
   importedStatus?: InputMaybe<UserImportedStatus>;
+  nameSort?: InputMaybe<SortOptions>;
   roles: Array<UserRole>;
   statuses?: InputMaybe<Array<UserStatus>>;
   userName?: InputMaybe<Scalars['String']['input']>;
+  year?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export enum UserImportedStatus {
@@ -634,6 +643,7 @@ export type WordFilterOptions = {
   page?: InputMaybe<Scalars['Int']['input']>;
   requestorId?: InputMaybe<Scalars['ID']['input']>;
   status: WordStatus;
+  titleSort?: InputMaybe<SortOptions>;
   word?: InputMaybe<Scalars['String']['input']>;
   year?: InputMaybe<Scalars['Int']['input']>;
 };

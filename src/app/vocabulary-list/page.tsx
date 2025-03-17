@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { getVocabulariesQuery } from "./query";
 import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
-import { WordStatus } from "../generated/gql/graphql";
+import { SortOptions, WordStatus } from "../generated/gql/graphql";
 import { useState } from "react";
 import { Box, Stack } from "@mui/material";
 import VocabFilter from "../components/vocabulary-list/VocabFilter/VocabFilter";
@@ -22,6 +22,7 @@ const VocabularyList = () => {
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
   const [getPage, setPage] = useState<number | null>(null);
+  const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   const debouncedPage = useDebounce(getPage, 500);
@@ -40,6 +41,7 @@ const VocabularyList = () => {
           year: parseInt(getYear),
           class: getClass.toString(),
           page: debouncedPage,
+          titleSort: getTitleSort,
         },
       },
       onError: (error) => {
@@ -77,6 +79,7 @@ const VocabularyList = () => {
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
             refetch={refetch}
+            setTitleSort={setTitleSort}
           />
         </Box>
       </Stack>

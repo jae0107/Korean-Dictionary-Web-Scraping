@@ -6,7 +6,7 @@ import usePaginationModel from "../hooks/usePaginationModel";
 import { useSnackbar } from "../hooks/useSnackbar";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { WordStatus } from "../generated/gql/graphql";
+import { SortOptions, WordStatus } from "../generated/gql/graphql";
 import { Box } from "@mui/material";
 import MyRequestFilter from "../components/my-requests/MyRequestFilter/MyRequestFilter";
 import MyRequestTable from "../components/my-requests/MyRequestTable/MyRequestTable";
@@ -23,6 +23,7 @@ const MyRequests = () => {
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
+  const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
 
@@ -37,6 +38,7 @@ const MyRequests = () => {
         filterOptions: {
           status: wordRequestStatus,
           word: debouncedWordKeyWord,
+          titleSort: getTitleSort,
         },
       },
       onError: (error) => {
@@ -73,6 +75,7 @@ const MyRequests = () => {
           refetch={refetch}
           selectedRequests={selectedRequests}
           setSelectedRequests={setSelectedRequests}
+          setTitleSort={setTitleSort}
         />
       </Box>
     </Box>

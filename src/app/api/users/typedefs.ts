@@ -36,6 +36,9 @@ export const userTypeDefs = gql`
     roles: [UserRole!]!
     userName: String
     importedStatus: UserImportedStatus
+    nameSort: SortOptions
+    year: Int
+    class: String
   }
 
   input RequestorFilterOptions {

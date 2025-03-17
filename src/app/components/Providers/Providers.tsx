@@ -89,7 +89,12 @@ const Providers = ({ children } : { children: ReactNode }) => {
                   display: 'none',
                 },
                 '& .MuiDataGrid-virtualScroller': {
-                  overflow: 'hidden',
+                  overflowY: 'hidden',
+                },
+                '& .MuiDataGrid-columnHeaderTitleContainerContent .MuiDataGrid-columnHeaderTitle': {
+                  textOverflow: 'unset',
+                  whiteSpace: 'normal',
+                  wordWrap: 'break-word',
                 }
               },
             }

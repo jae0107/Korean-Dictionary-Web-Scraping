@@ -1,4 +1,4 @@
-import { UserStatItemsFragment } from "@/app/generated/gql/graphql";
+import { SortOptions, UserStatItemsFragment } from "@/app/generated/gql/graphql";
 import { Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridPagination, GridRenderCellParams } from "@mui/x-data-grid";
 import { Dispatch, SetStateAction } from "react";
@@ -15,6 +15,7 @@ const UserStatTable = ({
   paginationModel,
   setPaginationModel,
   maxNumTest,
+  setNameSort,
 } : {
   loading: boolean;
   students: UserStatItemsFragment[];
@@ -29,6 +30,7 @@ const UserStatTable = ({
     pageSize: number;
   }>>;
   maxNumTest: number;
+  setNameSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const maxNumTestCols : GridColDef[] = Array.from({length: maxNumTest}, (_, i) => {
     return {
@@ -61,7 +63,7 @@ const UserStatTable = ({
   });
 
   const columns: GridColDef[] = [
-    { field: 'name', headerName: '이름', flex: 2, filterable: false, sortable: false },
+    { field: 'name', headerName: '이름', flex: 2, filterable: false },
     { field: 'year', headerName: '학년', flex: 1, filterable: false, sortable: false },
     { field: 'class', headerName: '반', flex: 1, filterable: false, sortable: false },
     { field: 'number', headerName: '번호', flex: 1, filterable: false, sortable: false },
@@ -100,6 +102,13 @@ const UserStatTable = ({
         onPaginationModelChange={(values, details) => {
           if (!details.reason) return;
           setPaginationModel(values);
+        }}
+        onSortModelChange={(newSortModel) => {
+          if (newSortModel.length === 0) {
+            setNameSort(null);
+          } else if (newSortModel[0].field === 'name') {
+            setNameSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+          }
         }}
         getRowHeight={() => 43}
         slots={{
