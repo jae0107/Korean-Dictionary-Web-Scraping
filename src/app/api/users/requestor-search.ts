@@ -21,16 +21,19 @@ export class RequestorSearch {
     const { limit, pageNum } = this.paginationOptions;
     const { userName } = this.filterOptions;
 
-    let query: QueryBuilder = queryBuilder('words');
+    let query: QueryBuilder = queryBuilder('users');
 
     query = query
       .select('users.*')
-      .distinct()
-      .leftJoin(
-        knex.raw('LATERAL jsonb_array_elements_text(to_jsonb(words."requestorIds")) AS "requestorId" ON true')
-      )
-      .leftJoin('users', 'users.id', knex.raw('"requestorId"::uuid'))
-      .where('users.name', 'is not', null);
+      .whereExists(function () {
+        this.select(1)
+          .from('words')
+          .crossJoin(
+            knex.raw('LATERAL jsonb_array_elements_text(to_jsonb(words."requestorIds")) AS "requestorId"')
+          )
+          .whereRaw('"users".id = "requestorId"::uuid')
+          .andWhere('users.name', 'is not', null);
+      });
 
     if (isPresent(userName)) {
       query = query
@@ -51,10 +54,12 @@ export class RequestorSearch {
 
     if (isPresent(limit)) {
       const countQuery = query.clone();
-      const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('users.id').toString())) as [
+
+      const [results] = (await sequelize.query(countQuery.clearSelect().count('* as count').toString())) as [
         [{ count: string }],
         unknown,
       ];
+
       totalRowCount = parseInt(results[0].count, 10);
       pageCount = Math.ceil(totalRowCount / limit);
 

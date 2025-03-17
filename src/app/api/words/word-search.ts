@@ -24,15 +24,24 @@ export class WordSearch {
 
     query = query
       .select('words.*')
-      .distinct()
-      .leftJoin(
-        knex.raw(
-          `LATERAL (
-            SELECT jsonb_array_elements_text(to_jsonb(words."requestorIds")) AS "requestorId"
-          ) AS expanded_requestor ON true`
-        )
-      )
-      .leftJoin('users', 'users.id', knex.raw('expanded_requestor."requestorId"::uuid'));
+      .where(function() {
+        this.whereExists(function() {
+          this.select(1)
+            .from('users')
+            .leftJoin(
+              knex.raw(
+                `LATERAL (
+                  SELECT jsonb_array_elements_text(to_jsonb(words."requestorIds")) AS "requestorId"
+                  WHERE words."requestorIds" IS NOT NULL 
+                    AND jsonb_array_length(to_jsonb(words."requestorIds")) > 0
+                ) AS expanded_requestor ON true`
+              )
+            )
+            .whereRaw('users.id = expanded_requestor."requestorId"::uuid');
+        })
+        .orWhere('words.requestorIds', null)
+        .orWhereRaw('jsonb_array_length(to_jsonb(words."requestorIds")) = 0');
+      });
 
     if (isPresent(status)) {
       query = query.andWhere('words.status', '=', status);
@@ -69,10 +78,12 @@ export class WordSearch {
     }
 
     const countQuery = query.clone();
-    const [results] = (await sequelize.query(countQuery.clearSelect().countDistinct('words.id').toString())) as [
+
+    const [results] = (await sequelize.query(countQuery.clearSelect().select(knex.raw('count(*)')).toString())) as [
       [{ count: string }],
       unknown,
     ];
+
     const totalRowCount = parseInt(results[0].count, 10);
 
     const pageCount = Math.ceil(totalRowCount / limit);
