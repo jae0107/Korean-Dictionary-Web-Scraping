@@ -121,17 +121,6 @@ User.addHook('beforeSave', 'hashPassword', async (user: User) => {
   }
 });
 
-User.addHook('beforeBulkCreate', 'bulkHashPassword', async (users: User[]) => {
-  for (const user of users) {
-    if (user.changed('password')) {
-      if (!user.password.startsWith("$2b$")) {  // bcrypt 해시인지 확인
-        user.password = await bcrypt.hash(user.password, 10);
-      }
-      user.sessionVersion = (user.sessionVersion || 0) + 1;
-    }
-  }
-});
-
 User.addHook('beforeDestroy', 'delete my vocabularies', async (user: User) => {
   await TestResult.destroy({
     where: {

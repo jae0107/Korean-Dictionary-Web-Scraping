@@ -1,6 +1,6 @@
 import { WordByTitleItemsFragment, WordInput } from "@/app/generated/gql/graphql";
 import { AddCircle, ArrowRightAlt, Cancel, Close, DeleteForever, MenuBook } from "@mui/icons-material";
-import { Box, Button, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputAdornment, Link, List, ListItem, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { FieldErrors, SubmitErrorHandler, UseFormReturn } from "react-hook-form";
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
@@ -29,7 +29,7 @@ const MergeWordPopUp = ({
   setLoader: (value: boolean) => void;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
-  
+
   const [getKorDic, setKorDic] = useState<string>('');
   const [getNaverDic, setNaverDic] = useState<string>('');
 
@@ -457,29 +457,61 @@ const MergeWordPopUp = ({
         </IconButton>
       </Box>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0, pb: 2 }}>
-        <MenuBook color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/> {existingWord?.title}
+        <MenuBook color='info' sx={{ mr: 1, width: '40px', height: '40px' }}/>
+        {
+          loading ?
+          <Skeleton variant="rounded" width={110} height={35}/> :
+          existingWord?.title
+        }
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2}>
           <Stack spacing={1}>
             <Stack spacing={1} direction={'row'} alignItems={'center'}>
-              <img 
-                src={korDicLogo.src}
-                style={{ 
-                  width: '2rem', 
-                  height: '2rem', 
-                  background: 'white',
-                  borderRadius: '50%',
-                  border: '1px solid #807c7c87',
-                }}
-              />
-              <DialogContentText fontWeight={'bold'}>
-                국립국어원
-              </DialogContentText>
+              {
+                loading ?
+                <Skeleton 
+                  variant="circular" 
+                  width={'2rem'} 
+                  height={'2rem'}
+                /> :
+                <img 
+                  src={korDicLogo.src}
+                  style={{ 
+                    width: '2rem', 
+                    height: '2rem', 
+                    background: 'white',
+                    borderRadius: '50%',
+                    border: '1px solid #807c7c87',
+                  }}
+                />
+              }
+              {
+                loading ?
+                <Skeleton 
+                  variant="rounded" 
+                  width={70} 
+                  height={24} 
+                /> :
+                <DialogContentText fontWeight={'bold'}>
+                  국립국어원
+                </DialogContentText>
+              }
             </Stack>
             <Box>
-              {getResults(existingWord?.korDicResults ?? [], 'koDic', false)}
-              {getResults(watch('korDicResults') ?? [], 'koDic', true)}
+              {
+                loading ?
+                <Stack spacing={'4px'}>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                </Stack> :
+                <>
+                  {getResults(existingWord?.korDicResults ?? [], 'koDic', false)}
+                  {getResults(watch('korDicResults') ?? [], 'koDic', true)}
+                </>
+              }
             </Box>
           </Stack>
           <Stack spacing={1}>
@@ -496,30 +528,82 @@ const MergeWordPopUp = ({
               </DialogContentText>
             </Stack>
             <Box>
-              {getResults(existingWord?.naverDicResults ?? [], 'naverDic', false)}
-              {getResults(watch('naverDicResults') ?? [], 'naverDic', true)}
+              {
+                loading ?
+                <Stack spacing={'4px'}>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                  <Skeleton variant="rounded" width={260} height={20}/>
+                </Stack> :
+                <>
+                  {getResults(existingWord?.naverDicResults ?? [], 'naverDic', false)}
+                  {getResults(watch('naverDicResults') ?? [], 'naverDic', true)}
+                </>
+              }
             </Box>
           </Stack>
           <Divider/>
           <Stack spacing={2}>
             <Stack spacing={0.5}>
               <DialogContentText>
-                <b>기존 페이지: </b>{' '}{!existingWord ||(existingWord && existingWord.pages?.length === 0) && '-'}
+                {
+                  loading ?
+                  <Skeleton variant="rounded" width={80} height={24}/> :
+                  <>
+                    <b>기존 페이지: </b>{' '}{!existingWord || (existingWord && existingWord.pages?.length === 0) && '-'}
+                  </>
+                }
               </DialogContentText>
-              {getExistingPages((existingWord?.pages || []).filter((page): page is number => page !== null))}
+              {
+                loading ?
+                <Stack spacing={2}>
+                  <Skeleton variant="rounded" width={110} height={28}/>
+                </Stack> :
+                <>
+                  {getExistingPages((existingWord?.pages || []).filter((page): page is number => page !== null))}
+                </>
+              }
             </Stack>
             <Box display={'flex'} flexDirection={'column'}>
-              {getPages(watch('pages') ?? [])}
+              {
+                loading ?
+                <Stack spacing={1}>
+                  <Skeleton variant="rounded" width={409} height={56}/>
+                  <Skeleton variant="rounded" width={409} height={36.5}/>
+                </Stack> :
+                <>
+                  {getPages(watch('pages') ?? [])}
+                </>
+              }
             </Box>
           </Stack>
           <Divider/>
           <Stack spacing={2}>
             <Stack spacing={0.5}>
               <DialogContentText>
-                <b>기존 예문: </b>{' '}{!existingWord ||(existingWord && existingWord.examples?.length === 0) && '-'}
+                {
+                  loading ?
+                  <Skeleton variant="rounded" width={70} height={24}/> :
+                  <>
+                    <b>기존 예문: </b>{' '}{!existingWord ||(existingWord && existingWord.examples?.length === 0) && '-'}
+                  </>
+                }
               </DialogContentText>
-              {getExistingExamples(existingWord?.examples || [])}
+              {
+                loading ?
+                <>
+                  <Skeleton variant="rounded" width={409} height={27}/>
+                  <Skeleton variant="rounded" width={409} height={27}/>
+                </> :
+                <>
+                  {getExistingExamples(existingWord?.examples || [])}
+                </>
+              }
             </Stack>
+            {
+              loading && <Skeleton variant="rounded" width={409} height={125}/>
+            }
             {
               watch('examples') && (watch('examples') || []).length > 0 && 
               <Stack spacing={2}>
@@ -553,25 +637,33 @@ const MergeWordPopUp = ({
                 ))}
               </Stack>
             }
-            <Button variant='outlined' onClick={handleAddExampleOption}>
-              예문 추가
-            </Button>
+            {
+              loading ?
+              <Skeleton variant="rounded" width={409} height={36.5}/> :
+              <Button variant='outlined' onClick={handleAddExampleOption}>
+                예문 추가
+              </Button>
+            }
           </Stack>
           <Divider/>
           <Box display={'flex'} justifyContent={'center'} sx={{ m: 1, position: 'relative' }}>
-            <Button
-              variant="contained"
-              loading={getLoader}
-              onClick={handleSubmit(onSubmit, onError)}
-              sx={{ 
-                fontSize: '0.875rem',
-                '@media (max-width:500px)': {
-                  fontSize: '0.8rem'
-                }
-              }}
-            >
-              추가 요청
-            </Button>
+            {
+              loading ?
+              <Skeleton variant="rounded" width={86} height={36.5}/> :
+              <Button
+                variant="contained"
+                loading={getLoader}
+                onClick={handleSubmit(onSubmit, onError)}
+                sx={{ 
+                  fontSize: '0.875rem',
+                  '@media (max-width:500px)': {
+                    fontSize: '0.8rem'
+                  }
+                }}
+              >
+                추가 요청
+              </Button>
+            }
           </Box>
         </Stack>
       </DialogContent>

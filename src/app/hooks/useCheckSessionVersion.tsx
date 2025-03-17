@@ -13,7 +13,7 @@ const getMySessionVersionQuery = gql(`
 `);
 
 export function useCheckSessionVersion(checkTestMode = false) {
-  const [getWordByTitle] = useLazyQuery(getMySessionVersionQuery);
+  const [getMySessionVersion] = useLazyQuery(getMySessionVersionQuery);
   const { dispatchCurrentSnackBar } = useSnackbar();
   
   useEffect(() => {
@@ -21,7 +21,7 @@ export function useCheckSessionVersion(checkTestMode = false) {
       const session = await getSession();
       if (!session) return;
       
-      const res = await getWordByTitle({ 
+      const res = await getMySessionVersion({ 
         variables: { 
           getUserId: session.user.id
         } 

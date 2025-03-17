@@ -196,7 +196,7 @@ const AdminTable = ({
             }
             label="프로필 보기"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360 ? true : undefined}
             onClick={() => router.push(`/admins/${params.row.id}`)}
             disabled={disabled}
           />,
@@ -212,7 +212,7 @@ const AdminTable = ({
             }
             label="거절"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360 ? true : undefined}
             onClick={() => onDeny(params.row.id)}
             disabled={disabled}
           />,
@@ -241,7 +241,7 @@ const AdminTable = ({
             }
             label="복구"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360 ? true : undefined}
             onClick={() => onRecover(params.row.id)}
             disabled={disabled}
           />,
@@ -257,7 +257,7 @@ const AdminTable = ({
             }
             label="삭제"
             showInMenu={maxWidth360}
-            dense={!!maxWidth360}
+            dense={maxWidth360 ? true : undefined}
             onClick={() => {
               setSelectedUserId(params.row.id);
               setOpenConfirmDialog(true);
@@ -286,7 +286,7 @@ const AdminTable = ({
           }
           label="프로필 보기"
           showInMenu={maxWidth400}
-          dense={!!maxWidth400}
+          dense={maxWidth400 ? true : undefined}
           onClick={() => router.push(`/admins/${params.row.id}`)}
           disabled={disabled}
         />,
@@ -302,7 +302,7 @@ const AdminTable = ({
           }
           label="승인"
           showInMenu={maxWidth400}
-          dense={!!maxWidth400}
+          dense={maxWidth400 ? true : undefined}
           onClick={() => onApproval(params.row.id)}
           disabled={disabled}
         />,
@@ -318,7 +318,7 @@ const AdminTable = ({
           }
           label="거절"
           showInMenu={maxWidth400}
-          dense={!!maxWidth400}
+          dense={maxWidth400 ? true : undefined}
           onClick={() => onDeny(params.row.id)}
           disabled={disabled}
         />

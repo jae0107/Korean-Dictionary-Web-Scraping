@@ -1,5 +1,5 @@
 import { RequestorItemsFragment, WordRequestItemsFragment, WordStatus } from "@/app/generated/gql/graphql";
-import { Close, Groups, MenuBook, Remove } from "@mui/icons-material";
+import { Close, Groups, MenuBook } from "@mui/icons-material";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack } from "@mui/material";
 import korDicLogo from "../../../../../assets/images/korDicLogo.png";
 import naverLogo from "../../../../../assets/images/naverLogo.png";
