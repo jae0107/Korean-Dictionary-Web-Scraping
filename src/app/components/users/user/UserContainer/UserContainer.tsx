@@ -260,7 +260,7 @@ const UserContainer = ({
             label="복구"
             showInMenu={true}
             onClick={() => onRecover(params.row.id)}
-            dense={maxWidth495}
+            dense={maxWidth495 ? true : undefined}
           />,
           <GridActionsCellItem
             key="delete"
@@ -276,7 +276,7 @@ const UserContainer = ({
               setSelectedWordId(params.row.id);
               setOpenConfirmDialog(true);
             }}
-            dense={maxWidth495}
+            dense={maxWidth495 ? true : undefined}
           />,
           <GridActionsCellItem
             key="reason"
@@ -293,7 +293,7 @@ const UserContainer = ({
               setSelectedDeniedReason(params.row.deniedReason || '');
               setOpenDeniedReasonPopUp(true);
             }}
-            dense={maxWidth495}
+            dense={maxWidth495 ? true : undefined}
           />
         ];
       } else if (params.row.status === 'DUPLICATED') {
@@ -342,7 +342,7 @@ const UserContainer = ({
           }
           label="승인"
           showInMenu={maxWidth360}
-          dense={maxWidth360}
+          dense={maxWidth360 ? true : undefined}
           onClick={() => onApproval(params.row.id)}
         />,
         <GridActionsCellItem
@@ -357,7 +357,7 @@ const UserContainer = ({
           }
           label="거절"
           showInMenu={maxWidth360}
-          dense={maxWidth360}
+          dense={maxWidth360 ? true : undefined}
           onClick={() => {
             setSelectedWordId(params.row.id);
             setOpenDeniedReasonPopUp(true);

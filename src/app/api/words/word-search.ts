@@ -77,7 +77,10 @@ export class WordSearch {
 
     const pageCount = Math.ceil(totalRowCount / limit);
 
-    query = query.orderBy('words.createdAt', 'desc');
+    query = query.orderBy([
+      { column: 'words.createdAt', order: 'desc' },
+      { column: 'words.title', order: 'asc' }
+    ]);
 
     query = query.limit(limit).offset(pageNum * limit);
 

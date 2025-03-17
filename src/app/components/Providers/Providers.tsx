@@ -87,6 +87,9 @@ const Providers = ({ children } : { children: ReactNode }) => {
                 },
                 '& .MuiTablePagination-displayedRows': {
                   display: 'none',
+                },
+                '& .MuiDataGrid-virtualScroller': {
+                  overflow: 'hidden',
                 }
               },
             }

@@ -60,7 +60,9 @@ async function getWordByTitle(_: any, { title }: { title: string }, { currentUse
     const word = await Word.findOne({
       where: {
         title: title, 
-        status: WordStatus.Approved,
+        status: {
+          [Op.in]: [WordStatus.Approved, WordStatus.Pending],
+        },
       }
     });
 
@@ -124,12 +126,14 @@ async function createWordRequest(
       const existingWord = await Word.findOne({
         where: {
           title: input.title, 
-          status: WordStatus.Approved,
+          status: {
+            [Op.in]: [WordStatus.Approved, WordStatus.Pending],
+          },
         }
       });
 
       if (existingWord) {
-        throw new Error('이미 등록된 단어입니다.');
+        throw new Error(existingWord.status === WordStatus.Approved ? '이미 등록된 단어입니다.' : '승인 대기중인 단어입니다.');
       }
     }
 
@@ -268,7 +272,7 @@ async function approveWordRequest(
     const word = await Word.findByPk(id);
 
     if (word) {
-      await word.update({ status: WordStatus.Approved, previousStatus: word.status });
+      await word.update({ status: WordStatus.Approved, previousStatus: word.status }, { validate: false });
     } else {
       throw new Error('No Word Found');
     }
@@ -350,7 +354,7 @@ async function denyWordRequest(
     const word = await Word.findByPk(id);
 
     if (word) {
-      await word.update({ status: WordStatus.Denied, previousStatus: word.status, deniedReason: deniedReason });
+      await word.update({ status: WordStatus.Denied, previousStatus: word.status, deniedReason: deniedReason }, { validate: false });
     } else {
       throw new Error('No Word Found');
     }
@@ -396,7 +400,7 @@ async function recoverWordRequest(
     const word = await Word.findByPk(id);
 
     if (word) {
-      await word.update({ status: word.previousStatus || WordStatus.Pending, previousStatus: word.status });
+      await word.update({ status: word.previousStatus || WordStatus.Pending, previousStatus: word.status }, { validate: false });
     } else {
       throw new Error('No Word Found');
     }

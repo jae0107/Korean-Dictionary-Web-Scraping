@@ -99,7 +99,7 @@ const SearchResults = ({
       },
       onError: async (error) => {
         setLoader(false);
-        if (error.message === '이미 등록된 단어입니다.') {
+        if (error.message === '이미 등록된 단어입니다.' || error.message === '승인 대기중인 단어입니다.') {
           setOpenMergeWordPopUp(true);
           word.title && await getWordByTitle({
             variables: {
