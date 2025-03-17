@@ -88,7 +88,7 @@ const naverDic = async (userSearch: string) => {
     });
 
     const data: NaverResponse = await naverRes.json();
-    console.log(data.searchResultMap.searchResultListMap.WORD)
+    
     const meaningsWithHtml = data.searchResultMap.searchResultListMap.WORD.items[0].meansCollector[0].means.map((mean) => mean.value)
     const meanings = meaningsWithHtml.map((mean) => {
       const $ = cheerio.load(mean); 

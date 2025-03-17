@@ -112,7 +112,9 @@ User.addHook('beforeValidate', 'defaultValues', (user: User) => {
 
 User.addHook('beforeSave', 'hashPassword', async (user: User) => {
   if (user.changed('password')) {
-    user.password = await bcrypt.hash(user.password, 10);
+    if (!user.password.startsWith("$2b$")) {  // bcrypt 해시인지 확인
+      user.password = await bcrypt.hash(user.password, 10);
+    }
     user.sessionVersion = (user.sessionVersion || 0) + 1;
   } else if (user.changed('role')) {
     user.sessionVersion = (user.sessionVersion || 0) + 1;
@@ -122,7 +124,9 @@ User.addHook('beforeSave', 'hashPassword', async (user: User) => {
 User.addHook('beforeBulkCreate', 'bulkHashPassword', async (users: User[]) => {
   for (const user of users) {
     if (user.changed('password')) {
-      user.password = await bcrypt.hash(user.password, 10);
+      if (!user.password.startsWith("$2b$")) {  // bcrypt 해시인지 확인
+        user.password = await bcrypt.hash(user.password, 10);
+      }
       user.sessionVersion = (user.sessionVersion || 0) + 1;
     }
   }
