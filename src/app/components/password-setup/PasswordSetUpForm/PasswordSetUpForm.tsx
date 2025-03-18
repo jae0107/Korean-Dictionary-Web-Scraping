@@ -151,7 +151,7 @@ const PasswordSetUpForm = ({ theme } : { theme: Theme | null }) => {
         padding={5} 
         borderRadius={2} 
         boxShadow={2} 
-        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : '#dfdcdc'}
+        bgcolor={theme && theme.palette.mode === 'dark' ? '#272727' : '#f4f6f8'}
         sx={{
           '@media (max-width:530px)': {
             width: '95% !important',

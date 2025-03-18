@@ -63,12 +63,16 @@ export class RequestorSearch {
       totalRowCount = parseInt(results[0].count, 10);
       pageCount = Math.ceil(totalRowCount / limit);
 
+      query = query.orderBy('users.name', 'asc');
+
       query = query.limit(limit);
     }
 
     if (isPresent(pageNum)) {
       query = query.offset(pageNum * limit);
     }
+
+    query = query.orderBy('users.name', 'asc');
 
     query = query.limit(limit).offset(pageNum * limit);
 

@@ -7,7 +7,7 @@ const DummyTestCard = () => {
     <Box 
       width={'800px'} 
       border={`2px solid ${theme.palette.mode === 'dark' ? '#515151' : '#b4b4b4'}`} 
-      bgcolor={theme.palette.mode === 'dark' ? '#353535' : '#dfdcdc'}
+      bgcolor={theme.palette.mode === 'dark' ? '#353535' : '#f4f6f8'}
       borderRadius={2} 
       position={'relative'}
       sx={{

@@ -388,7 +388,7 @@ const UserContainer = ({
         return (
           <Button 
             variant='text' 
-            color='info'
+            color='primary'
             onClick={() => {
               setSelectedWordId(params.row.id);
               setWordRequest(params.row);

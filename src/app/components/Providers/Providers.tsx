@@ -34,7 +34,17 @@ const Providers = ({ children } : { children: ReactNode }) => {
         palette: {
           mode,
           background: {
-            'default': mode === 'light' ? '#e5e5e5' : '#353535',
+            'default': mode === 'light' ? '#f4f6f8' : '#353535',
+          },
+          primary: {
+            main: mode === 'dark' ? '#90caf9' : '#5a4fcf', // 메인 색상 변경
+            light: '#d1c7ff', 
+            contrastText: mode === 'dark' ? 'rgba(0, 0, 0, 0.87)' : '#fff', 
+          },
+          info: {
+            main: mode === 'dark' ? 'rgb(41, 182, 246)' : '#a390e9', 
+            dark: mode === 'dark' ? '#0288d1' : '#8066c1',
+            light: mode === 'dark' ? '#039be5' : '#c2b3ff',
           }
         },
         components: {
@@ -48,11 +58,19 @@ const Providers = ({ children } : { children: ReactNode }) => {
               },
             },
           },
+          MuiAppBar: {
+            styleOverrides: {
+              root: {
+                backgroundColor: mode === 'light' ? '#a390e9' : '#121212', 
+                '--AppBar-background': mode === 'light' ? '#a390e9' : '#121212', 
+              },
+            },
+          },
           MuiDataGrid: {
             styleOverrides: {
               root: {
                 borderColor: mode === 'light' ? '#b4b4b4' : '#515151',
-                background: mode === 'light' ? '#ebebeb' : 'transparent',
+                background: mode === 'light' ? '#ffffff' : 'transparent',
                 '& .MuiDataGrid-toolbarContainer': {
                   borderBottom: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
                 },
@@ -125,7 +143,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
             styleOverrides: {
               root: {
                 '& .MuiPaper-root': {
-                  background: mode === 'light' ? '#e5e5e5' : '#353535',
+                  background: mode === 'light' ? '#f4f6f8' : '#353535',
                 },
               },
             },
@@ -133,14 +151,14 @@ const Providers = ({ children } : { children: ReactNode }) => {
           MuiMenu: {
             styleOverrides: {
               paper: {
-                background: mode === 'light' ? '#ebebeb' : '#353535',
+                background: mode === 'light' ? '#ffffff' : '#353535',
               },
             },
           },
           MuiInputBase: {
             styleOverrides: {
               root: {
-                background: mode === 'light' ? '#ebebeb' : '#353535',
+                background: mode === 'light' ? '#ffffff' : '#353535',
               },
             },
           }

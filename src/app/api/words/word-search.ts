@@ -88,17 +88,17 @@ export class WordSearch {
 
     const pageCount = Math.ceil(totalRowCount / limit);
 
-    query = query.orderBy([
-      { column: 'words.createdAt', order: 'desc' },
-      { column: 'words.title', order: 'asc' }
-    ]);
-
     if (isPresent(titleSort) && titleSort) {
       if (titleSort === SortOptions.Asc) {
-        query = query.orderBy('words.title', 'asc');
+        query = query.orderBy('words.title', 'asc').orderBy('words.createdAt', 'asc');
       } else if (titleSort === SortOptions.Desc) {
-        query = query.orderBy('words.title', 'desc');
+        query = query.orderBy('words.title', 'desc').orderBy('words.createdAt', 'asc');
       }
+    } else {
+      query = query.orderBy([
+        { column: 'words.createdAt', order: 'desc' },
+        { column: 'words.title', order: 'asc' }
+      ]);
     }
 
     query = query.limit(limit).offset(pageNum * limit);

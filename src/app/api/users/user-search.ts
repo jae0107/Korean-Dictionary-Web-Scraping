@@ -68,16 +68,14 @@ export class UserSearch {
 
     const pageCount = Math.ceil(totalRowCount / limit);
 
-    query = query.orderBy('createdAt', 'desc');
-
-    query = query.orderBy('users.createdAt', 'asc');
-
     if (isPresent(nameSort) && nameSort) {
       if (nameSort === SortOptions.Asc) {
-        query = query.orderBy('users.name', 'asc');
+        query = query.orderBy('users.name', 'asc').orderBy('words.createdAt', 'asc');
       } else if (nameSort === SortOptions.Desc) {
-        query = query.orderBy('users.name', 'desc');
+        query = query.orderBy('users.name', 'desc').orderBy('words.createdAt', 'asc');
       }
+    } else {
+      query = query.orderBy('users.createdAt', 'desc');
     }
 
     query = query.limit(limit).offset(pageNum * limit);

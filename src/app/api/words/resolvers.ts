@@ -55,15 +55,35 @@ async function getWord(_: any, { id }: { id: string }, { currentUser }: Context)
   });
 }
 
+// async function getWordByTitle(_: any, { title }: { title: string }, { currentUser }: Context): Promise<Word> {
+//   return await transaction(async (t) => {
+//     const word = await Word.findOne({
+//       where: {
+//         title: title, 
+//         status: {
+//           [Op.in]: [WordStatus.Approved, WordStatus.Pending],
+//         },
+//       }
+//     });
+
+//     if (!word) throw new Error('단어를 찾을 수 없습니다.');
+//     return word;
+//   }).catch((e) => {
+//     throw new ApolloResponseError(e);
+//   });
+// }
+
 async function getWordByTitle(_: any, { title }: { title: string }, { currentUser }: Context): Promise<Word> {
   return await transaction(async (t) => {
     const word = await Word.findOne({
       where: {
-        title: title, 
-        status: {
-          [Op.in]: [WordStatus.Approved, WordStatus.Pending],
-        },
-      }
+        title,
+        status: { [Op.in]: [WordStatus.Approved, WordStatus.Pending] },
+      },
+      order: [
+        [sequelize.literal(`CASE WHEN status = '${WordStatus.Approved}' THEN 1 ELSE 2 END`), 'ASC'], // Approved 우선
+        ['createdAt', 'ASC'], // Pending 중에서는 먼저 신청한 것 우선
+      ],
     });
 
     if (!word) throw new Error('단어를 찾을 수 없습니다.');
@@ -197,7 +217,9 @@ async function duplicateWordRequest(
     const existingWord = await Word.findOne({
       where: {
         title: input.title, 
-        status: WordStatus.Approved,
+        status: {
+          [Op.in]: [WordStatus.Approved, WordStatus.Pending],
+        },
       }
     });
 

@@ -331,7 +331,7 @@ const StudentTable = ({
         return (
           <Button 
             variant='text' 
-            color='info'
+            color='primary'
             onClick={() => {
               setSelectedUserId(params.row.id);
               setUser({

@@ -54,7 +54,7 @@ const DuplicateAccountTable = ({
         return (
           <Button 
             variant='text' 
-            color='info'
+            color='primary'
             onClick={() => {
               setSelectedData(params.row);
               setOpenAccountDetailPopUp(true);
