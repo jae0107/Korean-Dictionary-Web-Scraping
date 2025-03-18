@@ -155,17 +155,22 @@ const MobileNavDrawer = ({
                 </ListItemButton>
               </ListItem>
             </List>
-            <Divider />
-            <List>
-              <ListItem disablePadding sx={{ backgroundColor: pathname === '/data-migration' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
-                <ListItemButton LinkComponent={Link} href={'/data-migration'} sx={{ pb: '2px', pt: '2px' }}>
-                  <ListItemIcon>
-                    <Storage/>
-                  </ListItemIcon>
-                  <ListItemText primary={'데이터 마이그레이션'} />
-                </ListItemButton>
-              </ListItem>
-            </List>
+            {
+              session.user.role === "SUPERADMIN" &&
+              <>
+                <Divider />
+                <List>
+                  <ListItem disablePadding sx={{ backgroundColor: pathname === '/data-migration' ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                    <ListItemButton LinkComponent={Link} href={'/data-migration'} sx={{ pb: '2px', pt: '2px' }}>
+                      <ListItemIcon>
+                        <Storage/>
+                      </ListItemIcon>
+                      <ListItemText primary={'데이터 마이그레이션'} />
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+              </>
+            }
           </>
         }
       </Box>

@@ -34,7 +34,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
         palette: {
           mode,
           background: {
-            'default': mode === 'light' ? '#d6d2d2' : '#353535',
+            'default': mode === 'light' ? '#e5e5e5' : '#353535',
           }
         },
         components: {
@@ -52,7 +52,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
             styleOverrides: {
               root: {
                 borderColor: mode === 'light' ? '#b4b4b4' : '#515151',
-                background: mode === 'light' ? '#dfdcdc' : 'transparent',
+                background: mode === 'light' ? '#ebebeb' : 'transparent',
                 '& .MuiDataGrid-toolbarContainer': {
                   borderBottom: mode === 'light' ? '0.2px solid #b4b4b4' : '0.2px solid #515151',
                 },
@@ -125,7 +125,7 @@ const Providers = ({ children } : { children: ReactNode }) => {
             styleOverrides: {
               root: {
                 '& .MuiPaper-root': {
-                  background: mode === 'light' ? '#d6d2d2' : '#353535',
+                  background: mode === 'light' ? '#e5e5e5' : '#353535',
                 },
               },
             },
@@ -133,14 +133,14 @@ const Providers = ({ children } : { children: ReactNode }) => {
           MuiMenu: {
             styleOverrides: {
               paper: {
-                background: mode === 'light' ? '#dfdcdc' : '#353535',
+                background: mode === 'light' ? '#ebebeb' : '#353535',
               },
             },
           },
           MuiInputBase: {
             styleOverrides: {
               root: {
-                background: mode === 'light' ? '#dfdcdc' : '#353535',
+                background: mode === 'light' ? '#ebebeb' : '#353535',
               },
             },
           }

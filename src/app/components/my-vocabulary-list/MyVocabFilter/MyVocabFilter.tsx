@@ -20,12 +20,21 @@ const MyVocabFilter = ({
       sx={{
         '@media (max-width:545px)': {
           width: '95% !important',
-        }
+          '& > :not(style) + :not(style)': {
+            ml: '8px !important',
+          }
+        },
+        '@media (max-width:400px)': {
+          '& > :not(style) + :not(style)': {
+            ml: '4px !important',
+          }
+        },
       }}
     >
       <TextField
         label="단어 검색"
         value={wordKeyword}
+        sx={{ flex: 1.5 }}
         onChange={(e) => setWordKeyword(e.target.value)}
         slotProps={{
           input: {
