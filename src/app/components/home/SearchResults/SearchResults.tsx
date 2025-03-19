@@ -95,6 +95,7 @@ const SearchResults = ({
         input: {
           ...word,
           pages: (word.pages || []).filter((page) => page > 0),
+          examples: (word.examples || []).filter((example) => example.trim() !== ''),
         },
       },
       onError: async (error) => {

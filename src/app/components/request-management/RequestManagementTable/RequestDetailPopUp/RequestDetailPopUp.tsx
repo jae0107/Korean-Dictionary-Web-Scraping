@@ -85,12 +85,17 @@ const RequestDetailPopUp = ({
   }
 
   const getExamples = () => {
-    if (!getWordRequest || !getWordRequest.examples || getWordRequest.examples?.length === 0) {
+    if (!getWordRequest) {
       return '-';
-    } else if (getWordRequest.examples.length === 1) {
-      return getWordRequest.examples[0];
     }
-    return `\n${getWordRequest.examples.map((example, index) => `${index+1}. ${example}`).join('\n')}`;
+
+    const filteredExamples = (getWordRequest.examples || []).filter((example) => example.trim() !== '');
+    if (filteredExamples.length === 0) {
+      return '-';
+    } else if (filteredExamples.length === 1) {
+      return filteredExamples[0];
+    }
+    return `\n${filteredExamples.map((example, index) => `${index+1}. ${example}`).join('\n')}`;
   }
 
   return (

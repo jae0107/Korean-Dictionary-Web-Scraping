@@ -101,6 +101,7 @@ const MergeWordPopUp = ({
         input: {
           ...handleMerge(),
           pages: (handleMerge().pages || []).filter((page) => page > 0),
+          examples: (handleMerge().examples || []).filter((example) => example.trim() !== ''),
         },
       },
       onError: async (error) => {

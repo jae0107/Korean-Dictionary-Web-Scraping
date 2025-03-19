@@ -154,23 +154,25 @@ const MyVocabTable = ({
       filterable: false, 
       sortable: false,
       valueGetter: (value, row: MyVocabularyItemsFragment) => {
-        if (!row.examples || row.examples.length === 0) {
+        const filteredExamples = (row.examples || []).filter((example) => example.trim() !== '');
+        if (filteredExamples.length === 0) {
           return '';
         }
-        if (row.examples.length === 1) {
-          return row.examples[0];
+        if (filteredExamples.length === 1) {
+          return filteredExamples[0];
         }
-        return row.examples.map((example, i) => `${i+1}. ${example}\n`);
+        return filteredExamples.map((example, i) => `${i+1}. ${example}\n`);
       },
       renderCell: (params: GridRenderCellParams<MyVocabularyItemsFragment>) => {
-        if (!params.row.examples || params.row.examples.length === 0) {
+        const filteredExamples = (params.row.examples || []).filter((example) => example.trim() !== '');
+        if (filteredExamples.length === 0) {
           return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
         }
-        if (params.row.examples.length === 1) {
-          return params.row.examples[0];
+        if (filteredExamples.length === 1) {
+          return filteredExamples[0];
         }
         return (
-          params.row.examples.map((example, i) => `${i+1}. ${example}\n`)
+          filteredExamples.map((example, i) => `${i+1}. ${example}\n`)
         );
       }
     },

@@ -207,6 +207,8 @@ const DuplicatedRequestPopUp = ({
   };
 
   const getExample = () => {
+    const filteredAddedExamples = addedExamples.filter((example) => example.trim() !== '');
+
     if (loading) {
       return (
         <Stack spacing={0.5} direction={'row'} display={'flex'} alignItems={'center'}>
@@ -217,7 +219,7 @@ const DuplicatedRequestPopUp = ({
           <Skeleton variant="rounded" width={'70%'} height={24}/>
         </Stack>
       );
-    } else if (deletedExamples.length === 0 && remainingExamples.length === 0 && addedExamples.length === 0) {
+    } else if (deletedExamples.length === 0 && remainingExamples.length === 0 && filteredAddedExamples.length === 0) {
       return (
         <Stack spacing={0.5} direction={'row'}>
           <DialogContentText>
@@ -226,7 +228,7 @@ const DuplicatedRequestPopUp = ({
           <DialogContentText>-</DialogContentText>
         </Stack>
       );
-    } else if (remainingExamples.length > 0 || deletedExamples.length > 0 || addedExamples.length > 0) {
+    } else if (remainingExamples.length > 0 || deletedExamples.length > 0 || filteredAddedExamples.length > 0) {
       return (
         <Stack spacing={0.5}>
           <DialogContentText>
@@ -235,7 +237,7 @@ const DuplicatedRequestPopUp = ({
           <Box>
             {getResults(remainingExamples, 'REMAINING')}
             {getResults(deletedExamples, 'DELETED')}
-            {getResults(addedExamples, 'NEW')}
+            {getResults(filteredAddedExamples, 'NEW')}
           </Box>
         </Stack>
       );
