@@ -39,11 +39,17 @@ async function getMiniTests(
       .select(
         knex.raw(`
           ARRAY(
-            SELECT title FROM words AS w
-            WHERE w.title != words.title
+            SELECT title_element FROM jsonb_array_elements_text(
+              jsonb_build_array(words.title) || 
+              (SELECT jsonb_agg(title) FROM (
+                SELECT title FROM words AS w 
+                WHERE w.title != words.title 
+                ORDER BY RANDOM() 
+                LIMIT 3
+              ) AS random_titles)
+            ) AS title_element
             ORDER BY RANDOM()
-            LIMIT 3
-          ) || words.title AS options
+          ) AS options
         `)
       )
       .where('status', 'APPROVED');
