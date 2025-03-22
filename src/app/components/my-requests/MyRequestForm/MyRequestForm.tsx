@@ -1,4 +1,4 @@
-import { MyWordRequestItemsFragment, WordInput } from "@/app/generated/gql/graphql";
+import { MyWordRequestItemsFragment, WordInput, WordStatus } from "@/app/generated/gql/graphql";
 import { useSnackbar } from "@/app/hooks/useSnackbar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, DialogContentText, Divider, IconButton, InputAdornment, Link, List, ListItem, Stack, TextField, Typography } from "@mui/material";
@@ -151,6 +151,7 @@ const MyRequestForm = ({
           ...handleMerge(),
           pages: (handleMerge().pages || []).filter((page) => page > 0).map((page) => Number(page)),
           examples: (handleMerge().examples || []).filter((example) => example.trim() !== ''),
+          status: defaultValues.wordId ? WordStatus.Duplicated : WordStatus.Pending,
         },
       },
       onError: async (error) => {
