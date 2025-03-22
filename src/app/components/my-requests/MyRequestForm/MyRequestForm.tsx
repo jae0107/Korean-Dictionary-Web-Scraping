@@ -10,19 +10,22 @@ import { AddCircle, ArrowRightAlt, Cancel, DeleteForever } from "@mui/icons-mate
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { updateWordRequestMutation } from "./query";
+import { checkDuplicate } from "../../shared/utils/utils";
 
-const schema = z.object({
-  title: z.string().nonempty(),
-  korDicResults: z.array(z.string()),
-  naverDicResults: z.array(z.string()),
-  pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
-  examples: z.array(z.union([z.string(), z.null()])).optional(),
-  wordId: z.string().optional(),
-})
-.refine((data) => data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
-  message: "국립국어원 사전 또는 네이버 사전의 검색 결과가 필요합니다.",
-  path: ["korDicResults"],
-});
+const schema = (getExistingWord: MyWordRequestItemsFragment | null) => {
+  return z.object({
+    title: z.string().nonempty(),
+    korDicResults: z.array(z.string()),
+    naverDicResults: z.array(z.string()),
+    pages: z.array(z.union([z.string(), z.number().int(), z.null()])).optional(),
+    examples: z.array(z.union([z.string(), z.null()])).optional(),
+    wordId: z.string().optional(),
+  })
+  .refine((data) => (getExistingWord?.korDicResults || []).length > 0 || (getExistingWord?.naverDicResults || []).length > 0 || data.korDicResults.length > 0 || data.naverDicResults.length > 0, {
+    message: "국립국어원 사전 또는 네이버 사전의 검색 결과가 필요합니다.",
+    path: ["korDicResults"],
+  });
+}
 
 const MyRequestForm = ({
   id,
@@ -46,7 +49,7 @@ const MyRequestForm = ({
   
   const form = useForm({
     defaultValues: defaultValues,
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema(getExistingWord)),
   });
 
   const { watch, setValue, handleSubmit, register } = form;
@@ -67,7 +70,7 @@ const MyRequestForm = ({
     }
 
     const input: WordInput = {
-      pages: [...(getExistingWord.pages || []).filter(page => page !== null), ...(watch('pages') || []).filter(page => page !== null)],
+      pages: [...(getExistingWord.pages || []).filter((page) => page !== null), ...(watch('pages') || []).filter((page) => page !== null)],
       title: getExistingWord.title,
       korDicResults: [...(getExistingWord.korDicResults || []), ...(watch('korDicResults') || [])],
       naverDicResults: [...(getExistingWord.naverDicResults || []), ...(watch('naverDicResults') || [])],
@@ -108,6 +111,37 @@ const MyRequestForm = ({
     }
   };
 
+  const onBeforeSubmit = () => {
+    if (originalWord) {
+      const existingInput: WordInput = {
+        pages: (originalWord.pages || []).filter((page): page is number => page !== null && page > 0),
+        korDicResults: originalWord.korDicResults || [],
+        naverDicResults: originalWord.naverDicResults || [],
+        examples: originalWord.examples || [],
+      };
+  
+      const newInput: WordInput = {
+        ...watch(),
+        pages: (watch('pages') || []).filter((page) => page > 0),
+        examples: (watch('examples') || []).filter((example) => example.trim() !== ''),
+      };
+  
+      const errors = checkDuplicate(existingInput, newInput);
+        
+      if (errors.length > 0) {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: errors.join('\n'),
+          },
+        });
+        return;
+      }
+    }
+    handleSubmit(onSubmit, onError)();
+  };
+
   const onSubmit = () => {
     setLoader(true);
     updateWordRequest({
@@ -115,7 +149,8 @@ const MyRequestForm = ({
         updateWordRequestId: id,
         input: {
           ...handleMerge(),
-          pages: (handleMerge().pages || []).filter((page) => page > 0),
+          pages: (handleMerge().pages || []).filter((page) => page > 0).map((page) => Number(page)),
+          examples: (handleMerge().examples || []).filter((example) => example.trim() !== ''),
         },
       },
       onError: async (error) => {
@@ -563,7 +598,7 @@ const MyRequestForm = ({
         <Button
           variant="contained"
           loading={getLoader}
-          onClick={handleSubmit(onSubmit, onError)}
+          onClick={onBeforeSubmit}
           sx={{ 
             fontSize: '0.875rem',
             '@media (max-width:500px)': {

@@ -55,34 +55,22 @@ async function getWord(_: any, { id }: { id: string }, { currentUser }: Context)
   });
 }
 
-// async function getWordByTitle(_: any, { title }: { title: string }, { currentUser }: Context): Promise<Word> {
-//   return await transaction(async (t) => {
-//     const word = await Word.findOne({
-//       where: {
-//         title: title, 
-//         status: {
-//           [Op.in]: [WordStatus.Approved, WordStatus.Pending],
-//         },
-//       }
-//     });
-
-//     if (!word) throw new Error('단어를 찾을 수 없습니다.');
-//     return word;
-//   }).catch((e) => {
-//     throw new ApolloResponseError(e);
-//   });
-// }
-
 async function getWordByTitle(_: any, { title }: { title: string }, { currentUser }: Context): Promise<Word> {
   return await transaction(async (t) => {
     const word = await Word.findOne({
       where: {
         title,
-        status: { [Op.in]: [WordStatus.Approved, WordStatus.Pending] },
+        status: { [Op.in]: [WordStatus.Approved, WordStatus.Pending, WordStatus.Duplicated] },
       },
       order: [
-        [sequelize.literal(`CASE WHEN status = '${WordStatus.Approved}' THEN 1 ELSE 2 END`), 'ASC'], // Approved 우선
-        ['createdAt', 'ASC'], // Pending 중에서는 먼저 신청한 것 우선
+        [sequelize.literal(`
+          CASE 
+            WHEN status = '${WordStatus.Duplicated}' THEN 1
+            WHEN status = '${WordStatus.Approved}' THEN 2
+            WHEN status = '${WordStatus.Pending}' THEN 3
+          END
+        `), 'ASC'], // Duplicated > Approved > Pending 순으로 정렬
+        ['createdAt', 'ASC'], // 같은 상태라면 먼저 신청한 것 우선
       ],
     });
 
@@ -259,14 +247,19 @@ async function updateWordRequest(
 ): Promise<Word> {
   return await transaction(async (t) => {
     if (!input.title) throw new Error('단어를 입력해주세요.');
+    if (!currentUser) throw new Error('No Current User Found');
 
     const existingWord = await Word.findByPk(id);
 
     if (!existingWord) throw new Error('단어가 존재하지 않습니다.');
 
+    const updatedRequestorIds = existingWord.requestorIds.includes(currentUser.id)
+      ? existingWord.requestorIds
+      : [...existingWord.requestorIds, currentUser.id];
+
     const newInput = {
       ...input,
-      requestorIds: input.requestorIds ?? existingWord.requestorIds,
+      requestorIds: updatedRequestorIds,
       korDicResults: input.korDicResults ?? [],
       naverDicResults: input.naverDicResults ?? [],
       pages: input.pages ?? [],

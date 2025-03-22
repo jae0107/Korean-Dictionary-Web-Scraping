@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, IconButton, InputAdornment, Skeleton, Stack, TextField } from '@mui/material';
+import { Backdrop, Box, CircularProgress, IconButton, InputAdornment, Skeleton, Stack, TextField } from '@mui/material';
 import { Cancel, Search } from '@mui/icons-material';
 import { useState } from 'react';
 import { SearchResult } from '@/app/types/types';
@@ -10,13 +10,23 @@ import logo from "../../assets/images/logo.png";
 import { useSearch } from '../hooks/useSearch';
 import './style.scss';
 import { useCheckSessionVersion } from '../hooks/useCheckSessionVersion';
+import { useLazyQuery } from '@apollo/client';
+import { getWordByTitleQuery } from '../components/home/SearchResults/query';
+import { useSnackbar } from '../hooks/useSnackbar';
+import ExistingWordPopup from '../components/home/ExistingWordPopup/ExistingWordPopup';
+import { WordByTitleItemsFragment } from '../generated/gql/graphql';
 
 const Home = () => {
   useCheckSessionVersion(true);
-
+  
+  const { dispatchCurrentSnackBar } = useSnackbar();
   const { searchResults, setSearchResults } = useSearch();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [openExistingWordPopup, setOpenExistingWordPopup] = useState(false);
+  const [getExistingWord, setExistingWord] = useState<WordByTitleItemsFragment | null>(null);
+
+  const [getWordByTitle, { data, loading, refetch }] = useLazyQuery(getWordByTitleQuery);
   
   const form = useForm({
     defaultValues: {
@@ -25,10 +35,37 @@ const Home = () => {
   });
   
   const { setValue, register, handleSubmit, watch } = form;
+
+  const checkDuplicate: SubmitHandler<{ kWord: string }> = async (value) => {
+    getWordByTitle({
+      variables: {
+        title: value.kWord,
+      },
+      onCompleted(res) {
+        if (res) {
+          setOpenExistingWordPopup(true);
+        }
+      },
+      onError: (error) => {
+        setExistingWord(null);
+        if (error.message === '단어를 찾을 수 없습니다.') {
+          onSubmit(value.kWord);
+        } else {
+          dispatchCurrentSnackBar({
+            payload: {
+              open: true,
+              type: 'error',
+              message: error.message,
+            },
+          });
+        }
+      },
+    });
+  };
   
-  const onSubmit: SubmitHandler<{ kWord: string }> = async (values) => {
+  const onSubmit = async (kWord: string) => {
     setIsLoading(true);
-    const searchPrompt = values.kWord;
+    const searchPrompt = kWord;
   
     const res = await fetch("/api/searchAPI", {
       method: "POST",
@@ -43,9 +80,26 @@ const Home = () => {
     setValue('kWord', '');
     setIsLoading(false);
   };
-    
+
+  const handleClose = (edit: boolean) => {
+    if (!edit) {
+      setOpenExistingWordPopup(false);
+      setExistingWord(null);
+    } else {
+      setOpenExistingWordPopup(false);
+      data && setExistingWord(data?.getWordByTitle);
+      onSubmit(data?.getWordByTitle.title || '');
+    }
+  };
+  
   return (
     <Box width={'100%'} display={'flex'} flexDirection={'column'} alignItems={'center'}>
+      <Backdrop
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Stack 
         spacing={4}
         mb={4} 
@@ -68,7 +122,7 @@ const Home = () => {
           </Box>
         }
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(checkDuplicate)}
         >
           <Box display={'flex'} flexDirection={'row'} justifyContent={'center'}> 
             <TextField
@@ -243,8 +297,16 @@ const Home = () => {
             </Stack>
           </Box>
         }
-        {!isLoading && searchResults && <SearchResults searchResults={searchResults}/>}
+        {!isLoading && searchResults && <SearchResults searchResults={searchResults} getExistingWord={getExistingWord} setExistingWord={setExistingWord} originalOldData={data?.getWordByTitle}/>}
       </Stack>
+      {
+        data?.getWordByTitle && 
+        <ExistingWordPopup
+          openExistingWordPopup={openExistingWordPopup}
+          getWordRequest={data?.getWordByTitle}
+          handleClose={handleClose}
+        />
+      }
     </Box>
   );
 }

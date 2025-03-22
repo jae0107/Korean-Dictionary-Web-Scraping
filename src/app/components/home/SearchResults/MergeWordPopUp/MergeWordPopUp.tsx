@@ -587,7 +587,7 @@ const MergeWordPopUp = ({
                   loading ?
                   <Skeleton variant="rounded" width={70} height={24}/> :
                   <>
-                    <b>기존 예문: </b>{' '}{!existingWord ||(existingWord && existingWord.examples?.length === 0) && '-'}
+                    <b>기존 예문: </b>{' '}{!existingWord || (existingWord && existingWord.examples?.length === 0) && '-'}
                   </>
                 }
               </DialogContentText>

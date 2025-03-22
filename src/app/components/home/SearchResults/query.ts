@@ -8,6 +8,7 @@ export const wordByTitleFragment = gql(`
     korDicResults
     naverDicResults
     examples
+    status
   }
 `);
 

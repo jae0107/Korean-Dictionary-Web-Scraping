@@ -34,6 +34,11 @@ model User {
   updatedAt             DateTime @updatedAt
 
   @@map("users")
+
+  @@index([status, name])
+  @@index([status, importedStatus])
+  @@index([status, year])
+  @@index([status, class])
 }
 
 model Word {
@@ -53,6 +58,8 @@ model Word {
   updatedAt       DateTime @updatedAt
 
   @@map("words")
+
+  @@index([status, title])
 }
 
 model PasswordResetRequest {
@@ -76,6 +83,7 @@ model MyVocabulary {
 
   @@unique([userId, wordId])
   @@map("myVocabularies")
+  @@index([wordId])
 }
 
 model TestVenue {
@@ -92,6 +100,9 @@ model TestVenue {
   updatedAt DateTime @updatedAt
 
   @@map("testVenues")
+
+  @@index([status, year])
+  @@index([status, year, class])
 }
 
 model TestResult {

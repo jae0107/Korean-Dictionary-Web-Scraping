@@ -23,7 +23,7 @@ const documents = {
     "\n  query GetAdmins($paginationOptions: OffsetPaginationOptions!, $filterOptions: UserFilterOptions!) {\n    getUsers(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...AdminItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetAdminsDocument,
     "\n  mutation FindMyId($input: FindMyIdInput!) {\n    findMyId(input: $input)\n  }\n": types.FindMyIdDocument,
     "\n  mutation DuplicateWordRequest($input: WordInput!) {\n    duplicateWordRequest(input: $input) {\n      id\n    }\n  }\n": types.DuplicateWordRequestDocument,
-    "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n  }\n": types.WordByTitleItemsFragmentDoc,
+    "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    status\n  }\n": types.WordByTitleItemsFragmentDoc,
     "\n  mutation CreateWordRequest($input: WordInput!) {\n    createWordRequest(input: $input) {\n      id\n    }\n  }\n": types.CreateWordRequestDocument,
     "\n  query GetWordByTitle($title: String!) {\n    getWordByTitle(title: $title) {\n      ...WordByTitleItems\n    }\n  }\n": types.GetWordByTitleDocument,
     "\n  mutation BulkAddMyVocabulary($wordIds: [ID!]!) {\n    bulkAddMyVocabulary(wordIds: $wordIds)\n  }\n": types.BulkAddMyVocabularyDocument,
@@ -161,7 +161,7 @@ export function gql(source: "\n  mutation DuplicateWordRequest($input: WordInput
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n  }\n"): (typeof documents)["\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n  }\n"];
+export function gql(source: "\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    status\n  }\n"): (typeof documents)["\n  fragment WordByTitleItems on Word {\n    id\n    pages\n    title\n    korDicResults\n    naverDicResults\n    examples\n    status\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
