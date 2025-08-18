@@ -20,6 +20,7 @@ export const myVocabularyTypeDefs = gql`
     userId: ID
     page: Int
     titleSort: SortOptions
+    pageSort: SortOptions
   }
 
   type MyVocabularyOffsetPaginationResponse {

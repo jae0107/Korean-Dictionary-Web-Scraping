@@ -319,6 +319,7 @@ export type MyVocabulary = {
 
 export type MyVocabularyFilterOptions = {
   page?: InputMaybe<Scalars['Int']['input']>;
+  pageSort?: InputMaybe<SortOptions>;
   titleSort?: InputMaybe<SortOptions>;
   userId?: InputMaybe<Scalars['ID']['input']>;
   word?: InputMaybe<Scalars['String']['input']>;
@@ -641,6 +642,7 @@ export type Word = {
 export type WordFilterOptions = {
   class?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+  pageSort?: InputMaybe<SortOptions>;
   requestorId?: InputMaybe<Scalars['ID']['input']>;
   status: WordStatus;
   titleSort?: InputMaybe<SortOptions>;

@@ -18,7 +18,7 @@ export class MyVocabularySearch {
 
   async process(): Promise<OffsetPaginationResponse<MyVocabulary>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { word, userId, page, titleSort } = this.filterOptions;
+    const { word, userId, page, titleSort, pageSort } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('myVocabularies');
 
@@ -60,14 +60,25 @@ export class MyVocabularySearch {
 
     const pageCount = Math.ceil(totalRowCount / limit);
 
-    query = query.orderBy('myVocabularies.createdAt', 'desc');
+    // query = query.orderBy('myVocabularies.createdAt', 'desc');
 
     if (isPresent(titleSort) && titleSort) {
       if (titleSort === SortOptions.Asc) {
-        query = query.orderBy('words.title', 'asc');
+        query = query.orderBy('words.title', 'asc').orderBy('myVocabularies.createdAt', 'asc');
       } else if (titleSort === SortOptions.Desc) {
-        query = query.orderBy('words.title', 'desc');
+        query = query.orderBy('words.title', 'desc').orderBy('myVocabularies.createdAt', 'asc');
       }
+    } else if (isPresent(pageSort) && pageSort) {
+      if (pageSort === SortOptions.Asc) {
+        query = query.orderByRaw('(SELECT MIN(p) FROM unnest(words.pages) AS p) ASC').orderBy('myVocabularies.createdAt', 'asc');
+      } else if (pageSort === SortOptions.Desc) {
+        query = query.orderByRaw('(SELECT MIN(p) FROM unnest(words.pages) AS p) DESC').orderBy('myVocabularies.createdAt', 'asc');
+      }
+    } else {
+      query = query.orderBy([
+        { column: 'myVocabularies.createdAt', order: 'desc' },
+        { column: 'words.title', order: 'asc' }
+      ]);
     }
 
     query = query.limit(limit).offset(pageNum * limit);

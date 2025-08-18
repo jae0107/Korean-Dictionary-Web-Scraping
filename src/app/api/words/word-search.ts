@@ -18,7 +18,7 @@ export class WordSearch {
 
   async process(): Promise<OffsetPaginationResponse<Word>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { status, word, requestorId, year, class: className, page, titleSort } = this.filterOptions;
+    const { status, word, requestorId, year, class: className, page, titleSort, pageSort } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('words');
 
@@ -93,6 +93,12 @@ export class WordSearch {
         query = query.orderBy('words.title', 'asc').orderBy('words.createdAt', 'asc');
       } else if (titleSort === SortOptions.Desc) {
         query = query.orderBy('words.title', 'desc').orderBy('words.createdAt', 'asc');
+      }
+    } else if (isPresent(pageSort) && pageSort) {
+      if (pageSort === SortOptions.Asc) {
+        query = query.orderByRaw('(SELECT MIN(p) FROM unnest(words.pages) AS p) ASC').orderBy('words.createdAt', 'asc');
+      } else if (pageSort === SortOptions.Desc) {
+        query = query.orderByRaw('(SELECT MIN(p) FROM unnest(words.pages) AS p) DESC').orderBy('words.createdAt', 'asc');
       }
     } else {
       query = query.orderBy([

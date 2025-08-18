@@ -29,6 +29,7 @@ const MyRequestTable = ({
   selectedRequests,
   setSelectedRequests,
   setTitleSort,
+  setPageSort,
 }: {
   loading: boolean;
   words: MyRequestItemsFragment[];
@@ -47,6 +48,7 @@ const MyRequestTable = ({
   selectedRequests: string[];
   setSelectedRequests: (value: string[]) => void;
   setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
+  setPageSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const router = useRouter();
@@ -84,9 +86,8 @@ const MyRequestTable = ({
     { 
       field: 'pages', 
       headerName: '페이지', 
-      width: 65, 
+      width: 90, 
       filterable: false, 
-      sortable: false,
       renderCell: (params: GridRenderCellParams<MyRequestItemsFragment>) => {
         if (!params.row.pages || params.row.pages.length === 0) {
           return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
@@ -365,8 +366,13 @@ const MyRequestTable = ({
         onSortModelChange={(newSortModel) => {
           if (newSortModel.length === 0) {
             setTitleSort(null);
+            setPageSort(null);
           } else if (newSortModel[0].field === 'title') {
             setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setPageSort(null);
+          } else if (newSortModel[0].field === 'pages') {
+            setPageSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setTitleSort(null);
           }
         }}
         getRowHeight={() => 'auto'}

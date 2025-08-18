@@ -17,6 +17,7 @@ const MyVocabTable = ({
   paginationModel,
   setPaginationModel,
   setTitleSort,
+  setPageSort,
 }: {
   loading: boolean;
   words: MyVocabularyItemsFragment[];
@@ -31,6 +32,7 @@ const MyVocabTable = ({
     pageSize: number;
   }>>;
   setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
+  setPageSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const maxWidth750 = useMediaQuery('(max-width:750px)');
   const maxWidth475 = useMediaQuery('(max-width:475px)');
@@ -60,9 +62,8 @@ const MyVocabTable = ({
       headerClassName: 'page-header',
       cellClassName: 'page-cell',
       headerName: '페이지', 
-      width: 65, 
+      width: 90, 
       filterable: false, 
-      sortable: false,
       valueGetter: (value, row: MyVocabularyItemsFragment) => {
         if (!row.pages || row.pages.length === 0) {
           return '';
@@ -217,8 +218,13 @@ const MyVocabTable = ({
         onSortModelChange={(newSortModel) => {
           if (newSortModel.length === 0) {
             setTitleSort(null);
+            setPageSort(null);
           } else if (newSortModel[0].field === 'title') {
             setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setPageSort(null);
+          } else if (newSortModel[0].field === 'pages') {
+            setPageSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setTitleSort(null);
           }
         }}
         getRowHeight={() => 'auto'}

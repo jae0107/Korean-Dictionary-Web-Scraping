@@ -29,6 +29,7 @@ const SingleTeacher = () => {
 
   const [wordRequestStatus, setWordRequestStatus] = useState<WordStatus>(searchParams.get('status') as WordStatus || WordStatus.Approved);
   const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
+  const [getPageSort, setPageSort] = useState<SortOptions | null>(null);
 
   const { data, loading, refetch } = useQuery(getTeacherQuery, {
     fetchPolicy: 'network-only',
@@ -67,6 +68,7 @@ const SingleTeacher = () => {
           status: wordRequestStatus,
           requestorId: id,
           titleSort: getTitleSort,
+          pageSort: getPageSort,
         },
       },
       skip: session?.user.role === "STUDENT" || session?.user.role === "TEACHER",
@@ -114,6 +116,7 @@ const SingleTeacher = () => {
         pageInfo={userRequestData ? userRequestData.getWords.pageInfo : { totalRowCount:0, pageCount: 0 }}
         loading={userRequestLoading}
         setTitleSort={setTitleSort}
+        setPageSort={setPageSort}
       />
     </Box>
   );

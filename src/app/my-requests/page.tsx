@@ -24,6 +24,7 @@ const MyRequests = () => {
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
+  const [getPageSort, setPageSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
 
@@ -39,6 +40,7 @@ const MyRequests = () => {
           status: wordRequestStatus,
           word: debouncedWordKeyWord,
           titleSort: getTitleSort,
+          pageSort: getPageSort,
         },
       },
       onError: (error) => {
@@ -76,6 +78,7 @@ const MyRequests = () => {
           selectedRequests={selectedRequests}
           setSelectedRequests={setSelectedRequests}
           setTitleSort={setTitleSort}
+          setPageSort={setPageSort}
         />
       </Box>
     </Box>

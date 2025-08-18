@@ -30,6 +30,7 @@ const RequestManagement = () => {
   const [getClass, setClass] = useState<string>('');
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
+  const [getPageSort, setPageSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   
@@ -48,6 +49,7 @@ const RequestManagement = () => {
           year: parseInt(getYear),
           class: getClass.toString(),
           titleSort: getTitleSort,
+          pageSort: getPageSort,
         },
       },
       skip: session?.user.role === "STUDENT",
@@ -95,6 +97,7 @@ const RequestManagement = () => {
           selectedRequests={selectedRequests}
           setSelectedRequests={setSelectedRequests}
           setTitleSort={setTitleSort}
+          setPageSort={setPageSort}
         />
       </Box>
     </Box>

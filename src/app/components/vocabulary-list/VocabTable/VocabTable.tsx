@@ -22,6 +22,7 @@ const VocabTable = ({
   setPaginationModel,
   refetch,
   setTitleSort,
+  setPageSort,
 }: {
   loading: boolean;
   words: VocabularyItemsFragment[];
@@ -37,6 +38,7 @@ const VocabTable = ({
   }>>;
   refetch: () => void;
   setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
+  setPageSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const maxWidth750 = useMediaQuery('(max-width:750px)');
@@ -164,9 +166,8 @@ const VocabTable = ({
       headerClassName: 'page-header',
       cellClassName: 'page-cell',
       headerName: '페이지', 
-      width: 65, 
+      width: 90, 
       filterable: false, 
-      sortable: false,
       valueGetter: (value, row: VocabularyItemsFragment) => {
         if (!row.pages || row.pages.length === 0) {
           return '';
@@ -184,7 +185,7 @@ const VocabTable = ({
           return params.row.pages[0];
         }
         return params.row.pages.map((page) => `• ${page}\n`);
-      }
+      },
     },
     { field: 'title', headerName: '단어', width: 120, filterable: false },
     { 
@@ -322,8 +323,13 @@ const VocabTable = ({
         onSortModelChange={(newSortModel) => {
           if (newSortModel.length === 0) {
             setTitleSort(null);
+            setPageSort(null);
           } else if (newSortModel[0].field === 'title') {
             setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setPageSort(null);
+          } else if (newSortModel[0].field === 'pages') {
+            setPageSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setTitleSort(null);
           }
         }}
         getRowHeight={() => 'auto'}

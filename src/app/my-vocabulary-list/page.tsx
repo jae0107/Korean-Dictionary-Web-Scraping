@@ -21,6 +21,7 @@ const MyVocabularyList = () => {
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [getPage, setPage] = useState<number | null>(null);
   const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
+  const [getPageSort, setPageSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
   const debouncedPage = useDebounce(getPage, 500);
@@ -37,6 +38,7 @@ const MyVocabularyList = () => {
           page: debouncedPage,
           word: debouncedWordKeyWord,
           titleSort: getTitleSort,
+          pageSort: getPageSort,
         },
       },
       onError: (error) => {
@@ -70,6 +72,7 @@ const MyVocabularyList = () => {
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
             setTitleSort={setTitleSort}
+            setPageSort={setPageSort}
           />
         </Box>
       </Stack>

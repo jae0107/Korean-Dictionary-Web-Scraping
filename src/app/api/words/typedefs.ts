@@ -21,6 +21,7 @@ export const wordTypeDefs = gql`
     class: String
     page: Int
     titleSort: SortOptions
+    pageSort: SortOptions
   }
 
   type Word {

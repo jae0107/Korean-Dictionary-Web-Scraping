@@ -31,6 +31,7 @@ const RequestManagementTable = ({
   selectedRequests,
   setSelectedRequests,
   setTitleSort,
+  setPageSort,
 } : {
   loading: boolean;
   words: WordRequestItemsFragment[];
@@ -49,6 +50,7 @@ const RequestManagementTable = ({
   selectedRequests: string[];
   setSelectedRequests: (value: string[]) => void;
   setTitleSort: Dispatch<SetStateAction<SortOptions | null>>;
+  setPageSort: Dispatch<SetStateAction<SortOptions | null>>;
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   const maxWidth360 = useMediaQuery('(max-width:360px)');
@@ -432,9 +434,8 @@ const RequestManagementTable = ({
       headerName: '페이지', 
       headerClassName: 'page-header',
       cellClassName: 'page-cell',
-      width: 65, 
+      width: 90, 
       filterable: false, 
-      sortable: false,
       renderCell: (params: GridRenderCellParams<WordRequestItemsFragment>) => {
         if (!params.row.pages || params.row.pages.length === 0) {
           return <Typography display={'flex'} width={'100%'} justifyContent={'center'} alignItems={'center'}>-</Typography>;
@@ -695,8 +696,13 @@ const RequestManagementTable = ({
         onSortModelChange={(newSortModel) => {
           if (newSortModel.length === 0) {
             setTitleSort(null);
+            setPageSort(null);
           } else if (newSortModel[0].field === 'title') {
             setTitleSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setPageSort(null);
+          } else if (newSortModel[0].field === 'pages') {
+            setPageSort(newSortModel[0].sort === 'asc' ? SortOptions.Asc : SortOptions.Desc);
+            setTitleSort(null);
           }
         }}
         getRowHeight={() => 'auto'}
