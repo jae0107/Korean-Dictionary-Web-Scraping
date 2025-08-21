@@ -1,4 +1,4 @@
-import { CreationOptional, DataTypes, DestroyOptions, HasManyCountAssociationsMixin, HasManyGetAssociationsMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model, ModelStatic, Op } from "sequelize";
+import { BulkCreateOptions, CreationOptional, DataTypes, DestroyOptions, HasManyCountAssociationsMixin, HasManyGetAssociationsMixin, HasManyRemoveAssociationsMixin, HasManySetAssociationsMixin, InferAttributes, InferCreationAttributes, Model, ModelStatic, Op } from "sequelize";
 import { ID } from "../utils/shared-types";
 import { sequelize } from "../initialisers";
 import { isPresent } from "../utils/object-helpers";
@@ -118,6 +118,19 @@ User.addHook('beforeSave', 'hashPassword', async (user: User) => {
     user.sessionVersion = (user.sessionVersion || 0) + 1;
   } else if (user.changed('role')) {
     user.sessionVersion = (user.sessionVersion || 0) + 1;
+  }
+});
+
+User.addHook('beforeBulkCreate', 'bulk hashPassword', async (users: User[], options: BulkCreateOptions<InferAttributes<User>>) => {
+  for (const user of users) {
+    if (user.changed('password')) {
+      if (!user.password.startsWith("$2b$")) {  // bcrypt 해시인지 확인
+        user.password = await bcrypt.hash(user.password, 10);
+      }
+      user.sessionVersion = (user.sessionVersion || 0) + 1;
+    } else if (user.changed('role')) {
+      user.sessionVersion = (user.sessionVersion || 0) + 1;
+    }
   }
 });
 

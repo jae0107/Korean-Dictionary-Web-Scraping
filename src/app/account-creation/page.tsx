@@ -216,7 +216,7 @@ const AccountCreation = () => {
                       password: obj['비밀번호'],
                     };
                   });
-                  
+                  console.log("jsonData: ", jsonData)
                   getJsonData(jsonData);
                 }
                 setLoader(false);

@@ -171,8 +171,7 @@ async function bulkCreateUsers(
         password: user.password || '',
         status: UserStatus.Pending,
         importedStatus: 'IMPORTED',
-      })),
-      { individualHooks: true }
+      }))
     );
 
     return users;
