@@ -54,6 +54,7 @@
     "oci-secrets": "^2.100.3",
     "oracledb": "^6.7.1",
     "os-browserify": "^0.3.0",
+    "p-limit": "^6.2.0",
     "papaparse": "^5.5.2",
     "path-browserify": "^1.0.1",
     "pg": "^8.13.1",
