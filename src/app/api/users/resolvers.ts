@@ -160,19 +160,22 @@ async function bulkCreateUsers(
   { inputs }: { inputs: UserInput[]; },
 ): Promise<User[]> {
   return await transaction(async (t) => {
-    const users = await User.bulkCreate(
-      inputs.map((user) => ({
+    const hashedInputs = await Promise.all(
+      inputs.map(async (user) => ({
         name: user.name || '',
         accountId: user.accountId || '',
         year: user.year || undefined,
         class: user.class || '',
         number: user.number || undefined,
         role: user.role || '',
-        password: user.password || '',
+        password: user.password?.startsWith("$2b$")
+          ? user.password
+          : await bcrypt.hash(user.password || '', 10),
         status: UserStatus.Pending,
         importedStatus: 'IMPORTED',
       }))
     );
+    const users = await User.bulkCreate(hashedInputs);
 
     return users;
   }).catch((e) => {
