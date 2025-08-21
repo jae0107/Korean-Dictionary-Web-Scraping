@@ -149,7 +149,12 @@ const AccountCreation = () => {
 
     setWrongData(inValidData);
     setDuplicateAccounts(tmpDuplicates);
-    onBulkCreate(tmpCorrectData);
+
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < tmpCorrectData.length; i += BATCH_SIZE) {
+      const batch = tmpCorrectData.slice(i, i + BATCH_SIZE);
+      onBulkCreate(batch);
+    }
   };
 
   const {

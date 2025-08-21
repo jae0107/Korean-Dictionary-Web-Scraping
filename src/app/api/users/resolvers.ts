@@ -158,93 +158,36 @@ async function createUser(
 
 async function bulkCreateUsers(
   root: any,
-  { inputs }: { inputs: UserInput[] }
+  { inputs }: { inputs: UserInput[]; },
 ): Promise<User[]> {
-  try {
-    const batchSize = 100; // 한 번에 처리할 유저 수 (환경에 맞게 조정)
-    const concurrency = 5; // bcrypt 동시에 처리할 개수 제한
-    const limit = pLimit(concurrency);
-
-    const users: User[] = [];
-
-    // 입력 데이터를 batch 단위로 나눠서 처리
-    for (let i = 0; i < inputs.length; i += batchSize) {
-      const batch = inputs.slice(i, i + batchSize);
-
-      // bcrypt 해싱 (동시 실행 개수 제한)
-      const hashedBatch = await Promise.all(
-        batch.map((user) =>
-          limit(async () => ({
-            name: user.name || "",
-            accountId: user.accountId || "",
-            year: user.year || undefined,
-            class: user.class || "",
-            number: user.number || undefined,
-            role: user.role || "",
-            password: user.password?.startsWith("$2b$")
-              ? user.password
-              : await bcrypt.hash(user.password || "", 10),
-            status: UserStatus.Pending,
-            importedStatus: "IMPORTED",
-          }))
-        )
-      );
-
-      // batch 단위로 트랜잭션 실행
-      const created = await transaction(async (t) => {
-        return await User.bulkCreate(hashedBatch, {
-          transaction: t,
-          validate: false,       // 검증 비활성화 (성능 ↑)
-          individualHooks: false // beforeBulkCreate 훅 비활성화
-        });
-      });
-
-      users.push(...created);
-    }
+  return await transaction(async (t) => {
+    const hashedInputs = await Promise.all(
+      inputs.map(async (user) => ({
+        name: user.name || '',
+        accountId: user.accountId || '',
+        year: user.year || undefined,
+        class: user.class || '',
+        number: user.number || undefined,
+        role: user.role || '',
+        password: user.password?.startsWith("$2b$")
+          ? user.password
+          : await bcrypt.hash(user.password || '', 10),
+        status: UserStatus.Pending,
+        importedStatus: 'IMPORTED',
+      }))
+    );
+    const users = await User.bulkCreate(hashedInputs);
 
     return users;
-  } catch (e: any) {
-    if (e.errors && e.errors[0].message === "accountId must be unique") {
-      e.message = "아이디가 중복되었습니다.";
-    } else if (e.errors && e.errors[0].message === "email must be unique") {
-      e.message = "이메일이 중복되었습니다.";
+  }).catch((e) => {
+    if (e.errors && e.errors[0].message === 'accountId must be unique') {
+      e.message = '아이디가 중복되었습니다.';
+    } else if (e.errors && e.errors[0].message === 'email must be unique') {
+      e.message = '이메일이 중복되었습니다.';
     }
     throw new ApolloResponseError(e);
-  }
+  });
 }
-
-// async function bulkCreateUsers(
-//   root: any,
-//   { inputs }: { inputs: UserInput[]; },
-// ): Promise<User[]> {
-//   return await transaction(async (t) => {
-//     const hashedInputs = await Promise.all(
-//       inputs.map(async (user) => ({
-//         name: user.name || '',
-//         accountId: user.accountId || '',
-//         year: user.year || undefined,
-//         class: user.class || '',
-//         number: user.number || undefined,
-//         role: user.role || '',
-//         password: user.password?.startsWith("$2b$")
-//           ? user.password
-//           : await bcrypt.hash(user.password || '', 10),
-//         status: UserStatus.Pending,
-//         importedStatus: 'IMPORTED',
-//       }))
-//     );
-//     const users = await User.bulkCreate(hashedInputs);
-
-//     return users;
-//   }).catch((e) => {
-//     if (e.errors && e.errors[0].message === 'accountId must be unique') {
-//       e.message = '아이디가 중복되었습니다.';
-//     } else if (e.errors && e.errors[0].message === 'email must be unique') {
-//       e.message = '이메일이 중복되었습니다.';
-//     }
-//     throw new ApolloResponseError(e);
-//   });
-// }
 
 async function updateUser(
   root: any,
