@@ -17,6 +17,7 @@ import { useSnackbar } from "../hooks/useSnackbar";
 import AccountCreationContainer from "../components/users/account-creation/AccountCreationContainer/AccountCreationContainer";
 import { useCheckSessionVersion } from "../hooks/useCheckSessionVersion";
 import { useSession } from "next-auth/react";
+import { chunk } from "lodash";
 
 const AccountCreation = () => {
   useCheckSessionVersion();
@@ -63,19 +64,17 @@ const AccountCreation = () => {
     return <AccessDenied/>;
   }
 
-  const onBulkCreate = (inputs: UserInput[]) => {
-    setMutationLoading(true);
-    bulkCreateStudents({
+  const onBulkCreate = async (inputs: UserInput[], progress: string) => {
+    return bulkCreateStudents({
       variables: {
         inputs: inputs,
       },
       onError: (error) => {
-        setMutationLoading(false);
         dispatchCurrentSnackBar({
           payload: {
             open: true,
             type: 'error',
-            message: error.message,
+            message: `${error.message} | ${progress}`,
           },
         });
       },
@@ -84,10 +83,9 @@ const AccountCreation = () => {
           payload: {
             open: true,
             type: 'success',
-            message: '성공적으로 학생 계정들이 생성되었습니다.',
+            message: `성공적으로 학생 계정들이 생성되었습니다. (${progress})`,
           },
         });
-        setMutationLoading(false);
       },
     });
   };
@@ -100,7 +98,7 @@ const AccountCreation = () => {
     );
   };
 
-  const getJsonData = (jsonData: RawJsonDataProps[]) => {
+  const getJsonData = async (jsonData: RawJsonDataProps[]) => {
     const inValidData: RawJsonDataProps[] = findInvalidRows(jsonData);
     const tmpDuplicates: ExtendedUserInput[] = [];
     const tmpCorrectData: UserInput[] = [];
@@ -151,10 +149,13 @@ const AccountCreation = () => {
     setDuplicateAccounts(tmpDuplicates);
 
     const BATCH_SIZE = 50;
-    for (let i = 0; i < tmpCorrectData.length; i += BATCH_SIZE) {
-      const batch = tmpCorrectData.slice(i, i + BATCH_SIZE);
-      onBulkCreate(batch);
+    setMutationLoading(true);
+    const batches = chunk(tmpCorrectData, BATCH_SIZE);
+    for (const [index, batch] of batches.entries()) {
+      const progress = `${index + 1}/${batches.length}`;
+      await onBulkCreate(batch, progress);
     }
+    setMutationLoading(false);
   };
 
   const {
