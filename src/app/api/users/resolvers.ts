@@ -161,10 +161,9 @@ async function bulkCreateUsers(
   { inputs }: { inputs: UserInput[]; },
 ): Promise<User[]> {
   return await transaction(async (t) => {
-    const limit = pLimit(5);
-
-    const hashedInputs = await Promise.all(
-      inputs.map((user) => limit(async () => ({
+    const hashedInputs = [];
+    for (const user of inputs) {
+      hashedInputs.push({
         name: user.name || '',
         accountId: user.accountId || '',
         year: user.year || undefined,
@@ -176,8 +175,25 @@ async function bulkCreateUsers(
           : await bcrypt.hash(user.password || '', 10),
         status: UserStatus.Pending,
         importedStatus: 'IMPORTED',
-      })))
-    );
+      });
+    }
+    // const limit = pLimit(5);
+
+    // const hashedInputs = await Promise.all(
+    //   inputs.map((user) => limit(async () => ({
+    //     name: user.name || '',
+    //     accountId: user.accountId || '',
+    //     year: user.year || undefined,
+    //     class: user.class || '',
+    //     number: user.number || undefined,
+    //     role: user.role || '',
+    //     password: user.password?.startsWith("$2b$")
+    //       ? user.password
+    //       : await bcrypt.hash(user.password || '', 10),
+    //     status: UserStatus.Pending,
+    //     importedStatus: 'IMPORTED',
+    //   })))
+    // );
     const users = await User.bulkCreate(hashedInputs);
 
     return users;
