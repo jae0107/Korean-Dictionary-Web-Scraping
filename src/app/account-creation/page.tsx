@@ -148,7 +148,7 @@ const AccountCreation = () => {
     setWrongData(inValidData);
     setDuplicateAccounts(tmpDuplicates);
 
-    const BATCH_SIZE = 50;
+    const BATCH_SIZE = 30;
     setMutationLoading(true);
     const batches = chunk(tmpCorrectData, BATCH_SIZE);
     for (const [index, batch] of batches.entries()) {

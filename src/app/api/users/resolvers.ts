@@ -158,90 +158,38 @@ async function createUser(
 
 async function bulkCreateUsers(
   root: any,
-  { inputs }: { inputs: UserInput[] },
+  { inputs }: { inputs: UserInput[]; },
 ): Promise<User[]> {
   return await transaction(async (t) => {
-    const MAX_CONCURRENCY = 5;
-    let index = 0;
-    const createdUsers: User[] = [];
+    const limit = pLimit(5);
 
-    async function worker() {
-      while (index < inputs.length) {
-        const i = index++;
-        const user = inputs[i];
-
-        const password = user.password?.startsWith('$2b$')
+    const hashedInputs = await Promise.all(
+      inputs.map((user) => limit(async () => ({
+        name: user.name || '',
+        accountId: user.accountId || '',
+        year: user.year || undefined,
+        class: user.class || '',
+        number: user.number || undefined,
+        role: user.role || '',
+        password: user.password?.startsWith("$2b$")
           ? user.password
-          : await bcrypt.hash(user.password || '', 10);
+          : await bcrypt.hash(user.password || '', 10),
+        status: UserStatus.Pending,
+        importedStatus: 'IMPORTED',
+      })))
+    );
+    const users = await User.bulkCreate(hashedInputs);
 
-        try {
-          const created = await User.create(
-            {
-              name: user.name || '',
-              accountId: user.accountId || '',
-              year: user.year || undefined,
-              class: user.class || '',
-              number: user.number || undefined,
-              role: user.role || '',
-              password,
-              status: UserStatus.Pending,
-              importedStatus: 'IMPORTED',
-            },
-            { transaction: t }
-          );
-
-          createdUsers.push(created);
-        } catch (e: any) {
-          if (e.errors && e.errors[0].message === 'accountId must be unique') {
-            e.message = '아이디가 중복되었습니다.';
-          } else if (e.errors && e.errors[0].message === 'email must be unique') {
-            e.message = '이메일이 중복되었습니다.';
-          }
-          throw new ApolloResponseError(e);
-        }
-      }
+    return users;
+  }).catch((e) => {
+    if (e.errors && e.errors[0].message === 'accountId must be unique') {
+      e.message = '아이디가 중복되었습니다.';
+    } else if (e.errors && e.errors[0].message === 'email must be unique') {
+      e.message = '이메일이 중복되었습니다.';
     }
-
-    await Promise.all(Array.from({ length: MAX_CONCURRENCY }, worker));
-
-    return createdUsers;
+    throw new ApolloResponseError(e);
   });
 }
-
-// async function bulkCreateUsers(
-//   root: any,
-//   { inputs }: { inputs: UserInput[]; },
-// ): Promise<User[]> {
-//   return await transaction(async (t) => {
-//     const limit = pLimit(5);
-
-//     const hashedInputs = await Promise.all(
-//       inputs.map((user) => limit(async () => ({
-//         name: user.name || '',
-//         accountId: user.accountId || '',
-//         year: user.year || undefined,
-//         class: user.class || '',
-//         number: user.number || undefined,
-//         role: user.role || '',
-//         password: user.password?.startsWith("$2b$")
-//           ? user.password
-//           : await bcrypt.hash(user.password || '', 10),
-//         status: UserStatus.Pending,
-//         importedStatus: 'IMPORTED',
-//       })))
-//     );
-//     const users = await User.bulkCreate(hashedInputs);
-
-//     return users;
-//   }).catch((e) => {
-//     if (e.errors && e.errors[0].message === 'accountId must be unique') {
-//       e.message = '아이디가 중복되었습니다.';
-//     } else if (e.errors && e.errors[0].message === 'email must be unique') {
-//       e.message = '이메일이 중복되었습니다.';
-//     }
-//     throw new ApolloResponseError(e);
-//   });
-// }
 
 async function updateUser(
   root: any,
