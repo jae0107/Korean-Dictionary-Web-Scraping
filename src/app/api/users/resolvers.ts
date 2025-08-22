@@ -161,8 +161,10 @@ async function bulkCreateUsers(
   { inputs }: { inputs: UserInput[]; },
 ): Promise<User[]> {
   return await transaction(async (t) => {
+    const limit = pLimit(5);
+
     const hashedInputs = await Promise.all(
-      inputs.map(async (user) => ({
+      inputs.map((user) => limit(async () => ({
         name: user.name || '',
         accountId: user.accountId || '',
         year: user.year || undefined,
@@ -174,7 +176,7 @@ async function bulkCreateUsers(
           : await bcrypt.hash(user.password || '', 10),
         status: UserStatus.Pending,
         importedStatus: 'IMPORTED',
-      }))
+      })))
     );
     const users = await User.bulkCreate(hashedInputs);
 
