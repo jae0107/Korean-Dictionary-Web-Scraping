@@ -70,9 +70,9 @@ export class UserSearch {
 
     if (isPresent(nameSort) && nameSort) {
       if (nameSort === SortOptions.Asc) {
-        query = query.orderBy('users.name', 'asc').orderBy('words.createdAt', 'asc');
+        query = query.orderBy('users.name', 'asc').orderBy('users.createdAt', 'asc');
       } else if (nameSort === SortOptions.Desc) {
-        query = query.orderBy('users.name', 'desc').orderBy('words.createdAt', 'asc');
+        query = query.orderBy('users.name', 'desc').orderBy('users.createdAt', 'asc');
       }
     } else {
       query = query.orderBy('users.createdAt', 'desc');

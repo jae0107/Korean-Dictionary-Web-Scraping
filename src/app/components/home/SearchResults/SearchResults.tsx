@@ -566,7 +566,6 @@ const SearchResults = ({
                 <TextField
                   label={'페이지'}
                   fullWidth={index > 0}
-                  type='number'
                   value={page}
                   onChange={(e) => {
                     const value = Number(e.target.value);
@@ -577,7 +576,6 @@ const SearchResults = ({
                   }}
                   slotProps={{
                     htmlInput: {
-                      min: 0,
                       sx: { 
                         '@media (max-width:500px)': {
                           fontSize: '0.8rem'
