@@ -19,7 +19,8 @@ export const wordTypeDefs = gql`
     requestorId: ID
     year: Int
     class: String
-    page: Int
+    pageFrom: Int
+    pageTo: Int
     titleSort: SortOptions
     pageSort: SortOptions
   }

@@ -51,8 +51,9 @@ const UserInfoPopUp = ({
     number: getRequestor?.number || undefined,
     accountId: getRequestor?.accountId || '',
     role: getRequestor?.role || 'STUDENT',
+    approvedCount: getRequestor?.approvedCount || 0,
   };
-  
+
   return (
     <Dialog
       open={openUserInfoPopUp}

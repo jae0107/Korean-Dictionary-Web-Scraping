@@ -27,6 +27,13 @@ const UserInfo = ({
               <TableCell sx={{ minWidth: 70 }} component="th" scope="row">번호</TableCell>
               <TableCell>{user?.number && user.number > 0 ? `${user.number}번` || '-' : '-'}</TableCell>
             </TableRow>}
+            {
+              user?.approvedCount !== undefined &&
+              <TableRow>
+                <TableCell sx={{ minWidth: 70 }} component="th" scope="row">승인된 요청</TableCell>
+                <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.approvedCount}</TableCell>
+              </TableRow>
+            }
             <TableRow>
               <TableCell sx={{ minWidth: 70 }} component="th" scope="row">아이디</TableCell>
               <TableCell sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{user.accountId || ''}</TableCell>

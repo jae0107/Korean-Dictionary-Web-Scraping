@@ -87,7 +87,7 @@ const documents = {
     "\n  query GetPasswordResetRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: PasswordResetRequestFilterOptions!) {\n    getPasswordResetRequests(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...PasswordResetRequestItems\n      }\n      pageInfo {\n        pageCount\n        totalRowCount\n      }\n    }\n  }\n": types.GetPasswordResetRequestsDocument,
     "\n  fragment MyProfileItems on User {\n    accountId\n    name\n    year\n    class\n    number\n    role\n  }\n": types.MyProfileItemsFragmentDoc,
     "\n  query GetMyProfile {\n    getCurrentUser {\n      id\n      ...MyProfileItems\n    }\n  }\n": types.GetMyProfileDocument,
-    "\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n": types.RequestorItemsFragmentDoc,
+    "\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n    approvedCount\n  }\n": types.RequestorItemsFragmentDoc,
     "\n  fragment WordRequestItems on Word {\n    id\n    requestors {\n      ...RequestorItems\n    }\n    korDicResults\n    naverDicResults\n    status\n    title\n    pages\n    examples\n    deniedReason\n    wordId\n  }\n": types.WordRequestItemsFragmentDoc,
     "\n  query GetWordRequests($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...WordRequestItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetWordRequestsDocument,
     "\n  fragment SingleStudentItems on User {\n    accountId\n    name\n    year\n    class\n    number\n    role\n  }\n": types.SingleStudentItemsFragmentDoc,
@@ -417,7 +417,7 @@ export function gql(source: "\n  query GetMyProfile {\n    getCurrentUser {\n   
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n"): (typeof documents)["\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n  }\n"];
+export function gql(source: "\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n    approvedCount\n  }\n"): (typeof documents)["\n  fragment RequestorItems on User {\n    id\n    name\n    role\n    year\n    class\n    number\n    accountId\n    approvedCount\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

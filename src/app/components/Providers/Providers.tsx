@@ -20,13 +20,8 @@ export const ThemeContext = createContext<Theme | null>(null);
 export const useThemeContext = () => useContext(ThemeContext);
 
 const Providers = ({ children } : { children: ReactNode }) => {
-  const prefersMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [mode, setMode] = useState<'light' | 'dark'>('dark');
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
-
-  useEffect(() => {
-    setMode(prefersMode ? 'dark' : 'light');
-  }, [prefersMode]);
 
   const theme = useMemo(
     () =>

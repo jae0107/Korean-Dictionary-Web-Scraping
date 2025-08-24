@@ -18,7 +18,7 @@ export class MyVocabularySearch {
 
   async process(): Promise<OffsetPaginationResponse<MyVocabulary>> {
     const { limit, pageNum } = this.paginationOptions;
-    const { word, userId, page, titleSort, pageSort } = this.filterOptions;
+    const { word, userId, pageFrom, pageTo, titleSort, pageSort } = this.filterOptions;
 
     let query: QueryBuilder = queryBuilder('myVocabularies');
 
@@ -39,8 +39,11 @@ export class MyVocabularySearch {
         .where('words.title', 'ilike', `%${word}%`);
     }
 
-    if (isPresent(page) && page) {
-      query = query.whereRaw('? = ANY(words.pages)', [page]);
+    if (isPresent(pageFrom) && isPresent(pageTo)) {
+      query = query.whereRaw(
+        'words.pages && ARRAY(SELECT generate_series(?, ?))',
+        [pageFrom, pageTo]
+      );
     }
 
     if (!isPresent(pageNum) || pageNum < 0) {

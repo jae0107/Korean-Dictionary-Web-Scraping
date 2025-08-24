@@ -9,6 +9,7 @@ export const requestorFragment = gql(`
     class
     number
     accountId
+    approvedCount
   }
 `);
 

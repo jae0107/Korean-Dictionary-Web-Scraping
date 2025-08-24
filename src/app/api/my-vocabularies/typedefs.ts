@@ -18,7 +18,8 @@ export const myVocabularyTypeDefs = gql`
   input MyVocabularyFilterOptions {
     word: String
     userId: ID
-    page: Int
+    pageFrom: Int
+    pageTo: Int
     titleSort: SortOptions
     pageSort: SortOptions
   }

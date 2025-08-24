@@ -8,4 +8,5 @@ export interface UserInfoProps {
   status?: 'APPROVED' | 'PENDING' | 'DENIED';
   importedStatus?: 'IMPORTED' | 'NOT_IMPORTED';
   password?: string;
+  approvedCount?: number;
 }

@@ -55,7 +55,7 @@ const ExistingWordPopup = ({
       </Box>
       <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'} pr={3} mt={'4px'}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', pt: 0, pb: 0 }}>
-          <ErrorOutline color='warning' sx={{ mr: 1 }}/>{`이미 ${getWordRequest.status === WordStatus.Approved ? '등록돤' : '신청 대기중인'} 단어입니다.`} 
+          <ErrorOutline color='warning' sx={{ mr: 1 }}/>{`이미 ${getWordRequest.status === WordStatus.Approved ? '등록된' : '신청 대기중인'} 단어입니다.`} 
         </DialogTitle>
       </Box>
       <DialogContent>

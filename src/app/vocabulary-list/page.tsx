@@ -21,13 +21,17 @@ const VocabularyList = () => {
   const [wordKeyword, setWordKeyword] = useState<string>('');
   const [getYear, setYear] = useState<string>('');
   const [getClass, setClass] = useState<string>('');
-  const [getPage, setPage] = useState<number | null>(null);
+  const [getPageFrom, setPageFrom] = useState<number | null>(null);
+  const [getPageTo, setPageTo] = useState<number | null>(null);
   const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
   const [getPageSort, setPageSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
-  const debouncedPage = useDebounce(getPage, 500);
-  
+  const debouncedPageFrom = useDebounce(getPageFrom, 500);
+  const debouncedPageTo = useDebounce(getPageTo, 500);
+
+  const skipPageFilter = (!debouncedPageFrom && !!debouncedPageTo) || (!!debouncedPageFrom && !debouncedPageTo);
+
   const { data, loading, refetch } =
     useQuery(getVocabulariesQuery, {
       fetchPolicy: 'network-only',
@@ -41,7 +45,8 @@ const VocabularyList = () => {
           word: debouncedWordKeyWord,
           year: parseInt(getYear),
           class: getClass.toString(),
-          page: debouncedPage,
+          pageFrom: skipPageFilter ? null : debouncedPageFrom,
+          pageTo: skipPageFilter ? null : debouncedPageTo,
           titleSort: getTitleSort,
           pageSort: getPageSort,
         },
@@ -68,8 +73,10 @@ const VocabularyList = () => {
             setYear={setYear}
             getClass={getClass}
             setClass={setClass}
-            getPage={getPage}
-            setPage={setPage}
+            getPageFrom={getPageFrom}
+            setPageFrom={setPageFrom}
+            getPageTo={getPageTo}
+            setPageTo={setPageTo}
           />
         </Box>
         <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>

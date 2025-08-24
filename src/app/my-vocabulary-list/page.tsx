@@ -19,12 +19,16 @@ const MyVocabularyList = () => {
   const { dispatchCurrentSnackBar } = useSnackbar();
 
   const [wordKeyword, setWordKeyword] = useState<string>('');
-  const [getPage, setPage] = useState<number | null>(null);
+  const [getPageFrom, setPageFrom] = useState<number | null>(null);
+  const [getPageTo, setPageTo] = useState<number | null>(null);
   const [getTitleSort, setTitleSort] = useState<SortOptions | null>(null);
   const [getPageSort, setPageSort] = useState<SortOptions | null>(null);
 
   const debouncedWordKeyWord = useDebounce(wordKeyword, 500);
-  const debouncedPage = useDebounce(getPage, 500);
+  const debouncedPageFrom = useDebounce(getPageFrom, 500);
+  const debouncedPageTo = useDebounce(getPageTo, 500);
+  
+  const skipPageFilter = (!debouncedPageFrom && !!debouncedPageTo) || (!!debouncedPageFrom && !debouncedPageTo);
 
   const { data, loading } =
     useQuery(getMyVocabulariesQuery, {
@@ -35,10 +39,11 @@ const MyVocabularyList = () => {
           pageNum: paginationModel.page,
         },
         filterOptions: {
-          page: debouncedPage,
           word: debouncedWordKeyWord,
           titleSort: getTitleSort,
           pageSort: getPageSort,
+          pageFrom: skipPageFilter ? null : debouncedPageFrom,
+          pageTo: skipPageFilter ? null : debouncedPageTo,
         },
       },
       onError: (error) => {
@@ -59,8 +64,10 @@ const MyVocabularyList = () => {
           <MyVocabFilter
             wordKeyword={wordKeyword}
             setWordKeyword={setWordKeyword}
-            getPage={getPage}
-            setPage={setPage}
+            getPageFrom={getPageFrom}
+            setPageFrom={setPageFrom}
+            getPageTo={getPageTo}
+            setPageTo={setPageTo}
           />
         </Box>
         <Box display={'flex'} alignItems={'center'} flexDirection={'column'} width={'100%'}>

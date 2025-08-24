@@ -8,8 +8,10 @@ const VocabFilter = ({
   setYear,
   getClass,
   setClass,
-  getPage,
-  setPage,
+  getPageFrom,
+  setPageFrom,
+  getPageTo,
+  setPageTo,
 } : {
   wordKeyword: string;
   setWordKeyword: (value: string) => void;
@@ -17,8 +19,10 @@ const VocabFilter = ({
   setYear: (value: string) => void;
   getClass: string;
   setClass: (value: string) => void;
-  getPage: number | null;
-  setPage: (value: number | null) => void;
+  getPageFrom: number | null;
+  setPageFrom: (value: number | null) => void;
+  getPageTo: number | null;
+  setPageTo: (value: number | null) => void;
 }) => {
   return (
     <Stack 
@@ -88,10 +92,11 @@ const VocabFilter = ({
           }}
         />
         <TextField
-          label={'페이지'}
+          label={'시작 페이지'}
+          error={!getPageFrom && !!getPageTo}
           type='number'
-          value={getPage ?? ''}
-          onChange={(e) => setPage(parseInt(e.target.value))}
+          value={getPageFrom ?? ''}
+          onChange={(e) => setPageFrom(parseInt(e.target.value))}
           sx={{ 
             flex: 0.5,
             '@media (max-width:495px)': {
@@ -102,7 +107,39 @@ const VocabFilter = ({
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setPage(null)}>
+                  <IconButton onClick={() => setPageFrom(null)}>
+                    <Cancel sx={{ width: '15px', height: '15px' }}/>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+            htmlInput: {
+              min: 0,
+              sx: {
+                '@media (max-width:600px)': {
+                  fontSize: '0.8rem',
+                }
+              },
+            },
+          }}
+        />
+        <TextField
+          label={'끝 페이지'}
+          error={!!getPageFrom && !getPageTo}
+          type='number'
+          value={getPageTo ?? ''}
+          onChange={(e) => setPageTo(parseInt(e.target.value))}
+          sx={{ 
+            flex: 0.5,
+            '@media (max-width:495px)': {
+              flex: 1,
+            }
+          }}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setPageTo(null)}>
                     <Cancel sx={{ width: '15px', height: '15px' }}/>
                   </IconButton>
                 </InputAdornment>
