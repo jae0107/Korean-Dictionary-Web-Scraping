@@ -44,8 +44,8 @@ const SearchResults = ({
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   
-  const [getKorDic, setKorDic] = useState<string>('');
-  const [getNaverDic, setNaverDic] = useState<string>('');
+  // const [getKorDic, setKorDic] = useState<string>('');
+  // const [getNaverDic, setNaverDic] = useState<string>('');
   const [getLoader, setLoader] = useState<boolean>(false);
 
   const [createWordRequest] = useMutation(createWordRequestMutation);
@@ -351,7 +351,7 @@ const SearchResults = ({
             <ArrowRightAlt/>
           </Link>
         }
-        {
+        {/* {
           isNew &&
           <form
             style={{ width: '100%' }}
@@ -417,7 +417,7 @@ const SearchResults = ({
               </IconButton>
             </Box>
           </form>
-        }
+        } */}
       </Box>
     );
   };
