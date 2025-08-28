@@ -1,6 +1,6 @@
 import { Cancel, DoDisturb } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputAdornment, TextField } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const DeniedReasonPopUp = ({
   open,
@@ -13,10 +13,18 @@ const DeniedReasonPopUp = ({
   getDeniedReason: string;
   setDeniedReason: (value: string) => void;
 }) => {
+  const deniedInputRef = useRef<HTMLInputElement>(null);
   return (
     <Dialog
       open={open}
       onClose={() => handleClose(false, getDeniedReason)}
+      slotProps={{
+        transition: {
+          onEntered: () => {
+            deniedInputRef.current?.focus();
+          }
+        }
+      }}
       sx={{
         '@media (max-width: 470px)': {
           "& .MuiDialog-container": {
@@ -41,6 +49,7 @@ const DeniedReasonPopUp = ({
         }}
       >
         <TextField
+          inputRef={deniedInputRef}
           type='text'
           placeholder="거절 사유를 입력하세요."
           multiline
