@@ -1,4 +1,4 @@
-import { AdminPanelSettings, Chat, Groups, MenuBook, Quiz, RestartAlt, Storage } from "@mui/icons-material";
+import { AdminPanelSettings, Assessment, Chat, Groups, MenuBook, PersonAdd, Quiz, RestartAlt, Storage } from "@mui/icons-material";
 import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Theme } from "@mui/material";
 import { Session } from "next-auth";
 import Link from "next/link";
@@ -142,6 +142,22 @@ const MobileNavDrawer = ({
                     </ListItemButton>
                   </ListItem>
                 }
+                <ListItem disablePadding sx={{backgroundColor: pathname.includes('/account-creation') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                  <ListItemButton LinkComponent={Link} href={'/account-creation'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
+                    <ListItemIcon>
+                      <PersonAdd style={{ height: '24px', width: '24px' }}/>
+                    </ListItemIcon>
+                    <ListItemText primary={'학생 계정 만들기'} />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding sx={{backgroundColor: pathname.includes('/user-stats') ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#00000026' : 'transparent' }}>
+                  <ListItemButton LinkComponent={Link} href={'/user-stats'} sx={{ pl: '40px !important', pb: '2px', pt: '2px' }}>
+                    <ListItemIcon>
+                      <Assessment style={{ height: '24px', width: '24px' }}/>
+                    </ListItemIcon>
+                    <ListItemText primary={'학생 통계'} />
+                  </ListItemButton>
+                </ListItem>
               </List>
             </List>
             <Divider />
