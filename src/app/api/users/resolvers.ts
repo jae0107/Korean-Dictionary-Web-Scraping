@@ -1,7 +1,7 @@
-import { PasswordResetRequest, User, Word } from "../models";
+import { PasswordResetRequest, User } from "../models";
 import { transaction } from "../utils/transaction-helpers";
 import { ApolloResponseError } from "../utils/error-handler";
-import { FindMyIdInput, FindPasswordInput, OffsetPaginationOptions, PasswordResetInput, RequestorFilterOptions, UserFilterOptions, UserInput, UserRole, UserStatus } from "../../generated/gql/graphql";
+import { FindMyIdInput, FindPasswordInput, OffsetPaginationOptions, RequestorFilterOptions, UserFilterOptions, UserInput, UserRole, UserStatus } from "../../generated/gql/graphql";
 import { OffsetPaginationResponse } from "../utils/shared-types";
 import { UserSearch } from "./user-search";
 import { Context } from "../graphql/route";
@@ -9,7 +9,6 @@ import { RequestorSearch } from "./requestor-search";
 import { knex, queryBuilder, QueryBuilder, sequelize } from "../initialisers";
 import { Op, QueryTypes } from "sequelize";
 import * as bcrypt from 'bcrypt';
-import pLimit from "p-limit";
 
 export const userResolvers = {
   Query: {
@@ -71,10 +70,10 @@ async function getUsers(
         .limit(1);
       
       const results = await sequelize.query(query.toString(), { type: QueryTypes.SELECT }) as { maxnumber: number }[];
-      
+
       return {
         ...offsetUsersResponse,
-        maxNumTest: results[0].maxnumber,
+        maxNumTest: results?.[0]?.maxnumber || 0,
       }
     }
 

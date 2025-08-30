@@ -1,6 +1,6 @@
 import { Cancel, DoDisturb } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputAdornment, TextField } from "@mui/material";
-import { useRef, useState } from "react";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 
 const DeniedReasonPopUp = ({
   open,
@@ -13,7 +13,29 @@ const DeniedReasonPopUp = ({
   getDeniedReason: string;
   setDeniedReason: (value: string) => void;
 }) => {
+  const predefinedReasons = ['주요개념', '고유명사 (이름)', '너무 쉬움', '너무 어려움'];
+  
   const deniedInputRef = useRef<HTMLInputElement>(null);
+  const [getSelectorValue, setSelectorValue] = useState(predefinedReasons.includes(getDeniedReason) ? getDeniedReason : '직접입력');
+  const [getDisplay, setDisplay] = useState(getSelectorValue === '직접입력');
+
+  useEffect(() => {
+    if (getDisplay) {
+      deniedInputRef.current?.focus();
+    }
+  }, [getDisplay]);
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setSelectorValue(event.target.value);
+    if (event.target.value === '직접입력') {
+      setDisplay(true);
+      setDeniedReason('');
+    } else {
+      setDisplay(false);
+      setDeniedReason(event.target.value);
+    }
+  };
+  
   return (
     <Dialog
       open={open}
@@ -21,7 +43,7 @@ const DeniedReasonPopUp = ({
       slotProps={{
         transition: {
           onEntered: () => {
-            deniedInputRef.current?.focus();
+            getDisplay && deniedInputRef.current?.focus();
           }
         }
       }}
@@ -48,27 +70,45 @@ const DeniedReasonPopUp = ({
           },
         }}
       >
-        <TextField
-          inputRef={deniedInputRef}
-          type='text'
-          placeholder="거절 사유를 입력하세요."
-          multiline
-          rows={4}
-          fullWidth
-          value={getDeniedReason}
-          onChange={(e) => setDeniedReason(e.target.value)}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setDeniedReason('')}>
-                    <Cancel sx={{ width: '15px', height: '15px' }}/>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
+        <FormControl fullWidth>
+          <InputLabel>거절 사유</InputLabel>
+          <Select
+            value={getSelectorValue}
+            label='거절 사유'
+            onChange={handleChange}
+          >
+            <MenuItem value={'주요개념'}>주요개념</MenuItem>
+            <MenuItem value={'고유명사 (이름)'}>고유명사 (이름)</MenuItem>
+            <MenuItem value={'너무 쉬움'}>너무 쉬움</MenuItem>
+            <MenuItem value={'너무 어려움'}>너무 어려움</MenuItem>
+            <MenuItem value={'직접입력'}>기타 (직접입력)</MenuItem>
+          </Select>
+        </FormControl>
+        {
+          getDisplay && 
+          <TextField
+            inputRef={deniedInputRef}
+            type='text'
+            placeholder="거절 사유를 입력하세요."
+            multiline
+            rows={4}
+            fullWidth
+            value={getDeniedReason}
+            onChange={(e) => setDeniedReason(e.target.value)}
+            sx={{ mt: 2 }}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setDeniedReason('')}>
+                      <Cancel sx={{ width: '15px', height: '15px' }}/>
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        }
       </DialogContent>
       <DialogActions>
         <Button autoFocus variant='contained' color='error' onClick={() => handleClose(false, getDeniedReason)}>

@@ -763,12 +763,15 @@ const UserContainer = ({
           title={'주의'}
           content={'정말 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.'}
         />
-        <DeniedReasonPopUp
-          open={openDeniedReasonPopUp}
-          handleClose={handleCloseDeniedReasonPopUp}
-          getDeniedReason={selectedDeniedReason}
-          setDeniedReason={setSelectedDeniedReason}
-        />
+        {
+          openDeniedReasonPopUp && 
+          <DeniedReasonPopUp
+            open={openDeniedReasonPopUp}
+            handleClose={handleCloseDeniedReasonPopUp}
+            getDeniedReason={selectedDeniedReason}
+            setDeniedReason={setSelectedDeniedReason}
+          />
+        }
         <RequestDetailPopUp
           openRequestDetailPopUp={openRequestDetailPopUp}
           getWordRequest={getWordRequest}
