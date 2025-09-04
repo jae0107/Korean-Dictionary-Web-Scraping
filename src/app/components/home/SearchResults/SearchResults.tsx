@@ -44,8 +44,8 @@ const SearchResults = ({
 }) => {
   const { dispatchCurrentSnackBar } = useSnackbar();
   
-  // const [getKorDic, setKorDic] = useState<string>('');
-  // const [getNaverDic, setNaverDic] = useState<string>('');
+  const [getKorDic, setKorDic] = useState<string>('');
+  const [getNaverDic, setNaverDic] = useState<string>('');
   const [getLoader, setLoader] = useState<boolean>(false);
 
   const [createWordRequest] = useMutation(createWordRequestMutation);
@@ -351,7 +351,7 @@ const SearchResults = ({
             <ArrowRightAlt/>
           </Link>
         }
-        {/* {
+        {
           isNew &&
           <form
             style={{ width: '100%' }}
@@ -371,6 +371,7 @@ const SearchResults = ({
               <TextField
                 size='small'
                 sx={{ width: '100%' }}
+                placeholder='원하는 뜻이 없을 경우 직접 입력하세요.'
                 value={dicType === 'koDic' ? getKorDic : getNaverDic}
                 onChange={(e) => dicType === 'koDic' ? setKorDic(e.target.value) : setNaverDic(e.target.value)}
                 slotProps={{
@@ -417,7 +418,7 @@ const SearchResults = ({
               </IconButton>
             </Box>
           </form>
-        } */}
+        }
       </Box>
     );
   };
@@ -530,7 +531,16 @@ const SearchResults = ({
               className='korDicLogo'
               src={korDicLogo.src}
             />
-            <Stack direction={'column'} width={'100%'}>
+            <Stack 
+              direction={'column'} 
+              width={'100%'} 
+              minWidth={'370px'}
+              sx={{
+                '@media (max-width:450px)': {
+                  minWidth: '80vw',
+                }
+              }}
+            >
               {getExistingWord && getResults(getExistingWord?.korDicResults ?? [], 'koDic', false)}
               {getResults(watch('korDicResults') ?? [], 'koDic', true)}
             </Stack>
