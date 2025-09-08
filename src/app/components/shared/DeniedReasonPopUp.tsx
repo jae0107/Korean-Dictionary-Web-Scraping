@@ -13,7 +13,15 @@ const DeniedReasonPopUp = ({
   getDeniedReason: string;
   setDeniedReason: (value: string) => void;
 }) => {
-  const predefinedReasons = ['주요개념', '고유명사 (이름)', '너무 쉬움', '너무 어려움'];
+  const predefinedReasons = [
+    '주요개념', 
+    '고유명사 (이름)', 
+    '너무 쉬움', 
+    '너무 어려움', 
+    '같은 단어 이미 등록됨 (예시: 거절하다-거절)',
+    '동음이의어',
+    '합성어',
+  ];
   
   const deniedInputRef = useRef<HTMLInputElement>(null);
   const [getSelectorValue, setSelectorValue] = useState(predefinedReasons.includes(getDeniedReason) ? getDeniedReason : '직접입력');
@@ -81,6 +89,9 @@ const DeniedReasonPopUp = ({
             <MenuItem value={'고유명사 (이름)'}>고유명사 (이름)</MenuItem>
             <MenuItem value={'너무 쉬움'}>너무 쉬움</MenuItem>
             <MenuItem value={'너무 어려움'}>너무 어려움</MenuItem>
+            <MenuItem value={'같은 단어 이미 등록됨 (예시: 거절하다-거절)'}>같은 단어 이미 등록됨 (예시: 거절하다-거절)</MenuItem>
+            <MenuItem value={'동음이의어'}>동음이의어</MenuItem>
+            <MenuItem value={'합성어'}>합성어</MenuItem>
             <MenuItem value={'직접입력'}>기타 (직접입력)</MenuItem>
           </Select>
         </FormControl>
