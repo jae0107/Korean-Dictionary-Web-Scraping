@@ -10,21 +10,27 @@ import logo from "../../assets/images/logo.png";
 import { useSearch } from '../hooks/useSearch';
 import './style.scss';
 import { useCheckSessionVersion } from '../hooks/useCheckSessionVersion';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { getWordByTitleQuery } from '../components/home/SearchResults/query';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ExistingWordPopup from '../components/home/ExistingWordPopup/ExistingWordPopup';
-import { WordByTitleItemsFragment } from '../generated/gql/graphql';
+import { ExistingVocabularyItemsFragment, WordByTitleItemsFragment, WordStatus } from '../generated/gql/graphql';
+import { getExistingVocabulariesQuery } from './query';
+import usePaginationModel from '../hooks/usePaginationModel';
+import { useDebounce } from '../hooks/useDebounce';
+import DictionarySearch from '../components/home/SearchResults/DictionarySearch/DictionarySearch';
 
 const Home = () => {
   useCheckSessionVersion(true);
   
   const { dispatchCurrentSnackBar } = useSnackbar();
   const { searchResults, setSearchResults } = useSearch();
+  const { paginationModel, setPaginationModel } = usePaginationModel();
 
   const [isLoading, setIsLoading] = useState(false);
   const [openExistingWordPopup, setOpenExistingWordPopup] = useState(false);
   const [getExistingWord, setExistingWord] = useState<WordByTitleItemsFragment | null>(null);
+  const [selectedExistingWord, setSelectedExistingWord] = useState<ExistingVocabularyItemsFragment | null>(null);
 
   const [getWordByTitle, { data, loading, refetch }] = useLazyQuery(getWordByTitleQuery);
   
@@ -36,7 +42,44 @@ const Home = () => {
   
   const { setValue, register, handleSubmit, watch } = form;
 
+  const debouncedWordKeyWord = useDebounce(watch('kWord'), 500);
+
+  const { data: wordData, loading: wordLoading } =
+    useQuery(getExistingVocabulariesQuery, {
+      fetchPolicy: 'network-only',
+      variables: {
+        paginationOptions: {
+          limit: paginationModel.pageSize,
+          pageNum: paginationModel.page,
+        },
+        filterOptions: {
+          status: WordStatus.Approved,
+          word: debouncedWordKeyWord,
+        },
+      },
+      skip: !watch('kWord'),
+      onError: (error) => {
+        dispatchCurrentSnackBar({
+          payload: {
+            open: true,
+            type: 'error',
+            message: error.message,
+          },
+        });
+      },
+    });
+
+  const options = wordData?.getWords?.records || [];
+
   const checkDuplicate: SubmitHandler<{ kWord: string }> = async (value) => {
+    const firstMatch = options.find((option) =>
+      option.title.toLowerCase().startsWith(watch('kWord').toLowerCase())
+    );
+    if (firstMatch) {
+      setValue('kWord', firstMatch.title);
+      setSelectedExistingWord(firstMatch);
+    }
+
     getWordByTitle({
       variables: {
         title: value.kWord,
@@ -95,7 +138,7 @@ const Home = () => {
   return (
     <Box width={'100%'} display={'flex'} flexDirection={'column'} alignItems={'center'}>
       <Backdrop
-        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer * 10 })}
         open={loading}
       >
         <CircularProgress color="inherit" />
@@ -125,7 +168,16 @@ const Home = () => {
           onSubmit={handleSubmit(checkDuplicate)}
         >
           <Box display={'flex'} flexDirection={'row'} justifyContent={'center'}> 
-            <TextField
+            <DictionarySearch
+              existingWordData={wordData}
+              loading={wordLoading}
+              isLoading={isLoading}
+              form={form}
+              options={options}
+              selectedExistingWord={selectedExistingWord}
+              setSelectedExistingWord={setSelectedExistingWord}
+            />
+            {/* <TextField
               placeholder="검색어를 입력하세요."
               {...register('kWord')}
               sx={{ flex: 1, maxWidth: '700px' }}
@@ -174,7 +226,7 @@ const Home = () => {
                 },
               }}
               variant="outlined" 
-            />
+            /> */}
           </Box>
         </form>
         {

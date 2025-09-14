@@ -71,6 +71,8 @@ const documents = {
     "\n  mutation AddMyVocabulary($input: MyVocabularyInput!) {\n    addMyVocabulary(input: $input) {\n      id\n    }\n  }\n": types.AddMyVocabularyDocument,
     "\n  mutation RemoveMyVocabulary($input: MyVocabularyInput!) {\n    removeMyVocabulary(input: $input)\n  }\n": types.RemoveMyVocabularyDocument,
     "\n  mutation BulkMigrationWords($inputs: [WordInput!]!) {\n    bulkMigrationWords(inputs: $inputs) {\n      id\n    }\n  }\n": types.BulkMigrationWordsDocument,
+    "\n  fragment ExistingVocabularyItems on Word {\n    id\n    title\n  }\n": types.ExistingVocabularyItemsFragmentDoc,
+    "\n  query GetExistingVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...ExistingVocabularyItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n": types.GetExistingVocabulariesDocument,
     "\n  query GetUser($getUserId: ID!) {\n    getUser(id: $getUserId) {\n      sessionVersion\n    }\n  }\n": types.GetUserDocument,
     "\n  fragment MiniTestItems on MiniTest {\n    id\n    correctAnswer\n    korDicResults\n    naverDicResults\n    options\n  }\n": types.MiniTestItemsFragmentDoc,
     "\n  query GetMiniTests($filterOptions: MiniTestFilterOptions!) {\n    getMiniTests(filterOptions: $filterOptions) {\n      ...MiniTestItems\n    }\n  }\n": types.GetMiniTestsDocument,
@@ -350,6 +352,14 @@ export function gql(source: "\n  mutation RemoveMyVocabulary($input: MyVocabular
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation BulkMigrationWords($inputs: [WordInput!]!) {\n    bulkMigrationWords(inputs: $inputs) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation BulkMigrationWords($inputs: [WordInput!]!) {\n    bulkMigrationWords(inputs: $inputs) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment ExistingVocabularyItems on Word {\n    id\n    title\n  }\n"): (typeof documents)["\n  fragment ExistingVocabularyItems on Word {\n    id\n    title\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetExistingVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...ExistingVocabularyItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetExistingVocabularies($paginationOptions: OffsetPaginationOptions!, $filterOptions: WordFilterOptions!) {\n    getWords(paginationOptions: $paginationOptions, filterOptions: $filterOptions) {\n      records {\n        ...ExistingVocabularyItems\n      }\n      pageInfo {\n        totalRowCount\n        pageCount\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
